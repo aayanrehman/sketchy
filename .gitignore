@@ -1,0 +1,6 @@
+node_modules
+client/dist
+.env
+server/data/demo/*.json
+!server/data/demo/.gitkeep
+.DS_Store
