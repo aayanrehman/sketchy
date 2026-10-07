@@ -1,0 +1,439 @@
+{
+  "targets": [
+    {
+      "id": "frog-band",
+      "theme": "Frogs",
+      "prompt": "A cheerful green frog playing a bright red drum kit on a giant lily pad at sunset, soft watercolor illustration",
+      "key": "a red drum kit",
+      "stealOptions": [
+        "a red drum kit",
+        "an acoustic guitar",
+        "a violin",
+        "a trumpet"
+      ],
+      "taboo": [
+        "frog",
+        "drum",
+        "drums",
+        "drummer"
+      ],
+      "image": "/targets/frog-band.webp",
+      "masked": "/targets/frog-band-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "cat-dj",
+      "theme": "Cats",
+      "prompt": "A chubby orange cat wearing purple headphones, spinning records on a neon turntable, pastel sticker illustration with thick outlines",
+      "key": "a neon turntable",
+      "stealOptions": [
+        "a neon turntable",
+        "a grand piano",
+        "a microphone stand",
+        "an electric guitar"
+      ],
+      "taboo": [
+        "cat",
+        "dj",
+        "headphones",
+        "turntable",
+        "records"
+      ],
+      "image": "/targets/cat-dj.webp",
+      "masked": "/targets/cat-dj-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "robot-dog",
+      "theme": "Robots",
+      "prompt": "A small silver robot walking a fluffy white poodle down a rainy city street at night, cinematic lighting",
+      "key": "a fluffy white poodle",
+      "stealOptions": [
+        "a fluffy white poodle",
+        "a baby dinosaur",
+        "a goldfish in a bowl",
+        "a black cat"
+      ],
+      "taboo": [
+        "robot",
+        "dog",
+        "poodle"
+      ],
+      "image": "/targets/robot-dog.webp",
+      "masked": "/targets/robot-dog-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "ghost-cake",
+      "theme": "Ghosts",
+      "prompt": "A friendly little ghost taking a selfie with a slice of birthday cake in a spooky kitchen, cute 3D render",
+      "key": "a slice of birthday cake",
+      "stealOptions": [
+        "a slice of birthday cake",
+        "a pizza",
+        "a teapot",
+        "a pumpkin"
+      ],
+      "taboo": [
+        "ghost",
+        "selfie",
+        "cake"
+      ],
+      "image": "/targets/ghost-cake.webp",
+      "masked": "/targets/ghost-cake-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "shark-interview",
+      "theme": "Sharks",
+      "prompt": "A shark in a blue business suit at a job interview, sitting across a desk from a nervous goldfish, flat vector art",
+      "key": "a nervous goldfish",
+      "stealOptions": [
+        "a nervous goldfish",
+        "an octopus",
+        "a crab",
+        "a penguin"
+      ],
+      "taboo": [
+        "shark",
+        "interview",
+        "suit"
+      ],
+      "image": "/targets/shark-interview.webp",
+      "masked": "/targets/shark-interview-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "wizard-car",
+      "theme": "Wizards",
+      "prompt": "A grumpy wizard stuck in traffic in a tiny yellow car, honking the horn, cartoon style, golden hour light",
+      "key": "a tiny yellow car",
+      "stealOptions": [
+        "a tiny yellow car",
+        "a red double-decker bus",
+        "a bicycle",
+        "a hot air balloon"
+      ],
+      "taboo": [
+        "wizard",
+        "car",
+        "traffic"
+      ],
+      "image": "/targets/wizard-car.webp",
+      "masked": "/targets/wizard-car-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "snowman-beach",
+      "theme": "Snowmen",
+      "prompt": "A melting snowman on a sunny tropical beach holding an ice cream cone, bright pop art",
+      "key": "an ice cream cone",
+      "stealOptions": [
+        "an ice cream cone",
+        "a beach ball",
+        "a surfboard",
+        "a parasol"
+      ],
+      "taboo": [
+        "snowman",
+        "beach",
+        "ice",
+        "cream"
+      ],
+      "image": "/targets/snowman-beach.webp",
+      "masked": "/targets/snowman-beach-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "pirate-skate",
+      "theme": "Pirates",
+      "prompt": "A pirate with a parrot on his shoulder riding a skateboard down a wooden pier, comic book style",
+      "key": "a skateboard",
+      "stealOptions": [
+        "a skateboard",
+        "a surfboard",
+        "a horse",
+        "roller skates"
+      ],
+      "taboo": [
+        "pirate",
+        "skateboard",
+        "parrot"
+      ],
+      "image": "/targets/pirate-skate.webp",
+      "masked": "/targets/pirate-skate-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "astronaut-garden",
+      "theme": "Astronauts",
+      "prompt": "An astronaut watering giant sunflowers on the moon, soft pastel colors, children's book illustration",
+      "key": "giant sunflowers",
+      "stealOptions": [
+        "giant sunflowers",
+        "giant cacti",
+        "giant mushrooms",
+        "giant carrots"
+      ],
+      "taboo": [
+        "astronaut",
+        "moon",
+        "sunflower",
+        "sunflowers",
+        "flowers"
+      ],
+      "image": "/targets/astronaut-garden.webp",
+      "masked": "/targets/astronaut-garden-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "dragon-cafe",
+      "theme": "Dragons",
+      "prompt": "A tiny dragon barista pouring latte art in a cozy cafe, warm lamplight, painterly anime-inspired style",
+      "key": "a latte with latte art",
+      "stealOptions": [
+        "a latte with latte art",
+        "a bowl of ramen",
+        "a teapot",
+        "a milkshake"
+      ],
+      "taboo": [
+        "dragon",
+        "coffee",
+        "latte",
+        "cafe",
+        "barista"
+      ],
+      "image": "/targets/dragon-cafe.webp",
+      "masked": "/targets/dragon-cafe-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "penguin-ski",
+      "theme": "Penguins",
+      "prompt": "A penguin in a red scarf skiing down a snowy mountain, low-poly 3D style",
+      "key": "skis",
+      "stealOptions": [
+        "skis",
+        "a snowboard",
+        "a sled",
+        "ice skates"
+      ],
+      "taboo": [
+        "penguin",
+        "ski",
+        "skiing",
+        "skis",
+        "snow"
+      ],
+      "image": "/targets/penguin-ski.webp",
+      "masked": "/targets/penguin-ski-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "bear-picnic",
+      "theme": "Bears",
+      "prompt": "A brown bear having a picnic with a basket of honey jars under a cherry blossom tree, watercolor",
+      "key": "a basket of honey jars",
+      "stealOptions": [
+        "a basket of honey jars",
+        "a plate of sandwiches",
+        "a watermelon",
+        "a box of cupcakes"
+      ],
+      "taboo": [
+        "bear",
+        "picnic",
+        "honey"
+      ],
+      "image": "/targets/bear-picnic.webp",
+      "masked": "/targets/bear-picnic-masked.webp",
+      "maskFallback": false
+    }
+  ],
+  "demo": {
+    "frog-band": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Green frog drumming on lily pad, sunset",
+          "draftImage": "/targets/frog-band-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 8,
+            "details": 6,
+            "style": 7,
+            "color": 7,
+            "composition": 8,
+            "missed": "frog playing different drums and poses",
+            "tip": "match frog's pose and drum set exactly"
+          },
+          "finalPrompt": "Cheerful green frog playing a bright red drum kit with golden cymbals on a giant lily pad, warm sunset sky, soft watercolor illustration",
+          "finalImage": "/targets/frog-band-bot-pixel-final.webp",
+          "final": {
+            "subject": 18,
+            "details": 15,
+            "style": 17,
+            "color": 16,
+            "composition": 16,
+            "missed": "drumsticks and cymbals details differ",
+            "tip": "specify exact drumstick and cymbal shapes and positions"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "frog playing drums on a lily pad",
+          "draftImage": "/targets/frog-band-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 10,
+            "style": 12,
+            "color": 10,
+            "composition": 15,
+            "missed": "drum set and frog expression differ",
+            "tip": "match drum set details and frog's happy expression"
+          },
+          "finalPrompt": "Happy green frog playing a red drum set with cymbals, sitting on a big lily pad in a pond",
+          "finalImage": "/targets/frog-band-bot-doodle-final.webp",
+          "final": {
+            "subject": 18,
+            "details": 15,
+            "style": 12,
+            "color": 14,
+            "composition": 16,
+            "missed": "background and drum arrangement differences",
+            "tip": "use watercolor style with sunset background and detailed drums"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "frog with drums",
+          "draftImage": "/targets/frog-band-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 12,
+            "style": 13,
+            "color": 10,
+            "composition": 15,
+            "missed": "Frog's expression and drum setup differ",
+            "tip": "Specify cheerful frog with symmetrical drum set"
+          },
+          "finalPrompt": "smiling frog drumming on a lily pad, orange sky, painting",
+          "finalImage": "/targets/frog-band-bot-smudge-final.webp",
+          "final": {
+            "subject": 12,
+            "details": 6,
+            "style": 10,
+            "color": 8,
+            "composition": 10,
+            "missed": "frog playing full drum set on lily pad",
+            "tip": "include full drum set and multiple drumsticks in frog's hands"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "imposter",
+        "draftPrompt": "frog playing guitar on a lily pad",
+        "draftImage": "/targets/frog-band-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 8,
+          "details": 6,
+          "style": 14,
+          "color": 10,
+          "composition": 12,
+          "missed": "frog playing guitar instead of drums",
+          "tip": "specify frog playing drums on lily pad at sunset"
+        },
+        "finalPrompt": "Cheerful green frog playing drums on a lily pad at sunset, watercolor style",
+        "finalImage": "/targets/frog-band-bot-imposter-final.webp",
+        "final": {
+          "subject": 15,
+          "details": 12,
+          "style": 17,
+          "color": 16,
+          "composition": 14,
+          "missed": "frog's pose and drum set arrangement",
+          "tip": "match frog's front-facing pose and drum kit layout exactly"
+        }
+      }
+    },
+    "cat-dj": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Chubby orange kitty mixing music, sticker art",
+          "draftImage": "/targets/cat-dj-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 14,
+            "style": 10,
+            "color": 8,
+            "composition": 16,
+            "missed": "Headphones and DJ deck colors differ",
+            "tip": "Use brighter, pastel colors and simpler shapes"
+          },
+          "finalPrompt": "Chubby orange tabby kitty wearing purple over-ear audio gear, scratching a spinning vinyl on glowing neon music decks, pastel sticker illustration, thick outlines, white border",
+          "finalImage": "/targets/cat-dj-bot-pixel-final.webp",
+          "final": {
+            "subject": 16,
+            "details": 12,
+            "style": 10,
+            "color": 14,
+            "composition": 15,
+            "missed": "two turntables instead of one",
+            "tip": "use single turntable with yellow record and pink accents"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "orange kitty playing music on mixing decks",
+          "draftImage": "/targets/cat-dj-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 16,
+            "details": 12,
+            "style": 8,
+            "color": 10,
+            "composition": 14,
+            "missed": "cartoon style and simplified DJ setup",
+            "tip": "use flat colors and simple shapes for cartoon style"
+          },
+          "finalPrompt": "Fat orange kitten with purple earphones spinning vinyl on a pink and blue music mixer, happy face",
+          "finalImage": "/targets/cat-dj-bot-doodle-final.webp",
+          "final": {
+            "subject": 18,
+            "details": 14,
+            "style": 10,
+            "color": 12,
+            "composition": 15,
+            "missed": "cartoon style and simplified details",
+            "tip": "use flat colors and bold outlines for cartoon style"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "orange kitty, music",
+          "draftImage": "/targets/cat-dj-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 10,
+            "style": 6,
+            "color": 8,
+            "composition": 12,
+            "missed": "cat is DJ with turntable, not just listening",
+            "tip": "include DJ turntable and cartoon style explicitly"
+          },
+          "finalPrompt": "cute orange kitty mixing beats, pastel cartoon sticker",
+          "finalImage": "/targets/cat-dj-bot-smudge-final.webp",
+          "final": {
+            "subject": 18,
+            "details": 14,
+            "style": 12,
+            "color": 10,
+            "composition": 16,
+            "missed": "color and detail vibrancy",
+            "tip": "use brighter, more saturated colors and clearer details"
+          }
+        }
+      ]
+    }
+  }
+}

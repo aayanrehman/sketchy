@@ -1,5 +1,10 @@
 import { Button } from '@/design/components';
 
+const PROMPT_STEPS = [
+  { title: 'Recreate the picture with a prompt', text: 'Everyone sees a target image and writes a prompt to recreate it with AI. Quick draft first, then refine it using your draft’s score and tip.' },
+  { title: 'One imposter sees part of it blurred', text: 'They have to guess what’s hidden. Compare the images and drafts, chat, then vote for who you think couldn’t see.' },
+  { title: 'Score for prompting and for catching', text: 'Your final image is judged against the target. Better prompts earn more points, and so does catching the imposter.' },
+];
 const STEPS = [
   { title: 'Everyone draws the same secret prompt', text: 'Except one imposter, who secretly gets a slightly different one.' },
   { title: 'Spot the odd drawing', text: 'Chat about the drawings, then vote for the one you think the imposter made.' },
@@ -7,13 +12,14 @@ const STEPS = [
 ];
 
 /** 3 illustrated steps. Used in the HOW_TO phase and from the "?" button anytime. */
-export function HowTo({ onDone, cta = 'Got it', compact, solo }: { onDone?: () => void; cta?: string; compact?: boolean; solo?: boolean }) {
+export function HowTo({ onDone, cta = 'Got it', compact, solo, mode = 'prompt' }: { onDone?: () => void; cta?: string; compact?: boolean; solo?: boolean; mode?: 'prompt' | 'sketch' }) {
+  const steps = mode === 'prompt' ? PROMPT_STEPS : STEPS;
   return (
     <div className="howto">
       {!compact && <h2 className="display-md" style={{ textAlign: 'center' }}>How to play</h2>}
       {solo && <p className="howto__solo">Practice game: 2 quick rounds against 3 bots. In round 1 you’re an artist; in round 2 <b>you’re the imposter</b>. Sketchy will tell you what to do at each step.</p>}
       <ol className="howto__steps">
-        {STEPS.map((s, i) => (
+        {steps.map((s, i) => (
           <li key={i} className="howto__step">
             <img className="howto__pic" src={`/mascot/howto-${i + 1}.webp`} alt="" width={72} height={72} />
             <div><h3>{i + 1}. {s.title}</h3><p>{s.text}</p></div>
@@ -25,8 +31,10 @@ export function HowTo({ onDone, cta = 'Got it', compact, solo }: { onDone?: () =
         <ul>
           <li>Vote for the imposter: +100 (+150 if you catch them two rounds in a row).</li>
           <li>Imposter escapes: +200. If the votes tie and the imposter is one of the tied players, there’s a quick revote.</li>
-          <li>Caught imposter: one guess at the real prompt; right = +150.</li>
-          <li>An AI judge scores each original sketch against the real prompt: best artist +50; an imposter who matches as well as the typical artist +100.</li>
+          <li>Caught imposter: one guess at {mode === 'prompt' ? 'what was hidden' : 'the real prompt'}; right = +150.</li>
+          {mode === 'prompt'
+            ? <li>An AI judge compares each final image with the target in five areas. Everyone earns half their match score; the closest artist +50; an imposter who matches as well as the typical artist +100.</li>
+            : <li>An AI judge scores each original sketch against the real prompt: best artist +50; an imposter who matches as well as the typical artist +100.</li>}
         </ul>
       </details>
       {onDone && <Button variant="secondary" size="lg" block onClick={onDone}>{cta}</Button>}

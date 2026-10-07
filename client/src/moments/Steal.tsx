@@ -38,7 +38,7 @@ export function StealMoment({ view, phone }: MomentProps & { phone?: boolean }) 
   return (
     <div className="steal">
       <Rise><h2 className="display-md phase__title">{isImposter ? 'Steal the round!' : `${imposter?.name} gets one steal`}</h2></Rise>
-      <Rise><p className="phase__sub">{isImposter ? 'Which prompt did everyone else get?' : 'If they guess the real prompt, they steal +150'}</p></Rise>
+      <Rise><p className="phase__sub">{r.mode === 'prompt' ? (isImposter ? 'What was hidden behind the blur?' : 'If they guess what was hidden behind the blur, they steal +150') : isImposter ? 'Which prompt did everyone else get?' : 'If they guess the real prompt, they steal +150'}</p></Rise>
       <Rise style={{ display: 'flex', gap: 24, alignItems: 'center' }}>
         {imposter && <Avatar player={imposter} size="lg" layoutPrefix="steal" />}
         <Timer endsAt={room.phaseEndsAt} serverOffset={view.serverOffset} variant="ring" tick={isImposter} layoutId="steal-timer" />

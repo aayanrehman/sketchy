@@ -13,8 +13,10 @@ export const revealAt = (view: MomentProps['view'], i: number) => view.room?.pha
 const REVEAL_FIRST_S = 1.6, REVEAL_STEP_S = 0.9; // keep in sync with galleryMinMs in convex/engine.ts
 
 /** One line telling everyone exactly what is happening right now. */
-function copy(phase: string, drawings: Drawing[]) {
+function copy(phase: string, drawings: Drawing[], prompt = false) {
   const pending = drawings.filter((d) => d.glowStatus === 'pending').length;
+  if (prompt && phase === 'GALLERY') return { title: 'The final images', sub: pending ? 'Generating everyone’s final prompt. Their first draft is in the corner.' : 'All in. Which one doesn’t quite fit?' };
+  if (prompt && phase === 'DISCUSS') return { title: 'Who couldn’t see the whole picture?', sub: 'One player saw the target with a detail blurred out. Compare the final images and the drafts in the corners, and talk it over in the chat.' };
   if (phase === 'GALLERY') return {
     title: 'Here’s what everyone drew',
     sub: pending ? 'Sketchy is redrawing every sketch as a sticker. The original stays in the corner.' : 'Every sketch, redrawn. Discussion starts in a moment.',
@@ -30,7 +32,7 @@ export function GalleryMain({ view }: MomentProps) {
   const phase = room.phase;
   const voters = room.players.filter((p) => r.participantIds.includes(p.id)).length;
   const votes = Object.keys(r.votes).length;
-  const c = copy(phase, r.drawings);
+  const c = copy(phase, r.drawings, r.mode === 'prompt');
   const grid = useFitGrid(r.drawings.length, { gap: 16, reserve: 160 });
   return (
     <div className="phase">
@@ -75,7 +77,7 @@ export function GalleryPhone({ view }: MomentProps) {
   };
   const voters = room.players.filter((x) => r.participantIds.includes(x.id));
   const left = voters.filter((x) => !x.hasVoted).length;
-  const c = copy(phase, r.drawings);
+  const c = copy(phase, r.drawings, r.mode === 'prompt');
   const names = (revote || []).map((id) => view.byId.get(id)?.name).filter(Boolean).join(' or ');
   const title = phase !== 'VOTE' ? c.title : revote && !voted ? 'It’s a tie! Revote' : voted ? `You voted for ${view.byId.get(picked || '')?.name || 'a player'}` : me.isImposter ? 'Frame someone' : 'Who’s the imposter?';
   const sub = phase !== 'VOTE' ? c.sub

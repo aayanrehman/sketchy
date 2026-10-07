@@ -17,6 +17,7 @@ export function useSession() { return useSyncExternalStore((l) => { listeners.ad
 type Events = {
   'draw:submit': { strokes: Stroke[]; png: string }; 'vote': { targetId: string }; 'steal:pick': { option: string };
   'chat:send': { text: string }; 'host:assign': { playerId: string };
+  'prompt:draft': { text: string }; 'prompt:final': { text: string }; 'host:mode': { mode: 'prompt' | 'sketch' };
   'howto:ready': void; 'verdict:ready': void; 'host:start': void; 'host:skip': void; 'host:playAgain': void; 'leave': void;
 };
 function toAction<E extends keyof Events>(e: E, p: any) {
@@ -26,6 +27,9 @@ function toAction<E extends keyof Events>(e: E, p: any) {
     case 'steal:pick': return { t: 'steal' as const, option: p.option };
     case 'chat:send': return { t: 'chat' as const, text: p.text };
     case 'host:assign': return { t: 'assignHost' as const, playerId: p.playerId };
+    case 'prompt:draft': return { t: 'draft' as const, text: p.text };
+    case 'prompt:final': return { t: 'final' as const, text: p.text };
+    case 'host:mode': return { t: 'setMode' as const, mode: p.mode };
     case 'howto:ready': return { t: 'howto' as const };
     case 'verdict:ready': return { t: 'verdictReady' as const };
     case 'host:start': return { t: 'start' as const };
@@ -38,11 +42,13 @@ function toAction<E extends keyof Events>(e: E, p: any) {
 /** Fire-and-forget game actions, kept as `send().emit(event, payload)` so the moment components stay simple. */
 export function socket() {
   return {
-    emit<E extends keyof Events>(event: E, ...payload: Events[E] extends void ? [] : [Events[E]]) {
-      const s = session; if (!s) return Promise.resolve();
+    /** Sends an action. Errors show as a toast-style banner unless `quiet` (the caller shows them inline). */
+    emit<E extends keyof Events>(event: E, ...payload: Events[E] extends void ? [] : [Events[E]]): Promise<{ ok: boolean; error?: string }> {
+      const s = session; if (!s) return Promise.resolve({ ok: false });
+      const quiet = event === 'prompt:draft' || event === 'prompt:final';
       return convex.mutation(api.game.act, { code: s.code, token: s.token, hostToken: s.hostToken, action: toAction(event, payload[0]) })
-        .then((r) => { if (!r.ok && r.error) window.dispatchEvent(new CustomEvent('sketchy:error', { detail: r.error })); })
-        .catch(() => window.dispatchEvent(new CustomEvent('sketchy:error', { detail: 'Could not reach the game. Check your connection.' })));
+        .then((r) => { if (!r.ok && r.error && !quiet) window.dispatchEvent(new CustomEvent('sketchy:error', { detail: r.error })); return r; })
+        .catch(() => { const error = 'Could not reach the game. Check your connection.'; window.dispatchEvent(new CustomEvent('sketchy:error', { detail: error })); return { ok: false, error }; });
     },
   };
 }

@@ -28,6 +28,7 @@ export function LobbyMain({ view }: MomentProps) {
           <div className="lobby__code" aria-label={`Room code ${room.code.split('').join(' ')}`}>{room.code}</div>
         </div>
       </Card></Rise>
+      <Rise style={{ width: '100%', maxWidth: 640 }}><ModePicker view={view} canPick={!!view.canHost} /></Rise>
       <Rise className="lobby__cast">
         {room.players.map((p) => <motion.div key={p.id} variants={childVariants(rm)}><Avatar player={p} isHost={p.id === room.hostId} />{view.canHost && p.id !== room.hostId && <Button size="sm" variant="ghost" onClick={() => send().emit('host:assign', { playerId: p.id })}>Make host</Button>}</motion.div>)}
         {Array.from({ length: Math.max(0, MIN_PLAYERS - room.players.length) }, (_, i) => <div key={i} className="lobby__slot" aria-hidden />)}
@@ -50,6 +51,7 @@ export function LobbyPhone({ view }: MomentProps) {
       <Rise><Card style={{ width: '100%' }}>
         <div className="lobby__cast">{room.players.map((p) => <Avatar key={p.id} player={p} isHost={p.id === room.hostId} isYou={p.id === me.playerId} />)}</div>
       </Card></Rise>
+      <Rise style={{ width: '100%' }}><ModePicker view={view} canPick={isHost} /></Rise>
       <Rise style={{ width: '100%' }}>
         {isHost ? (
           <>
@@ -59,6 +61,25 @@ export function LobbyPhone({ view }: MomentProps) {
         ) : <p className="phase__sub">Waiting for host… ({n}/{MAX_PLAYERS})</p>}
       </Rise>
       <Rise><Button variant="ghost" size="sm" onClick={() => { send().emit('leave'); go('/'); }}>Leave</Button></Rise>
+    </div>
+  );
+}
+
+/** Host picks the game: write prompts to recreate a picture (default), or the original drawing game. */
+export function ModePicker({ view, canPick }: MomentProps & { canPick: boolean }) {
+  const mode = view.room?.mode || 'prompt';
+  const opts = [
+    { id: 'prompt' as const, title: 'Prompt mode', text: 'Recreate a picture by writing AI prompts. One imposter sees part of it blurred.' },
+    { id: 'sketch' as const, title: 'Sketch mode', text: 'Draw a secret prompt. One imposter got a slightly different one.' },
+  ];
+  return (
+    <div className="modes" role="radiogroup" aria-label="Game mode">
+      {opts.map((o) => (
+        <button key={o.id} type="button" role="radio" aria-checked={mode === o.id} disabled={!canPick} className={`modes__opt ${mode === o.id ? 'is-on' : ''}`}
+          onClick={() => canPick && send().emit('host:mode', { mode: o.id })}>
+          <b>{o.title}</b><span>{o.text}</span>
+        </button>
+      ))}
     </div>
   );
 }

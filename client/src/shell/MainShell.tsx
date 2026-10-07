@@ -38,7 +38,7 @@ export function MainShell({ room, children, hideRail, railIds, meId }: { room: P
           ))}
         </motion.footer>
       )}
-      <Modal open={help} onClose={() => setHelp(false)} label="How to play"><HowTo onDone={() => setHelp(false)} cta="Close" /></Modal>
+      <Modal open={help} onClose={() => setHelp(false)} label="How to play"><HowTo onDone={() => setHelp(false)} cta="Close" mode={room.mode || 'sketch'} /></Modal>
     </div>
   );
 }

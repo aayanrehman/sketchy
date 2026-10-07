@@ -1,11 +1,11 @@
 // Shared types between server and client. The server is the source of truth.
 
 export type Phase =
-  | 'LOBBY' | 'HOW_TO' | 'PROMPT' | 'DRAW' | 'GALLERY' | 'DISCUSS'
+  | 'LOBBY' | 'HOW_TO' | 'PROMPT' | 'DRAW' | 'DRAFT' | 'REFINE' | 'GALLERY' | 'DISCUSS'
   | 'VOTE' | 'UNMASK' | 'STEAL' | 'VERDICT' | 'SCORES' | 'FINAL';
 
 export const PHASE_ORDER: Phase[] = [
-  'LOBBY', 'HOW_TO', 'PROMPT', 'DRAW', 'GALLERY', 'DISCUSS',
+  'LOBBY', 'HOW_TO', 'PROMPT', 'DRAW', 'DRAFT', 'REFINE', 'GALLERY', 'DISCUSS',
   'VOTE', 'UNMASK', 'STEAL', 'VERDICT', 'SCORES', 'FINAL',
 ];
 
@@ -14,6 +14,8 @@ export const PHASE_MS: Record<Exclude<Phase, 'LOBBY' | 'FINAL' | 'VERDICT'>, num
   HOW_TO: 10_000,
   PROMPT: 8_000,
   DRAW: 50_000,
+  DRAFT: 35_000,
+  REFINE: 40_000,
   GALLERY: 20_000,
   DISCUSS: 30_000,
   VOTE: 20_000,
@@ -30,6 +32,13 @@ export const MAX_PLAYERS = 8;
 export const TOTAL_ROUNDS = 3;
 export const GLOWUP_ROOM_CAP = 24;
 export const GOLDEN_ODDS = 1 / 15;
+
+/** prompt: recreate a target image by writing prompts. sketch: the original drawing game. */
+export type GameMode = 'prompt' | 'sketch';
+/** A per-round rule in prompt mode. */
+export type Modifier = 'none' | 'taboo' | 'style';
+/** How close an AI image is to the target, five areas of 0-20 each. */
+export interface Breakdown { subject: number; details: number; style: number; color: number; composition: number }
 
 export interface Point { x: number; y: number }
 export interface Stroke { color: string; size: number; points: Point[] }
@@ -50,6 +59,16 @@ export interface Drawing {
   roast?: string;
   judgeStatus: JudgeStatus;
   blank: boolean;
+  // Prompt mode: glowUrl is the FINAL image, match/sees/roast are its score, what it missed, and a tip.
+  draftPrompt?: string;
+  draftUrl?: string;
+  draftStatus?: GlowStatus;
+  draftMatch?: number;       // only sent to the drafting player until the verdict
+  draftMissed?: string;
+  draftTip?: string;
+  finalPrompt?: string;
+  finalIn?: boolean;         // public: this player has locked in a final prompt
+  breakdown?: Breakdown;
 }
 
 export interface PromptPair {
@@ -63,7 +82,7 @@ export interface PromptPair {
 export interface Award { playerId: string; points: number; reason: AwardReason }
 export type AwardReason =
   | 'caught_vote' | 'caught_vote_streak' | 'escape' | 'steal'
-  | 'perfect_disguise' | 'judges_favorite' | 'imposter_fled';
+  | 'perfect_disguise' | 'judges_favorite' | 'imposter_fled' | 'prompt_match' | 'best_prompt';
 
 export interface Round {
   index: number;
@@ -82,6 +101,12 @@ export interface Round {
   stealPick: string | null;
   stealCorrect: boolean | null;
   fled: boolean;
+  /** Prompt mode: the target being recreated and this round's rule. */
+  mode?: GameMode;
+  targetId?: string;
+  targetUrl?: string;        // revealed to everyone at the verdict (artists see it via MeView)
+  targetPrompt?: string;     // the prompt behind the target, revealed at the verdict
+  modifier?: Modifier;
   /** Players in a tie-break revote (only when the imposter was one of the tied). */
   revote?: string[];
   awards: Award[];
@@ -122,6 +147,7 @@ export interface PublicRoom {
   aiImageCount: number;
   finalAwards: FinalAward[];
   aiMode: 'openai' | 'fal' | 'mock' | 'off';
+  mode?: GameMode;
 }
 
 export interface MeView {
@@ -130,6 +156,9 @@ export interface MeView {
   isImposter: boolean;
   isHost: boolean;
   sessionToken: string;
+  /** Prompt mode: the image you see (masked for the imposter), and this round's banned words. */
+  targetUrl?: string;
+  taboo?: string[];
 }
 
 export interface StateMessage {

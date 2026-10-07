@@ -86,12 +86,14 @@ export function DrawingTile({ drawing, player, layoutId, selectable, selected, d
       {pending && <Redrawing />}
       {glowed && !rm && revealDelay > 0 && <span className="tile__burst" aria-hidden>{Array.from({ length: 8 }, (_, i) => <i key={i} style={{ ['--a' as any]: `${i * 45}deg` }} />)}</span>}
       {drawing.glowStatus === 'fallback' && !drawing.blank && !rawOnly && <span className="tile__fallback">Sketch only</span>}
-      {glowed && !drawing.blank && (
+      {glowed && !drawing.blank && (drawing.draftUrl
+        ? <span className="tile__inset" title="This player's first draft"><img src={drawing.draftUrl} alt="" className="tile__layer" /><small>Draft</small></span>
+        : !drawing.draftStatus && (
         <span className="tile__inset" onPointerEnter={() => setPeek(true)} onPointerLeave={() => setPeek(false)} title="Original sketch: hover to compare">
           <SketchCanvas strokes={drawing.strokes} size={96} className="tile__layer" />
           <small>{peek ? 'Original' : 'Sketch'}</small>
         </span>
-      )}
+      ))}
       {selectable && actionLabel && <span className="tile__action" aria-hidden>{actionLabel}</span>}
       {player && !hideName && (
         <span className="tile__name"><span className="tile__name-dot"><AvatarArt avatar={player.avatar} /></span><span className="tile__name-text">{player.name}</span></span>

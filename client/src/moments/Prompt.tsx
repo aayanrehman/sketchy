@@ -12,7 +12,7 @@ export function PromptMain({ view }: MomentProps) {
     <div className="phase" style={{ justifyItems: 'center' }}>
       <Rise><p className="prompt-card__label">THIS ROUND'S THEME</p></Rise>
       <Rise><motion.h1 className="theme-word neon-text" initial={{ scale: rm ? 1 : 0.6 }} animate={{ scale: 1 }} transition={t.bounce(rm)}>{r.theme}</motion.h1></Rise>
-      <Rise><p className="phase__sub">Phones are reading their secret prompts…</p></Rise>
+      <Rise><p className="phase__sub">{r.mode === 'prompt' ? 'Players are studying their target images on their phones…' : 'Phones are reading their secret prompts…'}</p></Rise>
       <Rise><Timer endsAt={room.phaseEndsAt} serverOffset={view.serverOffset} tick={false} /></Rise>
     </div>
   );

@@ -348,3 +348,11 @@
 .howto__solo { padding: 10px 14px; border-radius: var(--r-md); background: var(--c-gold-2); border: 2px solid var(--c-ink); font-weight: 800; color: var(--c-ink); }
 .howto__more summary { cursor: pointer; font-weight: 900; color: var(--c-ink); }
 .howto__more ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: var(--t-body-sm); font-weight: 700; color: var(--c-text-dim); }
+
+/* Lobby mode picker */
+.modes { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: var(--s-3); width: 100%; }
+.modes__opt { display: grid; gap: 4px; text-align: left; padding: 12px 14px; border-radius: var(--r-md); border: 2px solid var(--c-ink); background: var(--c-surface); color: var(--c-text-dim); font-size: var(--t-body-sm); font-weight: 700; cursor: pointer; box-shadow: 0 3px 0 rgba(43,37,64,.12); }
+.modes__opt b { font-family: var(--f-display); font-size: var(--t-body-lg); color: var(--c-ink); }
+.modes__opt.is-on { background: var(--c-yellow); box-shadow: 0 3px 0 var(--c-ink); }
+.modes__opt:disabled { cursor: default; }
+.modes__opt:disabled:not(.is-on) { opacity: .55; }

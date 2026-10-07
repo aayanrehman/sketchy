@@ -10,6 +10,7 @@ import { api } from '../../../../convex/_generated/api';
 import { LobbyMain } from '@/moments/Lobby';
 import { HowToMain } from '@/moments/HowToPhase';
 import { PromptMain } from '@/moments/Prompt';
+import { WriteMain } from '@/moments/PromptMode';
 import { DrawMain } from '@/moments/Draw';
 import { GalleryMain } from '@/moments/Gallery';
 import { UnmaskMoment } from '@/moments/Unmask';
@@ -47,6 +48,7 @@ export function HostScreen() {
         {phase === 'LOBBY' && <LobbyMain view={view} />}
         {phase === 'HOW_TO' && <HowToMain view={view} />}
         {phase === 'PROMPT' && <PromptMain view={view} />}
+        {(phase === 'DRAFT' || phase === 'REFINE') && <WriteMain view={view} />}
         {phase === 'DRAW' && <DrawMain view={view} />}
         {(phase === 'GALLERY' || phase === 'DISCUSS' || phase === 'VOTE') && <GalleryMain view={view} />}
         {phase === 'UNMASK' && <UnmaskMoment view={view} />}

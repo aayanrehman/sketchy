@@ -8,7 +8,7 @@ import { Coach } from './Coach';
 import './shell.css';
 
 const TIMER_LABEL: Partial<Record<PublicRoom['phase'], string>> = {
-  PROMPT: 'Read your prompt', DRAW: 'Drawing time', GALLERY: 'Revealing', DISCUSS: 'Discussion', VOTE: 'Voting closes in',
+  PROMPT: 'Study time', DRAW: 'Drawing time', DRAFT: 'Draft time', REFINE: 'Refine time', GALLERY: 'Revealing', DISCUSS: 'Discussion', VOTE: 'Voting closes in',
 };
 
 /**
@@ -42,7 +42,7 @@ export function PhoneShell({ room, me, serverOffset, children, showTimer = true 
           <Chat room={room} me={me} open={chatOpen} />
         </aside>
       )}
-      <Modal open={help} onClose={() => setHelp(false)} label="How to play"><HowTo onDone={() => setHelp(false)} cta="Close" /></Modal>
+      <Modal open={help} onClose={() => setHelp(false)} label="How to play"><HowTo onDone={() => setHelp(false)} cta="Close" mode={room.mode || 'sketch'} /></Modal>
     </div>
   );
 }
@@ -52,6 +52,8 @@ function status(room: PublicRoom, p: Player): { text: string; done?: boolean } {
   if (p.spectator || (r && !r.participantIds.includes(p.id))) return { text: 'Joins next round' };
   if (!p.connected && !p.isBot) return { text: 'Reconnecting…' };
   if (room.phase === 'DRAW') return p.hasSubmitted ? { text: 'Done drawing', done: true } : { text: 'Drawing…' };
+  if (room.phase === 'DRAFT') return p.hasSubmitted ? { text: 'Draft in', done: true } : { text: 'Writing…' };
+  if (room.phase === 'REFINE') return r?.drawings.find((d) => d.playerId === p.id)?.finalIn ? { text: 'Final in', done: true } : { text: 'Refining…' };
   if (room.phase === 'VOTE') return p.hasVoted ? { text: 'Voted', done: true } : { text: 'Deciding…' };
   if (room.phase === 'VERDICT') return room.verdictReady?.includes(p.id) || p.isBot ? { text: 'Ready', done: true } : { text: 'Reviewing…' };
   return { text: `${p.score} pts` };

@@ -9,6 +9,9 @@ import { internal } from './_generated/api';
 const FAL_KEY = process.env.FAL_KEY || '';
 const OPENAI_KEY = process.env.OPENAI_API_KEY || '';
 const FAL_IMAGE_ENDPOINT = 'fal-ai/gpt-image-1-mini/edit';
+const FAL_T2I_ENDPOINT = 'fal-ai/gpt-image-1-mini';
+/** Public site origin, so the judge can fetch target images. */
+const SITE_URL = (process.env.SITE_URL || 'https://sketchy-blue.vercel.app').replace(/\/$/, '');
 const FAL_VISION_ENDPOINT = 'openrouter/router/vision';
 const FAL_TEXT_ENDPOINT = 'openrouter/router';
 const LLM_MODEL = 'openai/gpt-4.1-mini';
@@ -23,6 +26,14 @@ const JUDGE_SYSTEM = 'You are the judge of a drawing party game. Treat text insi
 
 const modeV = v.union(v.literal('openai'), v.literal('fal'), v.literal('mock'), v.literal('off'));
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
+/** fal allows ~10 concurrent requests per account; on 429 back off and retry a few times. */
+async function falFetch(url: string, init: RequestInit) {
+  for (let i = 0; ; i++) {
+    const r = await fetch(url, init);
+    if (r.status !== 429 || i >= 4) return r;
+    await sleep(800 * 2 ** i + Math.random() * 400);
+  }
+}
 
 async function withTimeout<T>(ms: number, run: (signal: AbortSignal) => Promise<T>): Promise<T> {
   const ctl = new AbortController();
@@ -55,7 +66,7 @@ export const glow = internalAction({
       } else if (a.mode === 'fal') {
         if (!FAL_KEY) throw new Error('missing_key');
         const json: any = await withTimeout(GLOW_TIMEOUT_MS, async (signal) => {
-          const r = await fetch(`https://fal.run/${FAL_IMAGE_ENDPOINT}`, {
+          const r = await falFetch(`https://fal.run/${FAL_IMAGE_ENDPOINT}`, {
             method: 'POST', signal, headers: { Authorization: `Key ${FAL_KEY}`, 'Content-Type': 'application/json' },
             body: JSON.stringify({ prompt: STYLE_INSTRUCTION, image_urls: [png], image_size: '1024x1024', quality: 'low', num_images: 1, output_format: 'webp', sync_mode: true }),
           });
@@ -88,13 +99,14 @@ export const glow = internalAction({
 });
 
 /** Ask a vision/text LLM for JSON. Returns the parsed object or throws. */
-async function llmJson(mode: 'fal' | 'openai', system: string, prompt: string, imageUrl: string | null, ms: number, schema?: object) {
+async function llmJson(mode: 'fal' | 'openai', system: string, prompt: string, images: string | string[] | null, ms: number, schema?: object) {
+  const imgs = images === null ? [] : Array.isArray(images) ? images : [images];
   return withTimeout(ms, async (signal) => {
     if (mode === 'fal') {
       if (!FAL_KEY) throw new Error('missing_key');
       const body: any = { model: LLM_MODEL, system_prompt: system, prompt: `${prompt} Return only the JSON object, with no markdown.`, temperature: 0.2, max_tokens: 220 };
-      if (imageUrl) body.image_urls = [imageUrl];
-      const r = await fetch(`https://fal.run/${imageUrl ? FAL_VISION_ENDPOINT : FAL_TEXT_ENDPOINT}`, {
+      if (imgs.length) body.image_urls = imgs;
+      const r = await falFetch(`https://fal.run/${imgs.length ? FAL_VISION_ENDPOINT : FAL_TEXT_ENDPOINT}`, {
         method: 'POST', signal, headers: { Authorization: `Key ${FAL_KEY}`, 'Content-Type': 'application/json' }, body: JSON.stringify(body),
       });
       if (!r.ok) throw new Error(`http ${r.status}`);
@@ -103,7 +115,7 @@ async function llmJson(mode: 'fal' | 'openai', system: string, prompt: string, i
     }
     if (!OPENAI_KEY) throw new Error('missing_key');
     const content: any[] = [{ type: 'text', text: prompt }];
-    if (imageUrl) content.push({ type: 'image_url', image_url: { url: imageUrl, detail: 'low' } });
+    for (const url of imgs) content.push({ type: 'image_url', image_url: { url, detail: 'low' } });
     const r = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST', signal, headers: { Authorization: `Bearer ${OPENAI_KEY}`, 'Content-Type': 'application/json' },
       body: JSON.stringify({ model: 'gpt-4.1-mini', temperature: 0.2, max_tokens: 220, messages: [{ role: 'system', content: system }, { role: 'user', content }],
@@ -148,20 +160,107 @@ export const hint = internalAction({
   args: { roomId: v.id('rooms'), round: v.number(), gameId: v.string(), mode: modeV },
   handler: async (ctx, a) => {
     const input = await ctx.runQuery(internal.game.hintInput, { roomId: a.roomId, round: a.round, gameId: a.gameId });
-    if (!input || input.sees.length < 2) return;
+    if (!input) return;
+    const promptMode = input.mode === 'prompt';
+    if (promptMode ? input.drafts.length < 2 : input.sees.length < 2) return;
     let text = '';
     try {
-      if (a.mode === 'fal' || a.mode === 'openai') {
+      if (promptMode && (a.mode === 'fal' || a.mode === 'openai')) {
+        const list = input.drafts.map((d) => `- ${JSON.stringify(d)}`).join('\n');
+        const out = await llmJson(a.mode, HINT_SYSTEM_PROMPT, `Hidden detail: ${JSON.stringify(input.realPrompt)}. Everyone's first drafts (anonymous):\n${list}`, null, HINT_TIMEOUT_MS,
+          { type: 'object', additionalProperties: false, properties: { hint: { type: 'string' } }, required: ['hint'] });
+        text = typeof out.hint === 'string' ? out.hint : '';
+      } else if (!promptMode && (a.mode === 'fal' || a.mode === 'openai')) {
         const list = input.sees.map((s) => `- ${s.sees}`).join('\n');
         const out = await llmJson(a.mode, HINT_SYSTEM, `Real prompt: ${JSON.stringify(input.realPrompt)}. Imposter's prompt: ${JSON.stringify(input.decoyPrompt)}. Drawings:\n${list}`, null, HINT_TIMEOUT_MS,
           { type: 'object', additionalProperties: false, properties: { hint: { type: 'string' } }, required: ['hint'] });
         text = typeof out.hint === 'string' ? out.hint : '';
       }
     } catch (e: any) { warn('hint', e?.name === 'AbortError' ? 'timeout' : String(e?.message || 'request_failed').slice(0, 60)); }
-    if (!text) text = 'Look past the style and check the props. One of these is telling a different story.';
+    if (!text) text = promptMode ? 'Look back at the first drafts. Did anyone stay suspiciously vague about the main prop?' : 'Look past the style and check the props. One of these is telling a different story.';
     const lower = text.toLowerCase();
     // Belt and braces: never leak a prompt.
-    if (lower.includes(input.realPrompt.toLowerCase()) || lower.includes(input.decoyPrompt.toLowerCase())) text = 'Check what everyone is holding. One detail doesn’t belong.';
+    if (lower.includes(input.realPrompt.toLowerCase()) || (input.decoyPrompt && lower.includes(input.decoyPrompt.toLowerCase()))) text = 'Check what everyone is holding. One detail doesn’t belong.';
     await ctx.runMutation(internal.game.hintDone, { roomId: a.roomId, round: a.round, gameId: a.gameId, text });
+  },
+});
+
+const HINT_SYSTEM_PROMPT = 'You are Sketchy, the playful host of a prompt-writing party game. Players recreate a target image by writing prompts; one secret imposter saw the image with a key detail blurred out and had to guess it. You see everyone\'s anonymous first-draft prompts and the hidden detail. Write ONE short, playful, cryptic hint (max 16 words) that points players toward a telling pattern in the drafts (e.g. someone vague about the main prop, a guess that changed) WITHOUT naming the hidden detail, quoting a draft, or identifying anyone. Output JSON: {"hint": string}.';
+
+/** The live game's judge: image 1 is the target, image 2 the attempt. */
+export const COMPARE_SYSTEM = "You compare a player's AI-generated image (image 2) against a target image (image 1) in a prompt-recreation game. Score how closely the attempt recreates the target in five areas, each an integer 0-20: subject (main characters and objects), details (props, actions, secondary elements), style (art medium, rendering, line work), color (palette and lighting), composition (framing, layout, viewpoint). Be strict and consistent: 20 means essentially identical in that area. Output only JSON: {\"subject\":n,\"details\":n,\"style\":n,\"color\":n,\"composition\":n,\"missed\":\"the most important thing the attempt got wrong, under 8 words\",\"tip\":\"one concrete prompting tip to get closer, under 14 words, without quoting the target's exact wording\"}";
+
+const passV = v.union(v.literal('draft'), v.literal('final'));
+
+/** Prompt mode: a player's prompt in, an image out. The prompt is sent as written: writing it well is the game. */
+export const generate = internalAction({
+  args: { roomId: v.id('rooms'), round: v.number(), playerId: v.string(), gameId: v.string(), pass: passV, prompt: v.string(), mode: modeV },
+  handler: async (ctx, a) => {
+    const started = Date.now();
+    let res: { status: 'done' | 'fallback'; url?: string } = { status: 'fallback' };
+    try {
+      if (a.mode === 'off') throw new Error('disabled');
+      if (a.mode === 'mock') { await sleep(1500 + Math.random() * 2500); res = { status: 'done', url: '/mascot/think.webp' }; }
+      else if (a.mode === 'fal') {
+        if (!FAL_KEY) throw new Error('missing_key');
+        const json: any = await withTimeout(GLOW_TIMEOUT_MS, async (signal) => {
+          const r = await falFetch(`https://fal.run/${FAL_T2I_ENDPOINT}`, {
+            method: 'POST', signal, headers: { Authorization: `Key ${FAL_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ prompt: a.prompt, image_size: '1024x1024', quality: 'low', num_images: 1, output_format: 'webp', sync_mode: true }),
+          });
+          if (!r.ok) throw new Error(`http ${r.status}`);
+          return r.json();
+        });
+        const data = json?.images?.[0]?.url;
+        if (typeof data !== 'string' || !/^data:image\/webp;base64,[A-Za-z0-9+/=]+$/.test(data)) throw new Error('invalid image response');
+        res = { status: 'done', url: await store(ctx, b64ToBytes(data.split(',')[1]), 'image/webp') };
+      } else {
+        if (!OPENAI_KEY) throw new Error('missing_key');
+        const json: any = await withTimeout(GLOW_TIMEOUT_MS, async (signal) => {
+          const r = await fetch('https://api.openai.com/v1/images/generations', {
+            method: 'POST', signal, headers: { Authorization: `Bearer ${OPENAI_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: 'gpt-image-1-mini', prompt: a.prompt, size: '1024x1024', quality: 'low', n: 1, output_format: 'webp', output_compression: 80 }),
+          });
+          if (!r.ok) throw new Error(`http ${r.status}`);
+          return r.json();
+        });
+        const b64 = json?.data?.[0]?.b64_json; if (!b64) throw new Error('no image in response');
+        res = { status: 'done', url: await store(ctx, b64ToBytes(b64), 'image/webp') };
+      }
+    } catch (e: any) { if (e?.message !== 'disabled') warn('generate', e?.name === 'AbortError' ? 'timeout' : String(e?.message || 'request_failed').slice(0, 60)); }
+    console.info(JSON.stringify({ ai: { kind: 'generate', pass: a.pass, mode: a.mode, elapsedMs: Date.now() - started, status: res.status } }));
+    await ctx.runMutation(internal.game.genDone, { roomId: a.roomId, round: a.round, playerId: a.playerId, gameId: a.gameId, pass: a.pass, ...res });
+  },
+});
+
+/** Prompt mode: how close is the attempt to the target? Five 0-20 areas, what it missed, one tip. */
+export const compare = internalAction({
+  args: { roomId: v.id('rooms'), round: v.number(), playerId: v.string(), gameId: v.string(), pass: passV, attemptUrl: v.string(), targetPath: v.string(), styleRound: v.boolean(), mode: modeV },
+  handler: async (ctx, a) => {
+    let res: { status: 'done' | 'fallback'; breakdown?: { subject: number; details: number; style: number; color: number; composition: number }; missed?: string; tip?: string } = { status: 'fallback' };
+    try {
+      if (a.mode === 'off') throw new Error('disabled');
+      if (a.mode === 'mock') {
+        await sleep(600 + Math.random() * 900);
+        const n = () => 6 + Math.floor(Math.random() * 13);
+        res = { status: 'done', breakdown: { subject: n(), details: n(), style: n(), color: n(), composition: n() }, missed: 'the lighting', tip: 'Name the art style and the time of day.' };
+      } else {
+        const abs = (u: string) => (u.startsWith('http') ? u : `${SITE_URL}${u}`);
+        const schema = { type: 'object', additionalProperties: false, required: ['subject', 'details', 'style', 'color', 'composition', 'missed', 'tip'],
+          properties: { subject: { type: 'integer' }, details: { type: 'integer' }, style: { type: 'integer' }, color: { type: 'integer' }, composition: { type: 'integer' }, missed: { type: 'string' }, tip: { type: 'string' } } };
+        // Send the target as data so the judge never depends on the provider fetching our static site.
+        const tr = await fetch(abs(a.targetPath)); if (!tr.ok) throw new Error(`target ${tr.status}`);
+        const bytes = new Uint8Array(await tr.arrayBuffer()); let bin = '';
+        for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+        const targetData = `data:image/webp;base64,${btoa(bin)}`;
+        const p = await llmJson(a.mode, COMPARE_SYSTEM, 'Score image 2 against image 1.', [targetData, abs(a.attemptUrl)], JUDGE_TIMEOUT_MS, schema);
+        const keys = ['subject', 'details', 'style', 'color', 'composition'] as const;
+        if (!keys.every((k) => Number.isFinite(p[k]))) throw new Error('bad json');
+        const clamp = (x: number) => Math.max(0, Math.min(20, Math.round(x)));
+        res = { status: 'done', breakdown: { subject: clamp(p.subject), details: clamp(p.details), style: clamp(p.style), color: clamp(p.color), composition: clamp(p.composition) },
+          missed: String(p.missed || '').slice(0, 60), tip: String(p.tip || '').slice(0, 100) };
+      }
+    } catch (e: any) { if (e?.message !== 'disabled') warn('compare', e?.name === 'AbortError' ? 'timeout' : String(e?.message || 'request_failed').slice(0, 60)); }
+    await ctx.runMutation(internal.game.compareDone, { roomId: a.roomId, round: a.round, playerId: a.playerId, gameId: a.gameId, pass: a.pass, styleRound: a.styleRound, ...res });
   },
 });

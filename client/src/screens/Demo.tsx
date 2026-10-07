@@ -11,6 +11,7 @@ import { unlockAudio } from '@/sound/sfx';
 import { Button, Card, Mascot, Scenery } from '@/design/components';
 import { HowToPhone } from '@/moments/HowToPhase';
 import { PromptPhone } from '@/moments/Prompt';
+import { StudyPhone, WritePhone } from '@/moments/PromptMode';
 import { DrawPhone } from '@/moments/Draw';
 import { GalleryPhone } from '@/moments/Gallery';
 import { UnmaskMoment } from '@/moments/Unmask';
@@ -80,7 +81,8 @@ export function Demo() {
       <PhaseStage phase={phase} narrow banner={phase === 'HOW_TO' || phase === 'LOBBY' ? null : undefined}>
         {phase === 'LOBBY' && <p className="phase__sub">Bots are warming up…</p>}
         {phase === 'HOW_TO' && <HowToPhone view={view} />}
-        {phase === 'PROMPT' && <PromptPhone view={view} />}
+        {phase === 'PROMPT' && (view.round?.mode === 'prompt' ? <StudyPhone view={view} /> : <PromptPhone view={view} />)}
+        {(phase === 'DRAFT' || phase === 'REFINE') && <WritePhone view={view} />}
         {phase === 'DRAW' && <DrawPhone view={view} />}
         {(phase === 'GALLERY' || phase === 'DISCUSS' || phase === 'VOTE') && <GalleryPhone view={view} />}
         {phase === 'UNMASK' && <UnmaskMoment view={view} phone />}

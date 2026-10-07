@@ -53,6 +53,14 @@ async function commit(ctx: MutationCtx, roomId: Id<'rooms'>, eng: Engine) {
         if (await reserve(ctx, 'judge')) await ctx.scheduler.runAfter(0, internal.ai.judge, { roomId, round: fx.round, playerId: fx.playerId, gameId: fx.gameId, prompt: fx.prompt, mode: AI_MODE });
         else eng.applyJudge(fx.round, fx.playerId, fx.gameId, { status: 'fallback' });
         break;
+      case 'gen':
+        if (await reserve(ctx, 'image')) await ctx.scheduler.runAfter(0, internal.ai.generate, { roomId, round: fx.round, playerId: fx.playerId, gameId: fx.gameId, pass: fx.pass, prompt: fx.prompt, mode: AI_MODE });
+        else eng.applyGen(fx.round, fx.playerId, fx.gameId, fx.pass, { status: 'fallback' });
+        break;
+      case 'compare':
+        if (await reserve(ctx, 'judge')) await ctx.scheduler.runAfter(0, internal.ai.compare, { roomId, round: fx.round, playerId: fx.playerId, gameId: fx.gameId, pass: fx.pass, attemptUrl: fx.attemptUrl, targetPath: fx.targetPath, styleRound: fx.styleRound, mode: AI_MODE });
+        else eng.applyCompare(fx.round, fx.playerId, fx.gameId, fx.pass, { status: 'fallback' });
+        break;
       case 'hint':
         // Give the judge a moment to finish rating late submissions before hinting.
         await ctx.scheduler.runAfter(2_500, internal.ai.hint, { roomId, round: fx.round, gameId: fx.gameId, mode: AI_MODE });
@@ -144,6 +152,9 @@ const actionV = v.union(
   v.object({ t: v.literal('playAgain') }),
   v.object({ t: v.literal('assignHost'), playerId: v.string() }),
   v.object({ t: v.literal('leave') }),
+  v.object({ t: v.literal('draft'), text: v.string() }),
+  v.object({ t: v.literal('final'), text: v.string() }),
+  v.object({ t: v.literal('setMode'), mode: v.union(v.literal('prompt'), v.literal('sketch')) }),
 );
 
 /** Every in-game action. A player acts with their seat token; the main screen acts with the host token. */
@@ -175,6 +186,9 @@ export const act = mutation({
       case 'playAgain': if (isHost) eng.playAgain(); break;
       case 'assignHost': if (screenHost) eng.assignHost(a.playerId); break;
       case 'leave': if (id) eng.removePlayer(id); break;
+      case 'draft': if (id) error = eng.submitPrompt(id, 'draft', a.text.slice(0, 400)); break;
+      case 'final': if (id) error = eng.submitPrompt(id, 'final', a.text.slice(0, 400)); break;
+      case 'setMode': if (isHost) eng.setMode(a.mode); break;
     }
     await commit(ctx, room._id, eng);
     return error ? { ok: false, error } : { ok: true };
@@ -255,7 +269,8 @@ export const hintInput = internalQuery({
     const r = s.rounds[round - 1];
     if (!r || s.gameId !== gameId) return null;
     const sees = r.drawings.filter((d) => !d.blank && d.sees).map((d) => ({ sees: d.sees!, match: d.match ?? -1, imposter: d.playerId === r.imposterId }));
-    return { realPrompt: r.realPrompt, decoyPrompt: r.decoyPrompt, sees };
+    const drafts = r.mode === 'prompt' ? r.drawings.filter((d) => d.draftPrompt).map((d) => d.draftPrompt!) : [];
+    return { realPrompt: r.realPrompt, decoyPrompt: r.decoyPrompt, sees, mode: r.mode || 'sketch', drafts };
   },
 });
 
@@ -275,6 +290,26 @@ export const judgeDone = internalMutation({
     const room = await ctx.db.get('rooms', roomId); if (!room) return;
     const eng = engineFor(room);
     eng.applyJudge(round, playerId, gameId, res);
+    await commit(ctx, roomId, eng);
+  },
+});
+
+const breakdownV = v.object({ subject: v.number(), details: v.number(), style: v.number(), color: v.number(), composition: v.number() });
+export const genDone = internalMutation({
+  args: { roomId: v.id('rooms'), round: v.number(), playerId: v.string(), gameId: v.string(), pass: v.union(v.literal('draft'), v.literal('final')), status: v.union(v.literal('done'), v.literal('fallback')), url: v.optional(v.string()) },
+  handler: async (ctx, { roomId, round, playerId, gameId, pass, ...res }) => {
+    const room = await ctx.db.get('rooms', roomId); if (!room) return;
+    const eng = engineFor(room);
+    eng.applyGen(round, playerId, gameId, pass, res);
+    await commit(ctx, roomId, eng);
+  },
+});
+export const compareDone = internalMutation({
+  args: { roomId: v.id('rooms'), round: v.number(), playerId: v.string(), gameId: v.string(), pass: v.union(v.literal('draft'), v.literal('final')), status: v.union(v.literal('done'), v.literal('fallback')), breakdown: v.optional(breakdownV), missed: v.optional(v.string()), tip: v.optional(v.string()), styleRound: v.optional(v.boolean()) },
+  handler: async (ctx, { roomId, round, playerId, gameId, pass, ...res }) => {
+    const room = await ctx.db.get('rooms', roomId); if (!room) return;
+    const eng = engineFor(room);
+    eng.applyCompare(round, playerId, gameId, pass, res);
     await commit(ctx, roomId, eng);
   },
 });

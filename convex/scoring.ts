@@ -46,7 +46,22 @@ export function scoreRound(round: Round, players: Map<string, Player>): Award[] 
         imposter.score += 100; awards.push({ playerId: imposter.id, points: 100, reason: 'perfect_disguise' });
       }
     }
-    if (artistScores.length) {
+    if (round.mode === 'prompt') {
+      // Prompt skill pays for everyone: half your final match, plus +50 for the closest artist.
+      for (const id of round.participantIds) {
+        const d = byId.get(id); const p = players.get(id);
+        if (!p || !validScore(d)) continue;
+        const pts = Math.round(d.match / 2);
+        if (pts > 0) { p.score += pts; awards.push({ playerId: id, points: pts, reason: 'prompt_match' }); }
+      }
+      if (artistScores.length) {
+        const top = Math.max(...artistScores);
+        for (const id of artists) {
+          const d = byId.get(id); const p = players.get(id);
+          if (p && validScore(d) && d.match === top) { p.score += 50; awards.push({ playerId: id, points: 50, reason: 'best_prompt' }); }
+        }
+      }
+    } else if (artistScores.length) {
       const top = Math.max(...artistScores);
       for (const id of artists) {
         const d = byId.get(id);
