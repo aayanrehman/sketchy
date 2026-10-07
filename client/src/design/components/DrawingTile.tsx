@@ -60,7 +60,7 @@ export function DrawingTile({ drawing, player, layoutId, selectable, selected, d
       style={{ ['--av-color' as any]: player?.color }}
     >
       {drawing.blank ? (
-        <div className="tile__blank">blank</div>
+        <div className="tile__blank">{drawing.draftStatus ? 'No prompt locked in' : 'blank'}</div>
       ) : (
         <SketchCanvas strokes={drawing.strokes} size={size} className="tile__layer" />
       )}

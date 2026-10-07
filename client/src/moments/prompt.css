@@ -58,3 +58,4 @@
 .result__prompt { padding: 0 4px; font-weight: 800; font-size: var(--t-body-sm); color: var(--c-ink); }
 .result__draft { padding: 0 4px; font-size: var(--t-body-xs); font-weight: 700; color: var(--c-text-mute); }
 .result .bars { padding: 0 4px; }
+.feedback__why { font-size: var(--t-body-xs) !important; color: var(--c-text-dim) !important; }

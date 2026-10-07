@@ -53,6 +53,9 @@ export function scoreRound(round: Round, players: Map<string, Player>): Award[] 
         if (!p || !validScore(d)) continue;
         const pts = Math.round(d.match / 2);
         if (pts > 0) { p.score += pts; awards.push({ playerId: id, points: pts, reason: 'prompt_match' }); }
+        // Refining is the skill: half of your draft -> final gain, up to +25.
+        const gain = typeof d.draftMatch === 'number' ? Math.min(25, Math.round(Math.max(0, d.match - d.draftMatch) / 2)) : 0;
+        if (gain > 0) { p.score += gain; awards.push({ playerId: id, points: gain, reason: 'improved' }); }
       }
       if (artistScores.length) {
         const top = Math.max(...artistScores);

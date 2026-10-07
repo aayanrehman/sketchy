@@ -2,8 +2,8 @@ import { Button } from '@/design/components';
 
 const PROMPT_STEPS = [
   { title: 'Recreate the picture with a prompt', text: 'Everyone sees a target image and writes a prompt to recreate it with AI. Quick draft first, then refine it using your draft’s score and tip.' },
-  { title: 'One imposter sees part of it blurred', text: 'They have to guess what’s hidden. Compare the images and drafts, chat, then vote for who you think couldn’t see.' },
-  { title: 'Score for prompting and for catching', text: 'Your final image is judged against the target. Better prompts earn more points, and so does catching the imposter.' },
+  { title: 'One imposter sees part of it blurred', text: 'They have to guess what’s hidden, so their draft is the best clue. Compare drafts and final images, chat, then vote.' },
+  { title: 'Score for prompting and for catching', text: 'Only your final image is judged against the target. Better prompts, bigger improvements and catching the imposter all earn points.' },
 ];
 const STEPS = [
   { title: 'Everyone draws the same secret prompt', text: 'Except one imposter, who secretly gets a slightly different one.' },

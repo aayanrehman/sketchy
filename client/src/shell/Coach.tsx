@@ -20,7 +20,10 @@ function line(room: PublicRoom, me: MeView): { text: string; mood: 'happy' | 'th
       : { text: imp ? 'Write a quick draft (8 words max). Too vague looks suspicious, a wrong guess gives you away.' : 'Write a quick draft prompt, 8 words max, then lock it in. You’ll get to improve it next.', mood: 'think' };
     case 'REFINE': return r.drawings.find((d) => d.playerId === me.playerId)?.finalIn
       ? { text: 'Final prompt locked in. Waiting for the others…', mood: 'happy' }
-      : { text: imp ? 'Peek at everyone’s draft images to work out what was hidden, then write your final prompt.' : 'Check your draft’s score and tip, then improve your prompt (30 words max). Careful: the imposter can see these drafts too.', mood: 'think' };
+      : { text: imp ? 'Peek at everyone’s draft images to work out what was hidden, then write your final prompt.' : 'Your draft was practice. Fix what it missed and lock in a final prompt: only the final image is scored. (The imposter can see these drafts too.)', mood: 'think' };
+    case 'DISCUSS': return imp
+      ? { text: 'Act natural! Point suspicion at someone else in the chat. Voting opens when the timer ends.', mood: 'imposter' }
+      : { text: 'Check the drafts in the corners: the imposter couldn’t see the hidden part, so their draft may have guessed wrong. Say who in the chat.', mood: 'sus' };
     case 'GALLERY': return { text: 'Everyone’s final images are coming in. Which one doesn’t quite match the others?', mood: 'sus' };
     case 'STEAL': return r.imposterId === me.playerId
       ? { text: 'You got caught, but you can still steal points: what was hidden behind the blur?', mood: 'imposter' }

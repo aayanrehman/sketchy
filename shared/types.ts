@@ -82,7 +82,7 @@ export interface PromptPair {
 export interface Award { playerId: string; points: number; reason: AwardReason }
 export type AwardReason =
   | 'caught_vote' | 'caught_vote_streak' | 'escape' | 'steal'
-  | 'perfect_disguise' | 'judges_favorite' | 'imposter_fled' | 'prompt_match' | 'best_prompt';
+  | 'perfect_disguise' | 'judges_favorite' | 'imposter_fled' | 'prompt_match' | 'best_prompt' | 'improved';
 
 export interface Round {
   index: number;

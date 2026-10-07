@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { Drawing, Modifier } from '@shared/types';
 import { Button, DrawingTile, Timer } from '@/design/components';
@@ -69,13 +69,22 @@ export function WritePhone({ view }: MomentProps) {
   const max = pass === 'draft' ? 8 : 30;
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
   const problem = text.trim() ? promptProblem(text, pass, me.taboo || null) : null;
-  const submit = async () => {
-    if (locked || busy || problem || !text.trim()) return;
+  const submit = async (value = text) => {
+    if (locked || busy || !value.trim() || promptProblem(value, pass, me.taboo || null)) return;
     setBusy(true); setErr(null);
-    const res = await send().emit(pass === 'draft' ? 'prompt:draft' : 'prompt:final', { text });
+    const res = await send().emit(pass === 'draft' ? 'prompt:draft' : 'prompt:final', { text: value });
     setBusy(false);
     if (!res.ok) setErr(res.error || 'Couldn’t send that. Try again.'); else sfx.play('submit');
   };
+  // Time's nearly up and you haven't locked in: lock in what you've typed (minus banned words) so your turn isn't lost.
+  const latest = useRef(text); latest.current = text;
+  useEffect(() => {
+    if (locked || !room.phaseEndsAt) return;
+    const ms = room.phaseEndsAt - (Date.now() + view.serverOffset) - 1200;
+    const id = setTimeout(() => { const v = cleanForAutoLock(latest.current, me.taboo || []); if (v) submit(v); }, Math.max(0, ms));
+    return () => clearTimeout(id);
+    // eslint-disable-next-line
+  }, [room.phaseEndsAt, locked, pass]);
   const others = r.drawings.filter((d) => d.playerId !== me.playerId);
   return (
     <div className="phase write">
@@ -85,21 +94,21 @@ export function WritePhone({ view }: MomentProps) {
           <ModifierBadge modifier={r.modifier} taboo={me.taboo} />
         </div>
         <div className="write__main">
+          {pass === 'final' && mine && <DraftFeedback d={mine} />}
           <form className="writer" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-            <label htmlFor="prompt" className="writer__label">{pass === 'draft' ? 'Quick draft' : 'Final prompt'} <small>{pass === 'draft' ? 'up to 8 words' : 'up to 30 words · start from your draft and improve it'}</small></label>
+            <label htmlFor="prompt" className="writer__label">{pass === 'draft' ? 'Quick draft' : 'Final prompt'} <small>{pass === 'draft' ? 'up to 8 words · a first try; you’ll improve it next' : 'up to 30 words · only your final image is scored'}</small></label>
             <textarea id="prompt" className="field writer__input" rows={pass === 'draft' ? 2 : 3} value={text} disabled={locked}
               placeholder={pass === 'draft' ? 'e.g. frog drumming on a lily pad, watercolor' : 'Add the details, style, colors and lighting your draft missed'}
-              onChange={(e) => { setText(e.target.value); setErr(null); }}
+              onChange={(e) => { setText(capWords(e.target.value, max)); setErr(null); }}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); } }} />
             <div className="writer__meta">
-              <span className={words > max ? 'is-bad' : ''}>{words}/{max} words</span>
+              <span className={words >= max ? 'is-bad' : ''}>{words}/{max} words{words >= max ? ' · limit reached' : ''}</span>
               {(err || problem) && <span className="writer__err" role="alert">{err || problem}</span>}
             </div>
             {locked
               ? <Button variant="lime" size="lg" block disabled>Locked in ✓ waiting for the others</Button>
               : <Button type="submit" variant="secondary" size="lg" block disabled={!text.trim() || !!problem || busy}>{busy ? 'Sending…' : pass === 'draft' ? 'Lock in draft' : 'Lock in final prompt'}</Button>}
           </form>
-          {pass === 'final' && mine && <DraftFeedback d={mine} />}
           {pass === 'final' && others.length > 0 && (
             <section className="drafts">
               <h3>Everyone’s drafts <small>(prompts stay secret until the end)</small></h3>
@@ -133,6 +142,7 @@ function DraftFeedback({ d }: { d: Drawing }) {
       <DraftImage d={d} />
       <div className="feedback__body">
         <h3>Your draft {scored && <b className="feedback__score">{d.draftMatch}/100</b>}</h3>
+        <p className="feedback__why">This was practice. Fix what it missed below; your final image is the one that’s scored (and improving earns a bonus).</p>
         {d.draftStatus === 'pending' ? <p>Generating your draft image…</p>
           : !scored ? <p>{d.draftStatus === 'done' ? 'Scoring it against the target…' : 'No draft image this time. Your final prompt still counts.'}</p>
           : <>
@@ -178,4 +188,17 @@ export function BreakdownBars({ b }: { b: NonNullable<Drawing['breakdown']> }) {
       {rows.map(([k, n]) => <div key={k} className="bars__row"><span>{k}</span><i><em style={{ width: `${(n / 20) * 100}%` }} /></i><b>{n}</b></div>)}
     </div>
   );
+}
+
+/** Keep at most `max` words while typing (whitespace is kept so typing feels normal). */
+function capWords(v: string, max: number) {
+  const parts = v.split(/(\s+)/); let n = 0; let out = '';
+  for (const part of parts) { if (!part.trim()) { if (n < max) out += part; continue; } if (++n > max) break; out += part; }
+  return out;
+}
+/** For auto-lock at the buzzer: drop banned words so the prompt is accepted. */
+function cleanForAutoLock(v: string, taboo: string[]) {
+  let t = v;
+  for (const w of taboo) t = t.replace(new RegExp(`\\b${w}(s|es)?\\b`, 'gi'), '');
+  return t.replace(/\s+/g, ' ').trim();
 }

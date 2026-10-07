@@ -11,11 +11,11 @@ import './polish.css';
 export const REASON: Record<AwardReason, string> = {
   caught_vote: 'Correct vote', caught_vote_streak: 'Correct vote streak', escape: 'Escaped', steal: 'Guessed the prompt',
   perfect_disguise: 'Disguise bonus', judges_favorite: 'Best drawing', imposter_fled: 'Imposter left',
-  prompt_match: 'Prompt match', best_prompt: 'Best prompt',
+  prompt_match: 'Prompt match', best_prompt: 'Best prompt', improved: 'Improved your prompt',
 };
 const DETAIL: Partial<Record<AwardReason, string>> = {
   perfect_disguise: 'imposter matched as well as the artists', judges_favorite: 'highest AI match',
-  prompt_match: 'half your final match score', best_prompt: 'closest final image',
+  prompt_match: 'half your final match score', best_prompt: 'closest final image', improved: 'half your draft-to-final gain',
 };
 const awardText = (a: Award) => `${REASON[a.reason]} +${a.points}${DETAIL[a.reason] ? ` (${DETAIL[a.reason]})` : ''}`;
 

@@ -91,7 +91,7 @@ function PromptVerdict({ view, ready, waiting, caughtLine }: MomentProps & { rea
                 <b>{p?.name}{d.playerId === me?.playerId ? ' (you)' : p?.isBot ? ' (bot)' : ''}</b>
                 <span className={`result__role ${isImp ? 'result__role--imp' : ''}`}>{isImp ? 'Imposter' : 'Artist'}</span>
               </div>
-              <div className="result__votes">{votes} vote{votes === 1 ? '' : 's'}{typeof d.draftMatch === 'number' && scored ? ` · draft ${d.draftMatch} → final ${d.match}` : ''}</div>
+              <div className="result__votes">{votes} vote{votes === 1 ? '' : 's'}{typeof d.draftMatch === 'number' && scored ? ` · draft ${d.draftMatch} → final ${d.match} (${d.match! - d.draftMatch >= 0 ? '+' : ''}${d.match! - d.draftMatch})` : ''}</div>
               {d.finalPrompt && <p className="result__prompt">“{d.finalPrompt}”</p>}
               {d.draftPrompt && d.draftPrompt !== d.finalPrompt && <p className="result__draft">Draft: “{d.draftPrompt}”</p>}
               <div className="result__score"><span>Match with the target</span><div className="result__bar"><i style={{ transform: `scaleX(${scored ? d.match! / 100 : 0})` }} /></div><b>{scored ? `${d.match}/100` : '—'}</b></div>
@@ -102,7 +102,7 @@ function PromptVerdict({ view, ready, waiting, caughtLine }: MomentProps & { rea
         })}
       </div>
       <footer className="verdict__foot">
-        <p className="dim">An AI judge compares each final image with the target in five areas (0–20 each). Everyone earns half their match score; the closest artist gets +50.{view.room?.players.some((p) => p.isBot) ? ' Bot prompts and scores are pre-made examples; yours are live.' : ''}</p>
+        <p className="dim">An AI judge compares each final image with the target in five areas (0–20 each). Everyone earns half their match score, plus half of their draft-to-final improvement (up to +25); the closest artist gets +50.{view.room?.players.some((p) => p.isBot) ? ' Bot prompts and scores are pre-made examples; yours are live.' : ''}</p>
         {me && r.participantIds.includes(me.playerId)
           ? <Button size="lg" variant={ready ? 'ghost' : 'primary'} disabled={ready} onClick={() => send().emit('verdict:ready')}>{ready ? (waiting ? `Waiting for ${waiting} player${waiting === 1 ? '' : 's'}…` : 'Starting…') : 'See scores →'}</Button>
           : <p className="phase__sub">Players continue when they’re ready.</p>}
