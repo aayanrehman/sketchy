@@ -1,3 +1,4 @@
+import { AvatarArt, SoundIcon } from '@/design/components/Illustrations';
 import { useState, type ReactNode } from 'react';
 import type { PublicRoom, MeView } from '@shared/types';
 import { Button, Modal, Timer, Scenery } from '@/design/components';
@@ -16,14 +17,15 @@ export function PhoneShell({ room, me, serverOffset, children, showTimer = true 
       <Scenery hills={false} density={2} />
       <header className={`phone-shell__head ${timerOn ? 'phone-shell__head--timer' : ''}`}>
         <div className="phone-shell__me">
-          {p && <span className="chip" data-avatar={p.id} style={{ ['--av-color' as any]: p.color }}><span>{p.avatar}</span><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>{room.round > 0 && <span className="avatar__score">{p.score}</span>}</span>}
+          {p && <span className="chip" data-avatar={p.id} style={{ ['--av-color' as any]: p.color }}><AvatarArt avatar={p.avatar} /><span style={{ overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{p.name}</span>{room.round > 0 && <span className="avatar__score">{p.score}</span>}</span>}
           {room.round > 0 ? <span className="phone-shell__round">R{room.round}/{room.totalRounds}</span> : !room.isDemo && <span className="phone-shell__round">{room.code}</span>}
         </div>
         <div className="phone-shell__ctl">
-          {timerOn && <Timer endsAt={room.phaseEndsAt} serverOffset={serverOffset} compact />}
+
           <Button variant="ghost" icon aria-label="How to play" onClick={() => setHelp(true)}>?</Button>
-          <Button variant="ghost" icon aria-label={muted ? 'Unmute' : 'Mute'} aria-pressed={muted} onClick={() => setMuted(!muted)}>{muted ? '🔇' : '🔊'}</Button>
+          <Button variant="ghost" icon aria-label={muted ? 'Unmute' : 'Mute'} aria-pressed={muted} onClick={() => setMuted(!muted)}><SoundIcon muted={muted} /></Button>
         </div>
+        {timerOn && <div className="phone-shell__time"><span>{room.phase === 'DRAW' ? 'Make your masterpiece' : room.phase === 'VOTE' ? 'Trust your gut' : 'Round in progress'}</span><Timer endsAt={room.phaseEndsAt} serverOffset={serverOffset} compact /></div>}
       </header>
       <main className="phone-shell__body">{children}</main>
       <Modal open={help} onClose={() => setHelp(false)} label="How to play"><HowTo onDone={() => setHelp(false)} cta="Close" /></Modal>

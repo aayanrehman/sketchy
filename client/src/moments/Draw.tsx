@@ -1,3 +1,4 @@
+import { StatusIcon } from '@/design/components/Illustrations';
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, Button, Card, Timer } from '@/design/components';
 import { Rise } from '@/shell/PhaseStage';
@@ -61,7 +62,7 @@ export function DrawPhone({ view }: MomentProps) {
         </div>
       </Rise>
       <Rise>
-        {submitted ? <Button variant="lime" size="lg" block disabled>Submitted ✓</Button>
+        {submitted ? <Button variant="lime" size="lg" block disabled>Submitted <StatusIcon kind="check" /></Button>
           : <Button variant="secondary" size="lg" block onClick={submit}>{strokes ? 'Submit drawing' : 'Submit (blank)'}</Button>}
       </Rise>
     </div>

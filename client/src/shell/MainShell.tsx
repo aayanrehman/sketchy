@@ -1,3 +1,4 @@
+import { SoundIcon } from '@/design/components/Illustrations';
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import type { PublicRoom } from '@shared/types';
@@ -27,7 +28,7 @@ export function MainShell({ room, children, hideRail, railIds, meId }: { room: P
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {!room.isDemo && <span className="main-shell__code"><small>ROOM</small>{room.code}</span>}
           <Button variant="ghost" icon aria-label="How to play" onClick={() => setHelp(true)}>?</Button>
-          <Button variant="ghost" icon aria-label={muted ? 'Unmute' : 'Mute'} aria-pressed={muted} onClick={() => setMuted(!muted)}>{muted ? '🔇' : '🔊'}</Button>
+          <Button variant="ghost" icon aria-label={muted ? 'Unmute' : 'Mute'} aria-pressed={muted} onClick={() => setMuted(!muted)}><SoundIcon muted={muted} /></Button>
         </div>
       </header>
       <main className="main-shell__stage">{children}</main>
@@ -35,7 +36,7 @@ export function MainShell({ room, children, hideRail, railIds, meId }: { room: P
         <motion.footer className="main-shell__rail" layout>
           {players.map((p) => (
             <Avatar key={p.id} player={p} isHost={p.id === room.hostId} isYou={p.id === meId} showScore={room.round > 0}
-              badge={p.spectator ? '👀' : (room.phase === 'DRAW' && p.hasSubmitted) || (room.phase === 'VOTE' && p.hasVoted) || (room.phase === 'HOW_TO' && p.readyHowTo) ? '✓' : null}
+              badge={p.spectator ? '…' : (room.phase === 'DRAW' && p.hasSubmitted) || (room.phase === 'VOTE' && p.hasVoted) || (room.phase === 'HOW_TO' && p.readyHowTo) ? '✓' : null}
               active={room.phase === 'DRAW' && !p.hasSubmitted && !p.spectator} />
           ))}
         </motion.footer>

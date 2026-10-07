@@ -4,6 +4,7 @@
  * Keys live here, on the server, only.
  */
 import { sha1 } from './util';
+import { parseSketch, storeImage } from './media';
 
 export type AiMode = 'openai' | 'mock' | 'off';
 
@@ -19,9 +20,9 @@ export const JUDGE_TIMEOUT_MS = 15_000;
 
 /** Same style instruction for everyone. The player's prompt is NEVER sent. */
 const STYLE_INSTRUCTION =
-  'Turn this sketch into a vibrant, playful sticker-style illustration. Keep the exact subject, pose and composition. Add no text and no new objects.';
+  'Turn this sketch into a vibrant, playful sticker-style illustration with bold dark ink outlines, soft pastel fills and a clean ivory background. Preserve the exact subject, number of characters, pose, props and composition, including unusual details. Treat the sketch as the only reference. Add no text and no new objects.';
 
-export interface GlowResult { status: 'done' | 'fallback'; glowUrl?: string; mock?: boolean; reason?: string }
+export interface GlowResult { elapsedMs?: number; status: 'done' | 'fallback'; glowUrl?: string; mock?: boolean; reason?: string }
 export interface JudgeResult { status: 'done' | 'fallback'; match?: number; sees?: string; roast?: string; reason?: string }
 
 const runtimeForce = new Map<string, Set<string>>(); // roomCode -> set of forced failures (dev testing)
@@ -31,11 +32,12 @@ function forced(code: string | undefined, kind: string) {
 }
 
 function dataUrlToBlob(dataUrl: string): Blob {
-  const [head, b64] = dataUrl.split(',');
-  const mime = /data:([^;]+)/.exec(head)?.[1] || 'image/png';
-  return new Blob([Buffer.from(b64, 'base64')], { type: mime });
+  return new Blob([new Uint8Array(parseSketch(dataUrl))], { type: 'image/png' });
 }
-
+function reportFailure(job: string, reason?: string) {
+  // Never log sketches, prompts, authorization headers, or full upstream response bodies.
+  console.warn(`[ai:${job}] fallback: ${reason || 'unknown'}`);
+}
 async function withTimeout<T>(p: (signal: AbortSignal) => Promise<T>, ms: number): Promise<T> {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), ms);
@@ -46,11 +48,13 @@ const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 /** Glow-up: sketch in, sticker art out. Input is the sketch only. */
 export async function glowUp(pngDataUrl: string, roomCode?: string): Promise<GlowResult> {
+  const startedAt = Date.now();
   if (AI_MODE === 'off' || forced(roomCode, 'glow')) return { status: 'fallback', reason: 'disabled' };
   if (forced(roomCode, 'safety')) return { status: 'fallback', reason: 'safety' };
   if (AI_MODE === 'mock') {
     await sleep(1500 + Math.random() * 3500);
-    return { status: 'done', glowUrl: pngDataUrl, mock: true };
+    try { return { status: 'done', glowUrl: await storeImage(parseSketch(pngDataUrl), 'png'), mock: true }; }
+    catch { return { status: 'fallback', reason: 'invalid sketch' }; }
   }
   try {
     return await withTimeout(async (signal) => {
@@ -61,21 +65,30 @@ export async function glowUp(pngDataUrl: string, roomCode?: string): Promise<Glo
       form.append('size', '1024x1024');
       form.append('quality', IMAGE_QUALITY);
       form.append('n', '1');
+      form.append('output_format', 'webp');
+      form.append('output_compression', '80');
       const res = await fetch('https://api.openai.com/v1/images/edits', {
         method: 'POST', headers: { Authorization: `Bearer ${KEY}` }, body: form, signal,
       });
       if (!res.ok) {
-        const text = await res.text();
-        // Safety refusal or any API error: silent fallback.
-        return { status: 'fallback', reason: `http ${res.status}: ${text.slice(0, 200)}` };
+        const error: any = await res.json().catch(() => ({}));
+        const reason = `http ${res.status}: ${String(error?.error?.code || 'upstream_error').slice(0, 60)}`;
+        reportFailure('glow', reason);
+        return { status: 'fallback', reason };
       }
       const json: any = await res.json();
       const b64 = json?.data?.[0]?.b64_json;
       if (!b64) return { status: 'fallback', reason: 'no image in response' };
-      return { status: 'done', glowUrl: `data:image/png;base64,${b64}` };
+      const bytes = Buffer.from(b64, 'base64');
+      const glowUrl = await storeImage(bytes, 'webp');
+      const elapsedMs = Date.now() - startedAt;
+      console.info(`[ai:glow] ${elapsedMs}ms, ${bytes.length} bytes, model=${IMAGE_MODEL}`);
+      return { status: 'done', glowUrl, elapsedMs };
     }, GLOW_TIMEOUT_MS);
   } catch (e: any) {
-    return { status: 'fallback', reason: e?.name === 'AbortError' ? 'timeout' : String(e?.message || e) };
+    const reason = e?.name === 'AbortError' ? 'timeout' : String(e?.message || e);
+    reportFailure('glow', reason);
+    return { status: 'fallback', reason };
   }
 }
 
@@ -85,7 +98,8 @@ const judgeCache = new Map<string, JudgeResult>();
 export async function judge(pngDataUrl: string, realPrompt: string, blank: boolean, roomCode?: string): Promise<JudgeResult> {
   if (blank) return { status: 'done', match: 0, sees: 'a blank canvas', roast: 'Bold choice.' };
   const key = sha1(pngDataUrl + '|' + realPrompt);
-  const cached = judgeCache.get(key);
+  const cacheable = AI_MODE !== 'off' && !forced(roomCode, 'judge');
+  const cached = cacheable ? judgeCache.get(key) : undefined;
   if (cached) return cached;
 
   let result: JudgeResult;
@@ -131,7 +145,7 @@ export async function judge(pngDataUrl: string, realPrompt: string, blank: boole
           method: 'POST', headers: { Authorization: `Bearer ${KEY}`, 'Content-Type': 'application/json' },
           body: JSON.stringify(body), signal,
         });
-        if (!res.ok) return { status: 'fallback', reason: `http ${res.status}` } as JudgeResult;
+        if (!res.ok) { reportFailure('judge', `http ${res.status}`); return { status: 'fallback', reason: `http ${res.status}` } as JudgeResult; }
         const json: any = await res.json();
         const parsed = JSON.parse(json.choices[0].message.content);
         const match = Math.max(0, Math.min(100, Math.round(Number(parsed.match))));
@@ -142,6 +156,10 @@ export async function judge(pngDataUrl: string, realPrompt: string, blank: boole
       result = { status: 'fallback', reason: e?.name === 'AbortError' ? 'timeout' : String(e?.message || e) };
     }
   }
-  if (result.status === 'done') judgeCache.set(key, result);
+  if (result.status === 'fallback') reportFailure('judge', result.reason);
+  if (cacheable && result.status === 'done') {
+    if (judgeCache.size >= 512) judgeCache.delete(judgeCache.keys().next().value!);
+    judgeCache.set(key, result);
+  }
   return result;
 }

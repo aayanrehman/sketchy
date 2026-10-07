@@ -1,3 +1,4 @@
+import { AwardArt } from '@/design/components/Illustrations';
 import { useEffect, useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Avatar, Button, Card, Confetti } from '@/design/components';
@@ -31,7 +32,7 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
       const res = recordGame({
         score: p.score, rank, gameKey: `${room.code}-${room.rounds[0]?.promptPairId}-${room.rounds.length}`,
         bestMatch: Math.max(0, ...mine.map(({ d }) => (typeof d.match === 'number' ? d.match : 0))),
-        bestStreak: Math.max(0, ...room.rounds.map((r) => (r.votes[me.playerId] === r.imposterId ? 1 : 0))),
+        bestStreak: room.rounds.reduce((a, r) => { const run = r.votes[me.playerId] === r.imposterId ? a.run + 1 : 0; return { run, best: Math.max(a.best, run) }; }, { run: 0, best: 0 }).best,
         escapes: room.rounds.filter((r) => r.imposterId === me.playerId && !r.caught).length,
         gallery: mine.filter(({ d }) => d.glowStatus === 'done' && d.glowUrl && !d.glowMock).map(({ d, r }) => ({ url: d.glowUrl!, golden: d.golden, prompt: r.realPrompt, at: Date.now() })),
       });
@@ -42,8 +43,10 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
 
   const share = async () => {
     const r = room.rounds[room.rounds.length - 1]; if (!r) return;
-    const url = await buildShareCard({ drawings: r.drawings, players: view.byId, imposterId: r.imposterId, prompt: r.realPrompt, url: location.host });
-    downloadDataUrl(url, `sketchy-${room.code}.png`);
+    try {
+      const url = await buildShareCard({ drawings: r.drawings, players: view.byId, imposterId: r.imposterId, prompt: r.realPrompt, url: location.host, mode: room.isDemo ? 'demo' : room.aiMode !== 'openai' ? 'preview' : undefined });
+      downloadDataUrl(url, `sketchy-${room.code}.png`);
+    } catch { toast.push({ kind: 'info', text: 'Could not save the card. Please try again.' }); }
   };
 
   return (
@@ -64,7 +67,7 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
         <Rise className="awards">
           {room.finalAwards.map((a, i) => { const p = view.byId.get(a.playerId); return (
             <motion.div key={a.title} className="award" initial={{ opacity: 0, x: rm ? 0 : -20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 1.2 + i * stagger.lg, duration: D.base, ease: ease.smooth }}>
-              <span style={{ fontSize: 28 }} aria-hidden>{a.title === 'Best Disguise' ? '🎭' : a.title === "Judge's Pet" ? '🏆' : '😅'}</span>
+              <AwardArt kind={a.title === 'Best Disguise' ? 'mask' : a.title === "Judge's Pet" ? 'cup' : 'oops'} />
               <div><div className="award__title">{a.title}: {p?.name}</div><div className="award__detail">{a.detail}</div></div>
             </motion.div>
           ); })}

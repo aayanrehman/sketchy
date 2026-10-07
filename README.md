@@ -31,7 +31,7 @@ npm run build
 npm start                   # http://localhost:3000
 ```
 
-Other scripts: `npm run typecheck`, `npm test` (vote resolution and scoring table).
+Other scripts: `npm run typecheck`, `npm test` (16 tests covering scoring, prompt privacy, demo fixtures, and AI requests/fallbacks).
 
 ### Solo testing without 4 phones
 
@@ -62,7 +62,7 @@ The per-room cap (24 glow-ups) is in `shared/types.ts` (`GLOWUP_ROOM_CAP`); lowe
 | `mock` (default without a key) | Glow-up echoes the sketch with a sticker treatment and an "AI PREVIEW" tag after 1.5 to 5 s. The judge returns a deterministic pseudo-score. Nothing leaves the server. |
 | `off` | Every drawing uses the designed fallback states. |
 
-Keys live only on the server. Set a monthly spending cap in the OpenAI dashboard before launch, and confirm `OPENAI_IMAGE_MODEL` is still the cheapest current model that supports edits.
+Keys live only on the server. The image edit requests 1024×1024 WebP at 80% compression. Images are saved to `MEDIA_DIR` and served by URL, so socket state does not repeatedly carry base64 artwork. The cost-focused default is `gpt-image-1-mini`; benchmark it with your own key before choosing the final model. Live latency and cost have not been measured in this checkout. Generation timing and output byte size are logged, and `/api/studio/generate` returns `elapsedMs`.
 
 ## Deploy
 
@@ -72,21 +72,27 @@ The server owns timers and pushes state over WebSockets, so it needs a host that
 
 1. Push this repo to GitHub.
 2. In Render, *New → Blueprint*, pick the repo. `render.yaml` defines the service.
-3. Set `OPENAI_API_KEY` (and optionally `STUDIO_KEY`) in the environment.
+3. Set `OPENAI_API_KEY` and `STUDIO_KEY` in the environment. The blueprint attaches a 1 GB persistent media disk; use a single instance.
 4. Deploy. The health check is `/api/health`. Your game URL is the service URL.
 
 **Any Docker host (Railway, Fly, a VPS):**
 
 ```bash
 docker build -t sketchy .
-docker run -p 3000:3000 -e OPENAI_API_KEY=sk-... sketchy
+docker run -p 3000:3000 -v sketchy-media:/app/server/data/media -e OPENAI_API_KEY=sk-... sketchy
 ```
 
 Rooms live in memory, so run one instance (or add sticky sessions and a shared store before scaling out).
 
 ## Demo content
 
-Demo Mode prefers prompt pairs that have complete studio content (3 real sketches and 1 decoy sketch, each with a real glow-up and score) in `server/data/demo/<pairId>.json`. Until you record them in `/studio`, bots use procedural doodles with preset scores, tagged "AI PREVIEW". Record at least 2 pairs for a real-art demo. `STUDIO_KEY` protects the save endpoints in production.
+Two complete prepared sample pairs ship with the repo: Cats (2) and Frogs (9). Each includes three authored real-prompt sketches, one decoy sketch, compressed built-in ImageGen artwork, and **example scores**. They demonstrate the game without spending tokens for bots; the demo explicitly labels the scores as examples. Your own sketch uses live OpenAI only when the server is configured, otherwise the UI says Preview mode.
+
+These fixtures are not claimed to be recordings from the live image-edit/judge pipeline. Replace them with measured recordings through `/studio` before advertising a fully live showcase. `scripts/build-demo-content.mjs` regenerates the authored stroke fixtures. Artwork provenance is in `server/data/demo/ARTWORK.md`. The two bundled JSON files and all eight WebP images are committed, so deployments have artwork from the first run. Other studio recordings remain gitignored.
+
+Production studio endpoints and `/api/proof` require `STUDIO_KEY` in the `x-studio-key` header; the studio is disabled in production without a key. Keep `MEDIA_DIR` on a persistent volume for gallery URLs to survive redeploys. Media has no automatic expiry; monitor disk usage and retain shared images for as long as you need them.
+
+See [the submission checklist](docs/SUBMISSION.md) for live-AI verification and recording steps.
 
 ## Project layout
 

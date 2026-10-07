@@ -11,6 +11,7 @@ import { makeRoomCode, uid } from './util';
 import { setupDemo, contentStatus, DEMO_DIR } from './demo';
 import { glowUp, judge, AI_MODE, setForcedFailures } from './ai';
 import { PROMPT_PAIRS } from '../../shared/prompts';
+import { MEDIA_DIR, parseSketch } from './media';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 3000);
@@ -18,6 +19,8 @@ const PROD = process.env.NODE_ENV === 'production';
 
 const app = express();
 app.use(express.json({ limit: '6mb' }));
+app.use('/media', express.static(MEDIA_DIR, { maxAge: '1y', immutable: true, index: false, dotfiles: 'deny' }));
+app.use('/demo-art', express.static(path.resolve(__dirname, '../data/demo/art'), { maxAge: '1d', index: false }));
 const server = http.createServer(app);
 const io = new Server<ClientToServer, ServerToClient>(server, { maxHttpBufferSize: 4e6, cors: PROD ? undefined : { origin: true } });
 
@@ -141,10 +144,13 @@ app.get('/api/health', (_req, res) => res.json({ ok: true, rooms: rooms.size, ai
 /** Proof test from the PRD: a server call to an external API with a secret key. */
 app.get('/api/proof', async (_req, res) => {
   if (!process.env.OPENAI_API_KEY) return res.json({ ok: false, error: 'OPENAI_API_KEY not set on the server' });
+  if (PROD && (!process.env.STUDIO_KEY || _req.header('x-studio-key') !== process.env.STUDIO_KEY)) return res.status(401).json({ ok: false, error: 'Studio authorization required' });
   try {
-    const r = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` } });
+    const r = await fetch('https://api.openai.com/v1/models', { headers: { Authorization: `Bearer ${process.env.OPENAI_API_KEY}` }, signal: AbortSignal.timeout(10_000) });
     const j: any = await r.json();
-    res.json({ ok: r.ok, status: r.status, models: (j.data || []).slice(0, 5).map((m: any) => m.id) });
+    const models = (j.data || []).map((m: any) => m.id);
+    const requested = [process.env.OPENAI_IMAGE_MODEL || 'gpt-image-1-mini', process.env.OPENAI_JUDGE_MODEL || 'gpt-4.1-mini'];
+    res.json({ ok: r.ok, status: r.status, configured: requested.map((id) => ({ id, available: models.includes(id) })), models: models.filter((id: string) => /image|gpt-4\.1/.test(id)) });
   } catch (e: any) { res.json({ ok: false, error: String(e?.message || e) }); }
 });
 
@@ -173,6 +179,7 @@ if (!PROD) {
 // ---------- Studio (hidden tool for making demo content) ----------
 const studioGuard = (req: express.Request, res: express.Response, next: express.NextFunction) => {
   const key = process.env.STUDIO_KEY;
+  if (PROD && !key) return res.status(503).json({ ok: false, error: 'Studio disabled: configure STUDIO_KEY' });
   if (key && req.header('x-studio-key') !== key) return res.status(401).json({ ok: false, error: 'Bad studio key' });
   next();
 };
@@ -181,6 +188,7 @@ app.post('/api/studio/generate', studioGuard, async (req, res) => {
   const { png, pairId } = req.body || {};
   const pair = PROMPT_PAIRS.find((p) => p.id === Number(pairId));
   if (!pair || typeof png !== 'string') return res.status(400).json({ ok: false, error: 'pairId and png required' });
+  try { parseSketch(png); } catch { return res.status(400).json({ ok: false, error: 'A valid PNG sketch is required' }); }
   const [g, j] = await Promise.all([glowUp(png), judge(png, pair.real, false)]);
   res.json({ ok: true, glow: g, judge: j });
 });

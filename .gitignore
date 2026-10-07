@@ -1,6 +1,11 @@
 node_modules
 client/dist
 .env
+server/data/media/
 server/data/demo/*.json
+!server/data/demo/2.json
+!server/data/demo/9.json
 !server/data/demo/.gitkeep
 .DS_Store
+
+tmp/

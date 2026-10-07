@@ -428,6 +428,7 @@ export class Room {
     const showStrokes = past || !['PROMPT', 'DRAW'].includes(this.phase);
     return {
       ...round,
+      promptPairId: imp ? round.promptPairId : 0,
       realPrompt: imp ? round.realPrompt : '',
       decoyPrompt: imp ? round.decoyPrompt : '',
       imposterId: imp ? round.imposterId : '',

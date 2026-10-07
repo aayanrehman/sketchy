@@ -17,6 +17,8 @@ export default defineConfig({
     proxy: {
       '/socket.io': { target: 'http://localhost:3000', ws: true },
       '/api': 'http://localhost:3000',
+      '/media': 'http://localhost:3000',
+      '/demo-art': 'http://localhost:3000',
     },
   },
   build: { outDir: path.resolve(__dirname, 'dist'), emptyOutDir: true },

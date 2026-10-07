@@ -1,3 +1,4 @@
+import { AvatarArt, AwardArt, StatusIcon } from './Illustrations';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
 import type { ToastKind, ToastMessage } from '@shared/types';
@@ -9,7 +10,7 @@ interface Ctx { push: (t: Omit<ToastItem, 'id'> & { id?: string }) => void }
 const ToastCtx = createContext<Ctx>({ push: () => {} });
 export const useToast = () => useContext(ToastCtx);
 
-const ICON: Record<ToastKind, string> = { join: '👋', leave: '🚪', host: '★', streak: '🔥', golden: '✨', info: '💬', fled: '🏃' };
+const ICON: Record<ToastKind, 'plus' | 'arrow' | 'star' | 'info'> = { join: 'plus', leave: 'arrow', host: 'star', streak: 'star', golden: 'star', info: 'info', fled: 'arrow' };
 const SOUND: Partial<Record<ToastKind, string>> = { join: 'pop', leave: 'popDown', host: 'chime', streak: 'streak', golden: 'golden', fled: 'thud' };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -32,7 +33,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         <AnimatePresence>
           {items.map((t) => (
             <motion.div key={t.id} className={`toast toast--${t.kind}`} variants={popVariants(rm)} initial="initial" animate="enter" exit="exit" layout="position" style={{ ['--av-color' as any]: t.color }}>
-              <span className="toast__icon">{t.icon || ICON[t.kind]}</span>
+              <span className="toast__icon">{t.icon && ['🦊','🐸','🦄','🐙','🐼','🦁','🐧','🐲'].includes(t.icon) ? <AvatarArt avatar={t.icon} /> : t.kind === 'streak' ? <AwardArt kind="flame" /> : <StatusIcon kind={ICON[t.kind]} />}</span>
               <span>{t.text}</span>
             </motion.div>
           ))}

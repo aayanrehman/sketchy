@@ -17,7 +17,12 @@ export function StealMoment({ view, phone }: MomentProps & { phone?: boolean }) 
   const D = rm ? durRM : dur;
   const resolved = r.stealPick !== null;
 
-  useEffect(() => { r.stealOptions.forEach((_, i) => setTimeout(() => sfx.play('flip'), i * stagger.lg * 1000 + 200)); /* eslint-disable-next-line */ }, []);
+  useEffect(() => {
+    if (rm) return;
+    const timers = r.stealOptions.map((_, i) => setTimeout(() => sfx.play('flip'), i * stagger.lg * 1000 + 200));
+    return () => timers.forEach(clearTimeout);
+    /* eslint-disable-next-line */
+  }, []);
   useEffect(() => {
     if (!resolved) return;
     if (r.stealCorrect) { sfx.play('slot'); navigator.vibrate?.([40, 30, 40, 30, 120]); } else sfx.play('thud');
@@ -44,8 +49,8 @@ export function StealMoment({ view, phone }: MomentProps & { phone?: boolean }) 
           const state = resolved ? (opt === r.realPrompt ? 'steal-card--right' : isPick ? 'steal-card--wrong' : '') : isPick ? 'steal-card--picked' : '';
           return (
             <motion.button key={opt} type="button" className={`steal-card ${state} ${!isImposter || resolved ? 'steal-card--disabled' : ''}`}
-              initial={{ rotateY: 0, opacity: 0 }} animate={{ rotateY: 180, opacity: 1 }}
-              transition={{ delay: 0.2 + i * stagger.lg, duration: D.dramatic * 0.7, ease: ease.snap }}
+              initial={{ rotateY: rm ? 180 : 0, opacity: 0 }} animate={{ rotateY: 180, opacity: 1 }}
+              transition={{ delay: rm ? 0 : 0.2 + i * stagger.lg, duration: rm ? D.fast : D.dramatic * 0.7, ease: ease.snap }}
               whileTap={isImposter && !resolved && !rm ? { scale: 0.96 } : undefined}
               onClick={() => pick(opt)} disabled={!isImposter || resolved} aria-label={`Option ${i + 1}: ${opt}`}>
               <span className="steal-card__face steal-card__face--back">?</span>

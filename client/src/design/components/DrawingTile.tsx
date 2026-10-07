@@ -1,3 +1,4 @@
+import { AvatarArt, StatusIcon } from '@/design/components/Illustrations';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useState, type ReactNode } from 'react';
 import type { Drawing, Player } from '@shared/types';
@@ -80,14 +81,14 @@ export function DrawingTile({ drawing, player, layoutId, selectable, selected, d
       {glowed && drawing.glowMock && !drawing.golden && <span className="tile__golden-tag tile__mock-tag">AI PREVIEW</span>}
       {drawing.glowStatus === 'fallback' && !drawing.blank && <span className="tile__fallback">The AI was speechless.</span>}
       {player && !hideName && (
-        <span className="tile__name"><span className="tile__name-dot">{player.avatar}</span><span className="tile__name-text">{player.name}</span></span>
+        <span className="tile__name"><span className="tile__name-dot"><AvatarArt avatar={player.avatar} /></span><span className="tile__name-text">{player.name}</span></span>
       )}
       <AnimatePresence>
         {showVotes && !!votes && (
           <motion.span key={votes} className="tile__votes" initial={{ scale: rm ? 1 : 1.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0 }} transition={t.bounce(rm)}>{votes}</motion.span>
         )}
         {submittedCheck && (
-          <motion.span key="check" className="tile__check" initial={{ scale: rm ? 1 : 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0 }} transition={t.bounce(rm)}>✓</motion.span>
+          <motion.span key="check" className="tile__check" initial={{ scale: rm ? 1 : 0, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} exit={{ opacity: 0 }} transition={t.bounce(rm)}><StatusIcon kind="check" /></motion.span>
         )}
       </AnimatePresence>
       {children && <div className="tile__stamp-slot">{children}</div>}

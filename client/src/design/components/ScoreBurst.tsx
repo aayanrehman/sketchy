@@ -35,8 +35,8 @@ export function ScoreBurstLayer({ children }: { children: ReactNode }) {
         <AnimatePresence>
           {items.map((b) => (
             <motion.div key={b.id} className={`burst ${b.big ? 'burst--big' : ''}`}
-              initial={{ x: b.x, y: b.y, scale: 0.6, opacity: 0, translateX: '-50%', translateY: '-50%' }}
-              animate={{ x: [b.x, b.x, b.x + b.dx], y: [b.y, b.y - (rm ? 0 : 30), b.y + b.dy], scale: [0.6, 1.3, 0.5], opacity: [0, 1, 0.9] }}
+              initial={{ x: b.x, y: b.y, scale: rm ? 1 : 0.6, opacity: 0, translateX: '-50%', translateY: '-50%' }}
+              animate={rm ? { x: b.x, y: b.y, scale: 1, opacity: 1 } : { x: [b.x, b.x, b.x + b.dx], y: [b.y, b.y - 30, b.y + b.dy], scale: [0.6, 1.3, 0.5], opacity: [0, 1, 0.9] }}
               exit={{ opacity: 0 }}
               transition={{ duration: D.dramatic, times: [0, 0.35, 1], ease: ease.snap }}
             >{b.text}</motion.div>

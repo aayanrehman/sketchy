@@ -1,5 +1,9 @@
 # Sketchy: handoff for the creative pass
 
+> **Creative pass implemented:** illustrated avatars and awards, refined Blotto, phone HUD and scenery composition, local fonts, landing and cover key art, prepared cat/frog demo artwork, compressed URL-based media, protected studio, and persistent Render media storage. Gameplay rules and prompt wording remain unchanged. A second polish pass corrected crowded score/verdict layouts, countdown layering, dialogs, drawing submission at the buzzer, consistent status icons, and reconnect handling.
+>
+> Verification: typecheck/build and 16 tests pass; two complete browser demos at 390×844 and 1366×820 (the latter with reduced motion) reached Final and downloaded result cards with zero page errors. The entries below describe the original handoff; see `docs/SUBMISSION.md` for current launch checks. **A live API key was unavailable: real OpenAI latency/cost and pipeline-recorded bot art remain to be verified.**
+
 **Repo:** https://github.com/aayanrehman/sketchy (branch `main`)
 **Your scope:** visual craft (composition, spacing, illustration, the mascot, the cover), motion refinement, and the AI image-generation pipeline (glow-up quality, demo art, cost and latency).
 **Not your scope:** gameplay rules, phases, timers, scoring, prompt pairs. Those come from the PRD and are implemented exactly; see `docs/PRD-NOTES.md` for the places the PRD is ambiguous and what the build chose.

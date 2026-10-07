@@ -75,7 +75,7 @@ export function UnmaskMoment({ view, phone }: MomentProps & { phone?: boolean })
           <DrawingTile key={d.playerId} drawing={d} player={view.byId.get(d.playerId)} layoutId={`tile-${r.index}-${d.playerId}`} size={phone ? 240 : 320}
             spot={spot === d.playerId} dim={step === 'roll' ? spot !== d.playerId : stamped && target !== d.playerId}
             votes={counts.get(d.playerId)} showVotes={stamped}>
-            {stamped && target === d.playerId && <Stamp kind={kind === 'escaped' ? 'innocent' : kind} sm={phone} />}
+            {stamped && target === d.playerId && <Stamp kind={kind === 'escaped' ? 'innocent' : kind} sm />}
           </DrawingTile>
         ))}
       </div>

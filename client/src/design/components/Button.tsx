@@ -11,6 +11,7 @@ export function Button({ variant = 'primary', size = 'md', block, icon, classNam
   const rm = !!useReducedMotion();
   return (
     <motion.button
+      type="button"
       className={`btn btn--${variant} ${size !== 'md' ? `btn--${size}` : ''} ${block ? 'btn--block' : ''} ${icon ? 'btn--icon' : ''} ${className}`}
       whileTap={rest.disabled ? undefined : { scale: rm ? 1 : 0.94 }}
       whileHover={rest.disabled || rm ? undefined : { scale: 1.03 }}

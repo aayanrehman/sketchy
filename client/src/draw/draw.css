@@ -3,7 +3,7 @@
 .draw__tools { display: grid; gap: var(--s-2); }
 .draw__colors { display: flex; gap: var(--s-2); justify-content: center; flex-wrap: wrap; }
 .draw__color { width: var(--tap); height: var(--tap); border-radius: var(--r-pill); border: var(--ol); background: var(--ink); box-shadow: 0 3px 0 rgba(43,37,64,0.2); cursor: pointer; transition: transform var(--d-fast) var(--e-bounce), box-shadow var(--d-fast) var(--e-snap); }
-.draw__color--on { transform: scale(1.18); box-shadow: 0 0 0 3px var(--c-surface), 0 0 0 6px var(--c-blue); }
+.draw__color--on { transform: none; box-shadow: 0 0 0 2px var(--c-surface), 0 0 0 4px var(--c-ink); }
 .draw__row { display: flex; gap: var(--s-2); align-items: center; justify-content: center; }
 .draw__sizes { display: flex; gap: var(--s-1); }
 .draw__size { width: var(--tap); height: var(--tap); border-radius: var(--r-pill); border: 2px solid var(--c-ink); background: var(--c-surface); display: grid; place-items: center; cursor: pointer; }

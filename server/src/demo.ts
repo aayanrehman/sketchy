@@ -16,7 +16,7 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 export const DEMO_DIR = path.resolve(__dirname, '../data/demo');
 
 export interface BotDrawing { strokes: Drawing['strokes']; glowUrl?: string; golden?: boolean; match: number; sees: string; roast: string }
-export interface DemoContent { pairId: number; real: BotDrawing[]; decoy: BotDrawing[] }
+export interface DemoContent { source?: 'prepared-sample'; pairId: number; real: BotDrawing[]; decoy: BotDrawing[] }
 
 export const BOT_NAMES = ['Pixel', 'Doodle', 'Smudge'];
 const BANTER = [

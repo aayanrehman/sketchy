@@ -29,13 +29,14 @@ export function PlayScreen() {
   const join = (c: string, n: string, token?: string) => {
     setJoining(true); setErr(null);
     const s = socket();
-    const go = () => s.emit('join', { code: c, name: n, token }, (r) => {
+    const go = () => s.timeout(10000).emit('join', { code: c, name: n, token }, (timeout, r) => {
       setJoining(false);
-      if (!r.ok) { setErr(r.error); if (token) { try { localStorage.removeItem('sketchy.tokens'); } catch { /* ignore */ } } return; }
+      if (timeout) { setErr('Could not reach the room. Please try again.'); return; }
+      if (!r.ok) { setErr(r.error || 'Could not join the room'); if (token) { try { localStorage.removeItem('sketchy.tokens'); } catch { /* ignore */ } } return; }
       saveToken(c, r.token); saveName(n); setJoined(true);
       history.replaceState(null, '', `/play?code=${c}`);
     });
-    if (s.connected) go(); else s.once('connect', go);
+    go();
   };
 
   // Auto-rejoin on refresh / reconnect.
@@ -89,7 +90,7 @@ export function PlayScreen() {
         {phase === 'SCORES' && <ScoresMoment view={view} phone />}
         {phase === 'FINAL' && <FinalMoment view={view} phone />}
       </PhaseStage>
-      {p?.spectator && phase !== 'LOBBY' && <p className="phase__sub" style={{ marginTop: 16 }}>👀 Spectating. You join the next round.</p>}
+      {p?.spectator && phase !== 'LOBBY' && <p className="phase__sub" style={{ marginTop: 16 }}>Spectating. You join the next round.</p>}
     </PhoneShell>
   );
 }

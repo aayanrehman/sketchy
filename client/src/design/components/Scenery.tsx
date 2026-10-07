@@ -7,10 +7,10 @@ import { useReducedMotion } from 'framer-motion';
 export function Scenery({ hills = true, density = 3 }: { hills?: boolean; density?: number }) {
   const rm = !!useReducedMotion();
   const clouds = [
-    { left: '2%', top: '12%', scale: 0.7, delay: 0 },
-    { left: '72%', top: '7%', scale: 0.9, delay: -8 },
-    { left: '84%', top: '26%', scale: 0.5, delay: -16 },
-    { left: '12%', top: '30%', scale: 0.45, delay: -4 },
+    { left: '-4%', top: '48%', scale: 0.7, delay: 0 },
+    { left: '90%', top: '37%', scale: 0.9, delay: -8 },
+    { left: '92%', top: '70%', scale: 0.5, delay: -16 },
+    { left: '-5%', top: '76%', scale: 0.45, delay: -4 },
   ].slice(0, density);
   return (
     <div className="scene" aria-hidden>

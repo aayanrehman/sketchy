@@ -6,14 +6,16 @@
   "description": "Sketchy: a drawing imposter party game with an AI judge.",
   "scripts": {
     "dev": "node scripts/dev.mjs",
-    "dev:server": "tsx watch server/src/index.ts",
+    "dev:server": "node --import tsx --watch server/src/index.ts",
     "dev:client": "vite --config client/vite.config.ts",
     "build": "vite build --config client/vite.config.ts",
-    "start": "NODE_ENV=production tsx server/src/index.ts",
+    "start": "NODE_ENV=production node --import tsx server/src/index.ts",
     "typecheck": "tsc -p tsconfig.json --noEmit",
-    "test": "tsx --test server/src/*.test.ts"
+    "test": "node --import tsx --test server/src/*.test.ts"
   },
   "dependencies": {
+    "@fontsource/fredoka": "^5.3.0",
+    "@fontsource/nunito": "^5.3.0",
     "dotenv": "^18.0.6",
     "express": "^4.21.2",
     "framer-motion": "^11.15.0",

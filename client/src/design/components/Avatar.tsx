@@ -1,3 +1,4 @@
+import { AvatarArt, AwardArt, StatusIcon } from '@/design/components/Illustrations';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { Player } from '@shared/types';
 import { t } from '../motion';
@@ -25,11 +26,11 @@ export function Avatar({ player, size = 'md', isHost, isYou, badge, showScore, a
     >
       <div className="avatar__disc">
         <span className="avatar__ring" aria-hidden />
-        <span aria-hidden>{player.avatar}</span>
-        {isHost && <span className="avatar__badge avatar__badge--host" title="Host">★</span>}
+        <AvatarArt avatar={player.avatar} />
+        {isHost && <span className="avatar__badge avatar__badge--host" title="Host"><StatusIcon kind="star" /></span>}
         {isYou && <span className="avatar__badge avatar__badge--you" title="You">YOU</span>}
-        {badge && <span className="avatar__badge">{badge}</span>}
-        {showFlame && <span className={`avatar__flame ${rm ? 'rm-still' : ''}`} title={`${player.streak} catch streak`}>🔥</span>}
+        {badge && <span className="avatar__badge" aria-label={badge === '✓' ? 'Ready' : badge}>{badge === '✓' ? <StatusIcon kind="check" /> : badge}</span>}
+        {showFlame && <span className={`avatar__flame ${rm ? 'rm-still' : ''}`} title={`${player.streak} catch streak`}><AwardArt kind="flame" /></span>}
       </div>
       <span className="avatar__name">{player.name}</span>
       {showScore && <span className="avatar__score">{player.score}</span>}

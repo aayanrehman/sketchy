@@ -21,7 +21,7 @@
   --c-line: rgba(43,37,64,0.14);
   --c-text: #2B2540;         /* 12.4:1 on white */
   --c-text-dim: #5A5478;     /* 6.5:1 on white */
-  --c-text-mute: #777194;    /* 4.6:1 on white */
+  --c-text-mute: #605A78;    /* readable on sky and white */
   --c-on-ink: #FFFFFF;
   /* ---- color: stickers ---- */
   --c-pink: #FF7AB0;
@@ -33,6 +33,10 @@
   --c-gold: #FFC83D;
   --c-gold-2: #FFF1B8;
   --c-red: #FF5C5C;          /* IMPOSTER */
+  --c-success-text: #176C3B;
+  --c-danger-text: #A52336;
+  --c-warning-text: #9C4800;
+  --c-purple-text: #7542BB;
   --c-green: #3FD37F;        /* INNOCENT */
   --c-paper: #FFFDF6;        /* drawing canvas */
   --c-paper-line: #E9E3D2;
@@ -72,7 +76,7 @@
   --sh-glow-red: 0 0 0 4px rgba(255,92,92,0.5);
   --sh-glow-green: 0 0 0 4px rgba(63,211,127,0.5);
   /* ---- z-layers ---- */
-  --z-base: 0; --z-scene: 1; --z-tile: 10; --z-rail: 20; --z-overlay: 50; --z-modal: 100; --z-stamp: 150; --z-toast: 200; --z-fx: 300;
+  --z-base: 0; --z-scene: 1; --z-tile: 10; --z-rail: 20; --z-overlay: 50; --z-modal: 400; --z-stamp: 150; --z-toast: 200; --z-fx: 300;
   /* ---- motion ---- */
   --d-fast: 160ms;
   --d-base: 320ms;

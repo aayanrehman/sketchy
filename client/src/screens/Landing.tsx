@@ -13,12 +13,18 @@ export function Landing() {
   const [gallery, setGallery] = useState(false);
   const [help, setHelp] = useState(false);
   return (
-    <div className="landing">
+    <div className="landing landing--home">
       <Scenery density={3} />
-      <motion.div className="landing__inner" variants={phaseVariants(rm)} initial="initial" animate="enter">
+      <motion.div className="landing__inner landing__home-grid" variants={phaseVariants(rm)} initial="initial" animate="enter">
+        <div className="landing__scene">
+        <span className="landing__eyebrow">A LITTLE ART. A LOT OF ACCUSATIONS.</span>
         <motion.div className="landing__hero" variants={childVariants(rm)}><Mascot mood="happy" size={132} float /></motion.div>
         <motion.h1 className="landing__logo gold-text" variants={childVariants(rm)}>SKETCHY</motion.h1>
         <motion.p className="landing__tag" variants={childVariants(rm)}>One of you is drawing something different.<br />The AI knows who.</motion.p>
+        <div className="landing__samples" aria-label="Three DJs. One suspicious chef.">{[0, 1, 3].map((i) => <div key={i} className={`landing__sample ${i === 3 ? 'landing__sample--sus' : ''}`}><img src={`/demo-art/cat-${i}.webp`} alt={i === 3 ? 'The imposter drew a chef' : 'An artist drew a cat DJ'} />{i === 3 && <span>IMPOSTER?</span>}</div>)}</div>
+        </div>
+        <div className="landing__menu">
+        <p className="landing__menu-title">Who's looking sketchy?</p>
         <motion.div variants={childVariants(rm)}><Button size="lg" block onClick={() => { unlockAudio(); location.href = '/host'; }}>Host a game</Button></motion.div>
         <motion.div variants={childVariants(rm)}><Button variant="secondary" size="lg" block onClick={() => { unlockAudio(); location.href = '/play'; }}>Join a game</Button></motion.div>
         <motion.div variants={childVariants(rm)}><Button variant="lime" size="lg" block onClick={() => { unlockAudio(); location.href = '/demo'; }}>Try it solo</Button></motion.div>
@@ -29,6 +35,7 @@ export function Landing() {
           </button>
           <Button variant="ghost" size="sm" onClick={() => setHelp(true)}>How to play</Button>
         </motion.div>
+        </div>
       </motion.div>
       <Modal open={help} onClose={() => setHelp(false)} label="How to play"><HowTo onDone={() => setHelp(false)} cta="Close" /></Modal>
       <Modal open={gallery} onClose={() => setGallery(false)} label="Your gallery">

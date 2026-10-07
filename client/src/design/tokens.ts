@@ -1,7 +1,7 @@
 /** JS mirror of tokens.css for code that needs raw values (canvas, confetti, flying points, share card). */
 export const color = {
   sky: '#BDE4FF', sky2: '#E3F5FF', grass: '#A9EC84', grass2: '#7ED35C',
-  ink: '#2B2540', surface: '#FFFFFF', surface2: '#F3F0FF', text: '#2B2540', textDim: '#5A5478', textMute: '#777194', onInk: '#FFFFFF',
+  ink: '#2B2540', surface: '#FFFFFF', surface2: '#F3F0FF', text: '#2B2540', textDim: '#5A5478', textMute: '#605A78', onInk: '#FFFFFF',
   pink: '#FF7AB0', blue: '#6CC1FF', purple: '#B48BFF', yellow: '#FFD84D', lime: '#BDF26E', orange: '#FFB15C',
   gold: '#FFC83D', gold2: '#FFF1B8', red: '#FF5C5C', green: '#3FD37F', paper: '#FFFDF6',
 } as const;

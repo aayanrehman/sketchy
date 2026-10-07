@@ -1,3 +1,4 @@
+import { StatusIcon } from '@/design/components/Illustrations';
 import { Button, Card, Timer } from '@/design/components';
 import { HowTo } from '@/shell/HowTo';
 import { Rise } from '@/shell/PhaseStage';
@@ -22,7 +23,7 @@ export function HowToPhone({ view }: MomentProps) {
     <Rise><Card padLg>
       <HowTo onDone={ready ? undefined : () => { setDone(true); markHowTo(); send().emit('howto:ready'); }} />
       {ready && <p className="phase__sub" style={{ marginTop: 12 }}>Waiting for the others…</p>}
-      {ready && <Button variant="ghost" size="sm" block disabled>Got it ✓</Button>}
+      {ready && <Button variant="ghost" size="sm" block disabled>Got it <StatusIcon kind="check" /></Button>}
     </Card></Rise>
   );
 }

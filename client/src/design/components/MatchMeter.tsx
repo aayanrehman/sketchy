@@ -1,3 +1,4 @@
+import { AvatarArt } from './Illustrations';
 import { motion, useReducedMotion } from 'framer-motion';
 import { useEffect, useRef, useState } from 'react';
 import type { Drawing, Player } from '@shared/types';
@@ -29,6 +30,7 @@ export function MatchMeter({ drawing, player, isImposter, isYou, run, slow, onDo
     const t0 = performance.now();
     sfx.play(slow ? 'meterSlow' : 'meter');
     let raf = 0;
+    let typer: ReturnType<typeof setInterval> | undefined;
     const step = (now: number) => {
       const p = Math.min(1, (now - t0) / fillMs);
       const eased = 1 - Math.pow(1 - p, 3);
@@ -42,8 +44,9 @@ export function MatchMeter({ drawing, player, isImposter, isYou, run, slow, onDo
       if (rm) { setTyped(text); onDone?.(); return; }
       let i = 0;
       const id = setInterval(() => { i += 2; setTyped(text.slice(0, i)); if (i >= text.length) { clearInterval(id); onDone?.(); } }, 28);
+      typer = id;
     };
-    return () => cancelAnimationFrame(raf);
+    return () => { cancelAnimationFrame(raf); if (typer) clearInterval(typer); };
     // eslint-disable-next-line
   }, [run]);
 
@@ -54,7 +57,7 @@ export function MatchMeter({ drawing, player, isImposter, isYou, run, slow, onDo
       </div>
       <div className="meter__body">
         <div className="meter__name">
-          <span>{player?.avatar} {player?.name}</span>
+          <span className="meter__player">{player && <AvatarArt avatar={player.avatar} />}<span>{player?.name}</span></span>
           {isImposter && <span className="meter__tag">IMPOSTER</span>}
           {isYou && <span className="meter__tag meter__tag--you">YOU</span>}
         </div>

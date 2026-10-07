@@ -70,7 +70,7 @@ export function ScoresMoment({ view, phone }: MomentProps & { phone?: boolean })
           );
         })}
       </motion.div>
-      {me && <Rise><p className="phase__sub">{(() => { const p = view.byId.get(me.playerId); if (!p) return ''; const rank = ranked.findIndex((x) => x.id === p.id) + 1; return `You: ${p.score} pts · rank #${rank || '-'}${p.streak >= 2 ? ` · 🔥 ${p.streak} streak` : ''}`; })()}</p></Rise>}
+      {me && <Rise><p className="phase__sub">{(() => { const p = view.byId.get(me.playerId); if (!p) return ''; const rank = ranked.findIndex((x) => x.id === p.id) + 1; return `You: ${p.score} pts · rank #${rank || '-'}${p.streak >= 2 ? ` · ${p.streak} catch streak` : ''}`; })()}</p></Rise>}
     </div>
   );
 }
