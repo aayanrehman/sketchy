@@ -215,12 +215,33 @@
 .tile__inset { position: absolute; right: var(--s-2); bottom: var(--s-2); width: 22%; min-width: 44px; max-width: 96px; aspect-ratio: 1; border-radius: var(--r-sm); background: var(--c-paper); border: 2px solid var(--c-ink); box-shadow: 0 2px 0 rgba(43,37,64,0.2); overflow: hidden; z-index: 3; cursor: zoom-in; transition: transform var(--d-fast) var(--e-snap); }
 .tile__inset:hover { transform: scale(1.06); }
 .tile__inset small { position: absolute; left: 0; right: 0; bottom: 0; text-align: center; font-size: 9px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; background: rgba(255,255,255,.85); color: var(--c-ink); }
-/* "Redrawing" status while the sticker version is being made. */
-.tile--pending .tile__layer { filter: saturate(.7); }
-.tile__pending { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; border-radius: var(--r-pill); background: var(--c-surface); border: 2px solid var(--c-ink); box-shadow: 0 3px 0 rgba(43,37,64,0.18); font-weight: 900; font-size: var(--t-body-xs); color: var(--c-ink); white-space: nowrap; z-index: 3; }
-.tile__pending i { width: 12px; height: 12px; border-radius: 50%; border: 2px solid var(--c-ink); border-right-color: transparent; animation: sk-spin .8s linear infinite; }
-@keyframes sk-spin { to { transform: rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) { .tile__pending i { animation: none; } }
+/* "Redrawing" while the sticker version is being made. */
+.tile--pending { border-color: transparent; background: linear-gradient(var(--c-paper), var(--c-paper)) padding-box, conic-gradient(from var(--spin, 0deg), var(--c-pink), var(--c-yellow), var(--c-lime), var(--c-blue), var(--c-purple), var(--c-pink)) border-box; animation: sk-border 2.4s linear infinite; }
+@property --spin { syntax: '<angle>'; initial-value: 0deg; inherits: false; }
+@keyframes sk-border { to { --spin: 360deg; } }
+.tile--pending > .tile__layer { animation: sk-breathe 2.4s ease-in-out infinite; }
+@keyframes sk-breathe { 50% { transform: scale(1.025); filter: saturate(1.2); } }
+.tile__paint { position: absolute; inset: 0; z-index: 1; pointer-events: none; mix-blend-mode: multiply; opacity: .28;
+  background: linear-gradient(115deg, var(--c-pink), var(--c-yellow), var(--c-lime), var(--c-blue), var(--c-purple), var(--c-pink)); background-size: 300% 300%; animation: sk-paint 3s linear infinite; }
+@keyframes sk-paint { to { background-position: 300% 0; } }
+.tile__scan { position: absolute; left: 0; right: 0; top: 0; height: 18%; z-index: 2; pointer-events: none; background: linear-gradient(180deg, transparent, rgba(255,255,255,.85), transparent); animation: sk-scan 1.8s cubic-bezier(.45,0,.55,1) infinite; }
+@keyframes sk-scan { from { transform: translateY(-100%); } to { transform: translateY(560%); } }
+.tile__twinkles i { position: absolute; z-index: 2; font-style: normal; font-size: 18px; color: var(--c-gold); text-shadow: 0 0 6px #fff; animation: sk-twinkle 1.85s ease-in-out infinite; pointer-events: none; }
+@keyframes sk-twinkle { 0%, 100% { transform: scale(0) rotate(0); opacity: 0; } 50% { transform: scale(1.1) rotate(90deg); opacity: 1; } }
+.tile__pending { position: absolute; left: 50%; bottom: 12%; transform: translateX(-50%); display: inline-flex; align-items: center; gap: 8px; padding: 4px 14px 4px 4px; border-radius: var(--r-pill); background: var(--c-surface); border: 2px solid var(--c-ink); box-shadow: 0 3px 0 rgba(43,37,64,0.18); font-weight: 900; font-size: var(--t-body-xs); color: var(--c-ink); white-space: nowrap; z-index: 3; }
+.tile__pending img { width: 30px; height: 30px; animation: sk-bob-sm .6s ease-in-out infinite alternate; }
+@keyframes sk-bob-sm { to { transform: translateY(-3px) rotate(-6deg); } }
+.tile__pending-text { display: grid; gap: 3px; }
+.tile__pending-text b { display: block; width: 96px; height: 6px; border-radius: 99px; background: var(--c-surface-3); overflow: hidden; }
+.tile__pending-text em { display: block; height: 100%; background: linear-gradient(90deg, var(--c-pink), var(--c-blue)); border-radius: 99px; animation: sk-progress 14s cubic-bezier(.1,.7,.3,1) forwards; }
+@keyframes sk-progress { from { width: 4%; } to { width: 92%; } }
+/* Reveal burst: little rays pop out as the sticker paints in. */
+.tile__burst { position: absolute; left: 50%; top: 50%; z-index: 4; pointer-events: none; }
+.tile__burst i { position: absolute; width: 10px; height: 10px; border-radius: 3px; background: var(--c-yellow); border: 2px solid var(--c-ink); transform: rotate(var(--a)) translateY(0) scale(0); animation: sk-burst .8s cubic-bezier(.2,0,0,1) forwards; }
+.tile__burst i:nth-child(even) { background: var(--c-pink); }
+@keyframes sk-burst { 40% { transform: rotate(var(--a)) translateY(-90px) scale(1); opacity: 1; } 100% { transform: rotate(var(--a)) translateY(-130px) scale(0); opacity: 0; } }
+@media (prefers-reduced-motion: reduce) { .tile--pending, .tile--pending > .tile__layer, .tile__paint, .tile__scan, .tile__twinkles i, .tile__pending img { animation: none; } .tile__scan, .tile__twinkles { display: none; } }
+
 /* Voting: selectable tiles lift on hover and show a "Vote" pill. */
 .tile--selectable { transition: transform var(--d-fast) var(--e-snap), box-shadow var(--d-fast) var(--e-snap); }
 .tile--selectable:hover, .tile--selectable:focus-visible { transform: translateY(-4px); box-shadow: var(--sh-card), 0 0 0 4px var(--c-pink); outline: none; }

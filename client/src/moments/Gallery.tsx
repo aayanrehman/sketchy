@@ -6,14 +6,18 @@ import { Rise } from '@/shell/PhaseStage';
 import { childVariants } from '@/design/motion';
 import { useFitGrid } from '@/design/useFitGrid';
 import { useSfx } from '@/sound/useSfx';
-import { send, type MomentProps } from './common';
+import { phaseElapsed, send, type MomentProps } from './common';
+
+/** At the start of the reveal, tiles paint in one after another (seconds from now); later mounts show art at once. */
+export const revealAt = (view: MomentProps['view'], i: number) => view.room?.phase === 'GALLERY' ? Math.max(0, REVEAL_FIRST_S + i * REVEAL_STEP_S - phaseElapsed(view) / 1000) : 0;
+const REVEAL_FIRST_S = 1.6, REVEAL_STEP_S = 0.9; // keep in sync with galleryMinMs in convex/engine.ts
 
 /** One line telling everyone exactly what is happening right now. */
 function copy(phase: string, drawings: Drawing[]) {
   const pending = drawings.filter((d) => d.glowStatus === 'pending').length;
   if (phase === 'GALLERY') return {
     title: 'Here’s what everyone drew',
-    sub: pending ? `Redrawing each sketch as a sticker · ${drawings.length - pending}/${drawings.length} done` : 'All drawings are in. Discussion starts in a moment.',
+    sub: pending ? 'Sketchy is redrawing every sketch as a sticker. The original stays in the corner.' : 'Every sketch, redrawn. Discussion starts in a moment.',
   };
   if (phase === 'DISCUSS') return { title: 'Who drew something different?', sub: 'One player had a slightly different prompt. Talk it over in the chat. Voting opens when the timer runs out.' };
   return { title: 'Vote for the imposter', sub: '' };
@@ -41,9 +45,9 @@ export function GalleryMain({ view }: MomentProps) {
         </div>
       </Rise>
       <div ref={grid.ref} style={grid.style}>
-        {r.drawings.map((d) => (
+        {r.drawings.map((d, i) => (
           <motion.div key={d.playerId} variants={childVariants(rm)}>
-            <DrawingTile drawing={d} player={view.byId.get(d.playerId)} layoutId={`tile-${r.index}-${d.playerId}`} size={grid.size} />
+            <DrawingTile drawing={d} player={view.byId.get(d.playerId)} layoutId={`tile-${r.index}-${d.playerId}`} size={grid.size} revealDelay={revealAt(view, i)} />
           </motion.div>
         ))}
       </div>
@@ -90,9 +94,9 @@ export function GalleryPhone({ view }: MomentProps) {
         {phase === 'DISCUSS' && me.isHost && <Button variant="ghost" size="sm" onClick={() => send().emit('host:skip')}>Skip to vote</Button>}
       </Rise>
       <div ref={grid.ref} style={grid.style}>
-        {r.drawings.map((d) => (
+        {r.drawings.map((d, i) => (
           <motion.div key={d.playerId} variants={childVariants(rm)}>
-            <DrawingTile drawing={d} player={view.byId.get(d.playerId)} layoutId={`tile-${r.index}-${d.playerId}`} size={grid.size}
+            <DrawingTile drawing={d} player={view.byId.get(d.playerId)} layoutId={`tile-${r.index}-${d.playerId}`} size={grid.size} revealDelay={revealAt(view, i)}
               selectable={canVote && d.playerId !== me.playerId && (!revote || revote.includes(d.playerId))} selected={(picked || r.votes[me.playerId]) === d.playerId} actionLabel="Vote"
               dim={phase === 'VOTE' && (d.playerId === me.playerId || (!!revote && !revote.includes(d.playerId)))} onSelect={() => vote(d.playerId)} />
           </motion.div>

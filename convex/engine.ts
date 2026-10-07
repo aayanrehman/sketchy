@@ -20,8 +20,8 @@ const HOST_GRACE_MS = 5_000;
 const IMPOSTER_GRACE_MS = 12_000;
 const LOBBY_DROP_MS = 20_000;
 const STEAL_REVEAL_MS = 2_800;
-/** The reveal stays up at least this long so the redraw is seen, even if the AI was fast. */
-const GALLERY_MIN_MS = 4_000;
+/** The reveal stays up until every tile's staggered paint-in has played (client: revealAt in Gallery.tsx), even if the AI was fast. */
+const galleryMinMs = (n: number) => 1_600 + Math.max(0, n - 1) * 900 + 1_800;
 const REVOTE_MS = 12_000;
 const BOT_GLOW_DELAY_MS = [1_500, 6_000];
 export const ROOM_IDLE_MS = 2 * 60 * 60 * 1000;
@@ -415,7 +415,7 @@ export class Engine {
     switch (this.s.phase) {
       case 'HOW_TO': if (active.length && active.every((p) => p.readyHowTo)) this.advance(); break;
       case 'DRAW': if (r && participants.every((p) => p.hasSubmitted)) this.advance(); break;
-      case 'GALLERY': if (r && r.drawings.every((d) => d.glowStatus !== 'pending')) this.shorten(Math.max(0, GALLERY_MIN_MS - (this.now - this.s.phaseStartedAt))); break;
+      case 'GALLERY': if (r && r.drawings.every((d) => d.glowStatus !== 'pending')) this.shorten(Math.max(0, galleryMinMs(r.drawings.length) - (this.now - this.s.phaseStartedAt))); break;
       case 'VOTE': if (r && participants.every((p) => p.hasVoted)) this.advance(); break;
       case 'VERDICT': { const humans = participants.filter((p) => !p.isBot); if (humans.length && humans.every((p) => this.s.verdictReady.includes(p.id))) this.advance(); break; }
       case 'STEAL': if (r && r.stealPick !== null) this.shorten(STEAL_REVEAL_MS); break;

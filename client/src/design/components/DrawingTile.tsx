@@ -28,7 +28,8 @@ export function DrawingTile({ drawing, player, layoutId, selectable, selected, d
   const mockOnly = drawing.glowStatus === 'done' && !drawing.glowUrl && !!drawing.glowMock;
   const [peek, setPeek] = useState(false);
   const glowed = !rawOnly && ready && drawing.glowStatus === 'done' && (!!drawing.glowUrl || mockOnly);
-  const pending = !rawOnly && !drawing.blank && drawing.glowStatus === 'pending';
+  // Redrawing: shown until this tile's sticker art appears (the AI is still working, or its staggered reveal hasn't come up yet).
+  const pending = !rawOnly && !drawing.blank && drawing.glowStatus !== 'fallback' && !glowed;
   const [playedGold, setPlayedGold] = useState(false);
   useEffect(() => {
     if (drawing.golden && glowed && !playedGold) { setPlayedGold(true); sfx.play('golden'); }
@@ -36,7 +37,7 @@ export function DrawingTile({ drawing, player, layoutId, selectable, selected, d
   useEffect(() => { if (glowed) sfx.play('glow'); /* eslint-disable-next-line */ }, [glowed]);
 
   const cls = ['tile',
-    !rawOnly && drawing.glowStatus === 'pending' ? 'tile--pending' : '',
+    pending ? 'tile--pending' : '',
     drawing.glowStatus === 'fallback' && !drawing.blank ? 'tile--fallback' : '',
     drawing.golden && glowed ? 'tile--golden' : '',
     selectable ? 'tile--selectable' : '', selected ? 'tile--selected' : '', dim ? 'tile--dim' : '', spot ? 'tile--spot' : '',
@@ -68,9 +69,9 @@ export function DrawingTile({ drawing, player, layoutId, selectable, selected, d
           <motion.div
             key="glow"
             className="tile__layer"
-            initial={{ opacity: 0, scale: rm ? 1 : 1.12 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={t.dramatic(rm)}
+            initial={rm ? { opacity: 0 } : { clipPath: 'circle(0% at 50% 50%)', scale: 1.06 }}
+            animate={rm ? { opacity: 1 } : { clipPath: 'circle(75% at 50% 50%)', scale: 1 }}
+            transition={{ duration: rm ? 0.2 : 0.75, ease: [0.2, 0, 0, 1] }}
           >
             {mockOnly
               ? <SketchCanvas strokes={drawing.strokes} size={size} className="tile__layer tile__layer--glow tile__layer--mock" />
@@ -82,7 +83,8 @@ export function DrawingTile({ drawing, player, layoutId, selectable, selected, d
       {drawing.golden && glowed && <div className="tile__shine" aria-hidden />}
       <div className="tile__frame" aria-hidden />
       {drawing.golden && glowed && <span className="tile__golden-tag">GOLDEN</span>}
-      {pending && <PendingLabel />}
+      {pending && <Redrawing />}
+      {glowed && !rm && revealDelay > 0 && <span className="tile__burst" aria-hidden>{Array.from({ length: 8 }, (_, i) => <i key={i} style={{ ['--a' as any]: `${i * 45}deg` }} />)}</span>}
       {drawing.glowStatus === 'fallback' && !drawing.blank && !rawOnly && <span className="tile__fallback">Sketch only</span>}
       {glowed && !drawing.blank && (
         <span className="tile__inset" onPointerEnter={() => setPeek(true)} onPointerLeave={() => setPeek(false)} title="Original sketch: hover to compare">
@@ -108,9 +110,19 @@ export function DrawingTile({ drawing, player, layoutId, selectable, selected, d
 }
 
 const STEPS = ['Reading the sketch', 'Inking outlines', 'Adding color', 'Final touches'];
-/** Shown on a tile while its sticker version is being drawn. */
-function PendingLabel() {
+/** The redraw-in-progress overlay: a paint sweep, a scan line, twinkles, and a progress pill with Sketchy at work. */
+function Redrawing() {
   const [i, setI] = useState(0);
-  useEffect(() => { const id = setInterval(() => setI((n) => Math.min(n + 1, STEPS.length - 1)), 2600); return () => clearInterval(id); }, []);
-  return <span className="tile__pending" role="status"><i aria-hidden />{STEPS[i]}…</span>;
+  useEffect(() => { const id = setInterval(() => setI((n) => Math.min(n + 1, STEPS.length - 1)), 2200); return () => clearInterval(id); }, []);
+  return (
+    <>
+      <span className="tile__paint" aria-hidden />
+      <span className="tile__scan" aria-hidden />
+      <span className="tile__twinkles" aria-hidden>{[[18, 22], [74, 16], [82, 64], [26, 70], [52, 40]].map(([x, y], k) => <i key={k} style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${k * 0.37}s` }}>✦</i>)}</span>
+      <span className="tile__pending" role="status">
+        <img src="/mascot/think.webp" alt="" width={30} height={30} />
+        <span className="tile__pending-text">{STEPS[i]}…<b><em /></b></span>
+      </span>
+    </>
+  );
 }
