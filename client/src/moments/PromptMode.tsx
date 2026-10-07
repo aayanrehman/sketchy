@@ -66,7 +66,7 @@ export function WritePhone({ view }: MomentProps) {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   useEffect(() => { setText(pass === 'final' ? mine?.draftPrompt || '' : ''); setErr(null); /* eslint-disable-next-line */ }, [pass]);
-  const max = pass === 'draft' ? 8 : 25;
+  const max = pass === 'draft' ? 8 : 30;
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
   const problem = text.trim() ? promptProblem(text, pass, me.taboo || null) : null;
   const submit = async () => {
@@ -86,7 +86,7 @@ export function WritePhone({ view }: MomentProps) {
         </div>
         <div className="write__main">
           <form className="writer" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-            <label htmlFor="prompt" className="writer__label">{pass === 'draft' ? 'Quick draft' : 'Final prompt'} <small>{pass === 'draft' ? 'up to 8 words' : 'up to 25 words · start from your draft and improve it'}</small></label>
+            <label htmlFor="prompt" className="writer__label">{pass === 'draft' ? 'Quick draft' : 'Final prompt'} <small>{pass === 'draft' ? 'up to 8 words' : 'up to 30 words · start from your draft and improve it'}</small></label>
             <textarea id="prompt" className="field writer__input" rows={pass === 'draft' ? 2 : 3} value={text} disabled={locked}
               placeholder={pass === 'draft' ? 'e.g. frog drumming on a lily pad, watercolor' : 'Add the details, style, colors and lighting your draft missed'}
               onChange={(e) => { setText(e.target.value); setErr(null); }}

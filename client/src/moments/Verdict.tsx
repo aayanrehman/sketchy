@@ -12,7 +12,7 @@ export function VerdictMoment({ view }: MomentProps) {
   const imposter = view.byId.get(r.imposterId);
   const order = [...r.drawings].sort((a, b) => Number(b.playerId === r.imposterId) - Number(a.playerId === r.imposterId));
   const caughtLine = r.caught
-    ? `Caught! ${imposter?.name} was the imposter${r.stealCorrect ? ', but stole the round by guessing the prompt' : ''}.`
+    ? `Caught! ${imposter?.name} was the imposter${r.stealCorrect ? `, but stole the round by guessing ${r.mode === 'prompt' ? 'what was hidden' : 'the prompt'}` : ''}.`
     : `${imposter?.name} was the imposter and got away${r.escapeReason === 'tie' ? ' on a tied vote' : r.escapeReason === 'novotes' ? ' (no votes)' : ''}.`;
   const waiting = (view.room?.players || []).filter((p) => !p.isBot && r.participantIds.includes(p.id) && !view.room?.verdictReady?.includes(p.id)).length;
   if (r.mode === 'prompt') return <PromptVerdict view={view} ready={!!ready} waiting={waiting} caughtLine={caughtLine} />;

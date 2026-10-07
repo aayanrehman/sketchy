@@ -84,6 +84,7 @@ export function GalleryPhone({ view }: MomentProps) {
     : voted ? (left ? `Waiting for ${left} more vote${left === 1 ? '' : 's'}…` : 'All votes in!')
     : revote ? `Pick between ${names}. If it’s still a tie, the imposter escapes.`
     : me.isImposter ? 'You’re the imposter. Click someone else’s drawing to throw suspicion on them.'
+    : r.mode === 'prompt' ? 'Click the image you think the imposter made. Check the drafts in the corners too. You can’t vote for yourself.'
     : 'Click the drawing you think came from a different prompt. You can’t vote for yourself.';
   return (
     <div className="phase">

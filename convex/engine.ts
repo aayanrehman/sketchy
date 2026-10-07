@@ -359,7 +359,8 @@ export class Engine {
     if (['UNMASK', 'VERDICT', 'SCORES', 'FINAL'].includes(phase)) this.cancel('imposterGrace');
     if (phase === 'VERDICT') {
       this.s.verdictReady = [];
-      for (const d of r?.drawings || []) if (d.judgeStatus === 'pending') { d.judgeStatus = 'fallback'; d.match = undefined; d.roast = JUDGE_FOG; }
+      // Prompt mode scores the final image late (after it's generated): let it land on the results screen.
+      if (r?.mode !== 'prompt') for (const d of r?.drawings || []) if (d.judgeStatus === 'pending') { d.judgeStatus = 'fallback'; d.match = undefined; d.roast = JUDGE_FOG; }
     }
     this.s.phase = phase;
     this.s.phaseStartedAt = this.now;

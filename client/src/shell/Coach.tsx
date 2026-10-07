@@ -20,9 +20,12 @@ function line(room: PublicRoom, me: MeView): { text: string; mood: 'happy' | 'th
       : { text: imp ? 'Write a quick draft (8 words max). Too vague looks suspicious, a wrong guess gives you away.' : 'Write a quick draft prompt, 8 words max, then lock it in. You’ll get to improve it next.', mood: 'think' };
     case 'REFINE': return r.drawings.find((d) => d.playerId === me.playerId)?.finalIn
       ? { text: 'Final prompt locked in. Waiting for the others…', mood: 'happy' }
-      : { text: imp ? 'Peek at everyone’s draft images to work out what was hidden, then write your final prompt.' : 'Check your draft’s score and tip, then improve your prompt (25 words max). Careful: the imposter can see these drafts too.', mood: 'think' };
+      : { text: imp ? 'Peek at everyone’s draft images to work out what was hidden, then write your final prompt.' : 'Check your draft’s score and tip, then improve your prompt (30 words max). Careful: the imposter can see these drafts too.', mood: 'think' };
     case 'GALLERY': return { text: 'Everyone’s final images are coming in. Which one doesn’t quite match the others?', mood: 'sus' };
-    case 'STEAL': if (r.imposterId === me.playerId) return { text: 'You got caught, but you can still steal points: what was hidden behind the blur?', mood: 'imposter' }; break;
+    case 'STEAL': return r.imposterId === me.playerId
+      ? { text: 'You got caught, but you can still steal points: what was hidden behind the blur?', mood: 'imposter' }
+      : { text: 'The imposter gets one guess at what was hidden behind the blur, to steal points…', mood: 'think' };
+    case 'VOTE': if (!p?.hasVoted && !r.revote) return { text: imp ? 'Click someone else’s image to frame them.' : 'Click the image you think the imposter made.', mood: 'sus' }; break;
   }
   switch (room.phase) {
     case 'PROMPT': return imp

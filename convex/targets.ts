@@ -21,13 +21,13 @@ export function matchOf(b: Breakdown, styleRound = false) {
   return Math.round((total / max) * 100);
 }
 
-/** Words that break this round's rule, or null. Draft: 8 words max; final: 25. Taboo bans the obvious words (and simple plurals). */
+/** Words that break this round's rule, or null. Draft: 8 words max; final: 30. Taboo bans the obvious words (and simple plurals). */
 export function promptProblem(text: string, pass: 'draft' | 'final', taboo: string[] | null): string | null {
   const t = text.trim();
   if (!t) return 'Write a prompt first.';
   if (t.length > 220) return 'Keep it under 220 characters.';
   const words = t.split(/\s+/).length;
-  const max = pass === 'draft' ? 8 : 25;
+  const max = pass === 'draft' ? 8 : 30;
   if (words > max) return `Your ${pass} can be at most ${max} words (you have ${words}).`;
   for (const w of taboo || []) {
     if (new RegExp(`\\b${w.replace(/[^a-z0-9]/gi, '')}(s|es)?\\b`, 'i').test(t)) return `“${w}” is a taboo word this round. Describe it another way.`;
