@@ -1,5 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion';
-import { Card, Timer } from '@/design/components';
+import { Card, Timer, Mascot } from '@/design/components';
 import { Rise } from '@/shell/PhaseStage';
 import { t } from '@/design/motion';
 import type { MomentProps } from './common';
@@ -26,6 +26,7 @@ export function PromptPhone({ view }: MomentProps) {
         <Rise><Card padLg className="prompt-card"><p className="prompt-card__label">SPECTATING</p><p className="prompt-card__text">{r.theme}</p><p className="dim">You join the next round.</p></Card></Rise>
       ) : (
         <Rise><Card padLg className={`prompt-card ${me.isImposter ? 'prompt-card--imposter' : ''}`}>
+          <Mascot mood={me.isImposter ? 'imposter' : 'happy'} size={88} float />
           <p className="prompt-card__label">YOUR SECRET PROMPT</p>
           <p className="prompt-card__text">{me.prompt}</p>
           {me.isImposter ? <span className="prompt-card__banner">You're the imposter. Blend in.</span> : <p className="dim" style={{ fontWeight: 700 }}>Everyone else has this too… except one.</p>}

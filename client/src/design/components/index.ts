@@ -10,3 +10,5 @@ export { Modal } from './Modal';
 export { Stamp } from './Stamp';
 export { ScoreBurstLayer, useScoreBurst } from './ScoreBurst';
 export { Confetti } from './Confetti';
+export { Scenery } from './Scenery';
+export { Mascot } from './Mascot';

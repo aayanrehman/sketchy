@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Button, Card, Modal } from '@/design/components';
+import { Button, Card, Modal, Mascot, Scenery } from '@/design/components';
 import { load, level, levelTitle, levelProgress } from '@/progression/store';
 import { childVariants, phaseVariants } from '@/design/motion';
 import { unlockAudio } from '@/sound/sfx';
@@ -14,13 +14,15 @@ export function Landing() {
   const [help, setHelp] = useState(false);
   return (
     <div className="landing">
+      <Scenery density={3} />
       <motion.div className="landing__inner" variants={phaseVariants(rm)} initial="initial" animate="enter">
-        <motion.h1 className="landing__logo neon-text" variants={childVariants(rm)}>SKETCHY</motion.h1>
+        <motion.div className="landing__hero" variants={childVariants(rm)}><Mascot mood="happy" size={132} float /></motion.div>
+        <motion.h1 className="landing__logo gold-text" variants={childVariants(rm)}>SKETCHY</motion.h1>
         <motion.p className="landing__tag" variants={childVariants(rm)}>One of you is drawing something different.<br />The AI knows who.</motion.p>
         <motion.div variants={childVariants(rm)}><Button size="lg" block onClick={() => { unlockAudio(); location.href = '/host'; }}>Host a game</Button></motion.div>
         <motion.div variants={childVariants(rm)}><Button variant="secondary" size="lg" block onClick={() => { unlockAudio(); location.href = '/play'; }}>Join a game</Button></motion.div>
         <motion.div variants={childVariants(rm)}><Button variant="lime" size="lg" block onClick={() => { unlockAudio(); location.href = '/demo'; }}>Try it solo</Button></motion.div>
-        <motion.p className="mute" style={{ fontWeight: 700, fontSize: 'var(--t-body-sm)' }} variants={childVariants(rm)}>4 to 8 players · 3 rounds · about 12 minutes · no login</motion.p>
+        <motion.p className="dim" style={{ fontWeight: 800, fontSize: 'var(--t-body-sm)' }} variants={childVariants(rm)}>4 to 8 players · 3 rounds · about 12 minutes · no login · any phone</motion.p>
         <motion.div variants={childVariants(rm)} style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button type="button" className="level-chip" onClick={() => setGallery(true)} aria-label="Your progress and gallery">
             <span>Lv {level(prog.xp)} {levelTitle(prog.xp)}</span><span className="level-bar"><i style={{ transform: `scaleX(${levelProgress(prog.xp)})` }} /></span>

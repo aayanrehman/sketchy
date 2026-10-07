@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { VERDICT_PER_DRAWING_MS } from '@shared/types';
-import { MatchMeter } from '@/design/components';
+import { MatchMeter, Mascot } from '@/design/components';
 import { Rise } from '@/shell/PhaseStage';
 import { t } from '@/design/motion';
 import { useSfx } from '@/sound/useSfx';
@@ -31,7 +31,7 @@ export function VerdictMoment({ view }: MomentProps) {
 
   return (
     <div className="verdict">
-      <Rise className="judge"><span className="judge__face" aria-hidden>🤖</span><h2 className="display-md">The judge's verdict</h2></Rise>
+      <Rise className="judge"><Mascot mood="judge" size={72} bob /><h2 className="display-md">The judge's verdict</h2></Rise>
       <motion.div className="verdict__prompt" initial={{ opacity: 0, scale: rm ? 1 : 0.9 }} animate={{ opacity: showPrompt ? 1 : 0, scale: 1 }} transition={t.bounce(rm)}>
         <span className="prompt-card__label">THE REAL PROMPT WAS</span>
         <b>{r.realPrompt}</b>

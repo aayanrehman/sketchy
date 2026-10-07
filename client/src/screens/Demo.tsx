@@ -5,7 +5,7 @@ import { PhaseStage } from '@/shell/PhaseStage';
 import { useRoom } from '@/state/useRoom';
 import { socket, loadName, saveName } from '@/net/socket';
 import { unlockAudio } from '@/sound/sfx';
-import { Button, Card } from '@/design/components';
+import { Button, Card, Mascot, Scenery } from '@/design/components';
 import { HowToPhone, HowToMain } from '@/moments/HowToPhase';
 import { PromptPhone, PromptMain } from '@/moments/Prompt';
 import { DrawPhone, DrawMain } from '@/moments/Draw';
@@ -37,8 +37,10 @@ export function Demo() {
   if (!started || !view.room || !view.me) {
     return (
       <div className="landing">
+        <Scenery density={3} />
         <form className="landing__inner" onSubmit={(e) => { e.preventDefault(); start(); }}>
-          <h1 className="landing__logo neon-text">DEMO</h1>
+          <div className="landing__hero"><Mascot mood="sus" size={120} float /></div>
+          <h1 className="landing__logo gold-text">TRY IT SOLO</h1>
           <p className="landing__tag">Play 2 quick rounds against 3 bots: once as an artist, once as the imposter. Your drawing goes through the real AI.</p>
           <Card padLg style={{ display: 'grid', gap: 12 }}>
             <label className="sr-only" htmlFor="name">Your name</label>

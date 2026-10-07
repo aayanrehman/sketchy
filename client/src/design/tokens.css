@@ -1,42 +1,56 @@
 /* =====================================================================
-   SKETCHY DESIGN SYSTEM: "NEON STAGE"
-   A dark TV-studio stage lit by neon. Every screen uses only these tokens.
+   SKETCHY DESIGN SYSTEM: "STICKER PARK"
+   A bright pastel playground drawn with thick ink outlines: chunky white
+   cards, hard offset shadows, rounded type, clouds and hills. Every screen
+   uses only these tokens.
    ===================================================================== */
 :root {
-  /* ---- color: stage ---- */
-  --c-ink: #0B0A1F;          /* stage floor */
-  --c-ink-2: #151338;        /* raised floor */
-  --c-surface: #1E1B4B;      /* cards */
-  --c-surface-2: #2B2768;    /* hovered / nested cards */
-  --c-line: rgba(255,255,255,0.12);
-  --c-text: #FFFFFF;
-  --c-text-dim: #C9C5F0;     /* 9.9:1 on ink */
-  --c-text-mute: #9A95D6;    /* 5.6:1 on ink */
-  /* ---- color: neon ---- */
-  --c-magenta: #FF3D8A;
-  --c-cyan: #22E4FF;
-  --c-lime: #C6FF3D;
-  --c-violet: #8B5CF6;
+  /* ---- color: scene ---- */
+  --c-sky: #BDE4FF;          /* top of sky */
+  --c-sky-2: #E3F5FF;        /* horizon */
+  --c-grass: #A9EC84;
+  --c-grass-2: #7ED35C;
+  --c-hill: #B9F09A;
+  --c-cloud: #FFFFFF;
+  /* ---- color: ink & surfaces ---- */
+  --c-ink: #2B2540;          /* outlines, primary buttons, text */
+  --c-ink-soft: #4A4466;
+  --c-surface: #FFFFFF;      /* cards */
+  --c-surface-2: #F3F0FF;    /* nested panels */
+  --c-surface-3: #E8E3FF;
+  --c-line: rgba(43,37,64,0.14);
+  --c-text: #2B2540;         /* 12.4:1 on white */
+  --c-text-dim: #5A5478;     /* 6.5:1 on white */
+  --c-text-mute: #777194;    /* 4.6:1 on white */
+  --c-on-ink: #FFFFFF;
+  /* ---- color: stickers ---- */
+  --c-pink: #FF7AB0;
+  --c-blue: #6CC1FF;
+  --c-purple: #B48BFF;
+  --c-yellow: #FFD84D;
+  --c-lime: #BDF26E;
+  --c-orange: #FFB15C;
   --c-gold: #FFC83D;
   --c-gold-2: #FFF1B8;
-  --c-red: #FF4D4D;          /* IMPOSTER */
-  --c-green: #3DFF9C;        /* INNOCENT */
-  --c-paper: #FFF9EF;        /* drawing canvas */
-  --c-paper-line: #E8DFC8;
+  --c-red: #FF5C5C;          /* IMPOSTER */
+  --c-green: #3FD37F;        /* INNOCENT */
+  --c-paper: #FFFDF6;        /* drawing canvas */
+  --c-paper-line: #E9E3D2;
   /* ---- gradients ---- */
-  --g-stage: radial-gradient(120% 80% at 50% -10%, #3B2A8C 0%, #1A1650 45%, var(--c-ink) 100%);
-  --g-neon: linear-gradient(135deg, var(--c-magenta) 0%, var(--c-violet) 55%, var(--c-cyan) 100%);
-  --g-gold: linear-gradient(135deg, #FFE27A 0%, var(--c-gold) 40%, #FF9F1C 100%);
-  --g-shine: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.75) 50%, transparent 65%);
-  --g-spot: radial-gradient(closest-side, rgba(255,255,255,0.22), rgba(255,255,255,0.0));
-  --g-card: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0) 60%);
+  --g-stage: linear-gradient(180deg, var(--c-sky) 0%, var(--c-sky-2) 70%, var(--c-sky-2) 100%);
+  --g-neon: linear-gradient(90deg, var(--c-pink) 0%, var(--c-purple) 50%, var(--c-blue) 100%);
+  --g-gold: linear-gradient(180deg, #FFE785 0%, var(--c-gold) 60%, #FFAD33 100%);
+  --g-shine: linear-gradient(115deg, transparent 35%, rgba(255,255,255,0.85) 50%, transparent 65%);
+  --g-spot: radial-gradient(closest-side, rgba(255,255,255,0.95), rgba(255,255,255,0.0));
+  --g-card: none;
+  --g-logo: linear-gradient(180deg, #FFE066 0%, #FFB15C 100%);
   /* ---- type ---- */
-  --f-display: 'Bungee', 'Arial Black', Impact, sans-serif;
+  --f-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
   --f-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
-  --t-display-xl: clamp(40px, 9vw, 88px);
-  --t-display-lg: clamp(28px, 6vw, 56px);
-  --t-display-md: clamp(20px, 4.5vw, 34px);
-  --t-display-sm: clamp(16px, 3.6vw, 22px);
+  --t-display-xl: clamp(44px, 10vw, 96px);
+  --t-display-lg: clamp(30px, 6.5vw, 60px);
+  --t-display-md: clamp(22px, 4.8vw, 36px);
+  --t-display-sm: clamp(17px, 3.8vw, 23px);
   --t-body-lg: 18px;
   --t-body-md: 16px;
   --t-body-sm: 14px;
@@ -44,17 +58,21 @@
   /* ---- spacing ---- */
   --s-1: 4px; --s-2: 8px; --s-3: 12px; --s-4: 16px; --s-5: 24px; --s-6: 32px; --s-7: 48px; --s-8: 64px;
   /* ---- radii ---- */
-  --r-sm: 8px; --r-md: 14px; --r-lg: 22px; --r-xl: 32px; --r-pill: 999px;
-  /* ---- shadows ---- */
-  --sh-card: 0 10px 30px rgba(0,0,0,0.45), 0 1px 0 rgba(255,255,255,0.06) inset;
-  --sh-pop: 0 18px 50px rgba(0,0,0,0.55);
-  --sh-glow-magenta: 0 0 24px rgba(255,61,138,0.55), 0 0 60px rgba(255,61,138,0.25);
-  --sh-glow-cyan: 0 0 24px rgba(34,228,255,0.55), 0 0 60px rgba(34,228,255,0.25);
-  --sh-glow-gold: 0 0 28px rgba(255,200,61,0.65), 0 0 80px rgba(255,200,61,0.35);
-  --sh-glow-red: 0 0 28px rgba(255,77,77,0.7);
-  --sh-glow-green: 0 0 28px rgba(61,255,156,0.7);
+  --r-sm: 10px; --r-md: 16px; --r-lg: 24px; --r-xl: 32px; --r-pill: 999px;
+  /* ---- outlines & shadows (the sticker look) ---- */
+  --ol: 3px solid var(--c-ink);
+  --ol-w: 3px;
+  --sh-card: 0 6px 0 rgba(43,37,64,0.16);
+  --sh-pop: 0 10px 0 rgba(43,37,64,0.18), 0 24px 40px rgba(43,37,64,0.18);
+  --sh-press: 0 3px 0 var(--c-ink);
+  --sh-btn: 0 5px 0 var(--c-ink);
+  --sh-glow-magenta: 0 0 0 4px rgba(255,122,176,0.45);
+  --sh-glow-cyan: 0 0 0 4px rgba(108,193,255,0.55);
+  --sh-glow-gold: 0 0 0 4px rgba(255,200,61,0.6), 0 0 28px rgba(255,200,61,0.6);
+  --sh-glow-red: 0 0 0 4px rgba(255,92,92,0.5);
+  --sh-glow-green: 0 0 0 4px rgba(63,211,127,0.5);
   /* ---- z-layers ---- */
-  --z-base: 0; --z-tile: 10; --z-rail: 20; --z-overlay: 50; --z-modal: 100; --z-stamp: 150; --z-toast: 200; --z-fx: 300;
+  --z-base: 0; --z-scene: 1; --z-tile: 10; --z-rail: 20; --z-overlay: 50; --z-modal: 100; --z-stamp: 150; --z-toast: 200; --z-fx: 300;
   /* ---- motion ---- */
   --d-fast: 160ms;
   --d-base: 320ms;
@@ -80,35 +98,40 @@
 *, *::before, *::after { box-sizing: border-box; }
 html, body, #root { height: 100%; }
 body {
-  margin: 0; background: var(--c-ink); color: var(--c-text);
-  font-family: var(--f-body); font-size: var(--t-body-md); line-height: 1.4;
+  margin: 0; background: var(--c-sky-2); color: var(--c-text);
+  font-family: var(--f-body); font-size: var(--t-body-md); line-height: 1.4; font-weight: 700;
   -webkit-font-smoothing: antialiased; overscroll-behavior: none; touch-action: manipulation;
 }
-h1, h2, h3 { margin: 0; font-family: var(--f-display); font-weight: 400; letter-spacing: 0.01em; line-height: 1.05; }
+h1, h2, h3 { margin: 0; font-family: var(--f-display); font-weight: 700; letter-spacing: 0.005em; line-height: 1.05; }
 p { margin: 0; }
 button { font: inherit; color: inherit; }
 input { font: inherit; }
-a { color: var(--c-cyan); }
-:focus-visible { outline: 3px solid var(--c-cyan); outline-offset: 2px; }
-.display-xl { font-family: var(--f-display); font-size: var(--t-display-xl); line-height: 1; }
-.display-lg { font-family: var(--f-display); font-size: var(--t-display-lg); line-height: 1.05; }
-.display-md { font-family: var(--f-display); font-size: var(--t-display-md); line-height: 1.1; }
-.display-sm { font-family: var(--f-display); font-size: var(--t-display-sm); line-height: 1.1; }
+a { color: var(--c-ink); text-decoration-thickness: 2px; text-underline-offset: 3px; }
+:focus-visible { outline: 3px solid var(--c-blue); outline-offset: 3px; }
+.display-xl { font-family: var(--f-display); font-weight: 700; font-size: var(--t-display-xl); line-height: 1; }
+.display-lg { font-family: var(--f-display); font-weight: 700; font-size: var(--t-display-lg); line-height: 1.05; }
+.display-md { font-family: var(--f-display); font-weight: 700; font-size: var(--t-display-md); line-height: 1.1; }
+.display-sm { font-family: var(--f-display); font-weight: 700; font-size: var(--t-display-sm); line-height: 1.1; }
 .dim { color: var(--c-text-dim); }
 .mute { color: var(--c-text-mute); }
-.neon-text { background: var(--g-neon); -webkit-background-clip: text; background-clip: text; color: transparent; }
-.gold-text { background: var(--g-gold); -webkit-background-clip: text; background-clip: text; color: transparent; }
+/* Outlined sticker text: pastel fill with an ink edge. */
+.neon-text { color: var(--c-on-ink); -webkit-text-stroke: 0; text-shadow: 0 3px 0 var(--c-ink), 2px 0 0 var(--c-ink), -2px 0 0 var(--c-ink), 0 -2px 0 var(--c-ink), 2px 3px 0 var(--c-ink), -2px 3px 0 var(--c-ink); }
+.gold-text { color: var(--c-yellow); text-shadow: 0 3px 0 var(--c-ink), 2px 0 0 var(--c-ink), -2px 0 0 var(--c-ink), 0 -2px 0 var(--c-ink), 2px 3px 0 var(--c-ink), -2px 3px 0 var(--c-ink); }
+.ink-text { color: var(--c-ink); }
 .stage-bg { background: var(--g-stage); }
 .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
 
 /* ---- keyframes (transform / opacity only) ---- */
 @keyframes sk-shimmer { from { transform: translateX(-120%); } to { transform: translateX(120%); } }
 @keyframes sk-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.06); } }
-@keyframes sk-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes sk-float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
+@keyframes sk-bob { 0%, 100% { transform: translateY(0) rotate(-2deg); } 50% { transform: translateY(-6px) rotate(2deg); } }
 @keyframes sk-spin { to { transform: rotate(360deg); } }
 @keyframes sk-flame { 0%, 100% { transform: scaleY(1) rotate(-3deg); } 50% { transform: scaleY(1.15) rotate(3deg); } }
 @keyframes sk-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.25; } }
 @keyframes sk-fog { 0%, 100% { opacity: 0.35; transform: translateX(-6%); } 50% { opacity: 0.6; transform: translateX(6%); } }
+@keyframes sk-drift { from { transform: translateX(-12%); } to { transform: translateX(12%); } }
+@keyframes sk-wiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
 @media (prefers-reduced-motion: reduce) {
   .rm-still { animation: none !important; }
 }

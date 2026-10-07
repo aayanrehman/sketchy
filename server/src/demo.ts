@@ -99,11 +99,10 @@ export function setupDemo(room: Room, humanId: string) {
       case 'VOTE': {
         if (!r) break;
         for (const id of botIds) {
-          if (id === r.imposterId) continue;
           later(2500 + Math.random() * 8000, () => {
-            // Mostly for the drawing least like the others (the imposter), sometimes wrong.
             const others = r.participantIds.filter((x) => x !== id);
-            const target = Math.random() < 0.65 ? r.imposterId : pick(others);
+            // A bot imposter frames a random artist; artist bots mostly pick the odd one out, sometimes wrong.
+            const target = id === r.imposterId ? pick(others) : Math.random() < 0.65 ? r.imposterId : pick(others);
             room.vote(id, target);
           });
         }

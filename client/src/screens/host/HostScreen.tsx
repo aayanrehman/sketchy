@@ -13,7 +13,7 @@ import { StealMoment } from '@/moments/Steal';
 import { VerdictMoment } from '@/moments/Verdict';
 import { ScoresMoment } from '@/moments/Scores';
 import { FinalMoment } from '@/moments/Final';
-import { Button, Card } from '@/design/components';
+import { Button, Card, Mascot } from '@/design/components';
 
 /** /host: the main screen. Creates a room (no code) or watches one (?code=). */
 export function HostScreen() {
@@ -31,7 +31,7 @@ export function HostScreen() {
   }, []);
 
   if (err) return <div className="landing"><Card padLg><h2 className="display-md">Hmm</h2><p className="dim" style={{ margin: '8px 0 16px' }}>{err}</p><Button onClick={() => { location.href = '/'; }}>Back</Button></Card></div>;
-  if (!view.room) return <div className="landing"><p className="display-md neon-text">Setting the stage…</p></div>;
+  if (!view.room) return <div className="landing"><div style={{ display: 'grid', justifyItems: 'center', gap: 12 }}><Mascot mood="think" size={120} float /><p className="display-md ink-text">Setting the stage…</p></div></div>;
   const room = view.room;
   const phase = room.phase;
   return (

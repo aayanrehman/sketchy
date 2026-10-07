@@ -11,7 +11,7 @@ export function GalleryMain({ view }: MomentProps) {
   const rm = !!useReducedMotion();
   const room = view.room!; const r = view.round!;
   const phase = room.phase;
-  const voters = room.players.filter((p) => r.participantIds.includes(p.id)).length - 1;
+  const voters = room.players.filter((p) => r.participantIds.includes(p.id)).length;
   const votes = Object.keys(r.votes).length;
   const glowing = r.drawings.filter((d) => d.glowStatus === 'pending').length;
   const sub = phase === 'GALLERY' ? (glowing ? `The AI is glowing up ${glowing} sketch${glowing === 1 ? '' : 'es'}…` : 'Every sketch, glowed up.')
@@ -42,7 +42,7 @@ export function GalleryPhone({ view }: MomentProps) {
   const room = view.room!; const r = view.round!; const me = view.me!;
   const phase = room.phase;
   const p = view.byId.get(me.playerId);
-  const canVote = phase === 'VOTE' && r.participantIds.includes(me.playerId) && !me.isImposter && !p?.hasVoted;
+  const canVote = phase === 'VOTE' && r.participantIds.includes(me.playerId) && !p?.hasVoted;
   const [picked, setPicked] = useState<string | null>(null);
   const sfx = useSfx();
   const vote = (id: string) => {
@@ -50,20 +50,20 @@ export function GalleryPhone({ view }: MomentProps) {
     setPicked(id); sfx.play('pop'); navigator.vibrate?.(30);
     send().emit('vote', { targetId: id });
   };
-  const title = phase === 'GALLERY' ? 'Glow-up gallery' : phase === 'DISCUSS' ? 'Discuss out loud' : me.isImposter ? 'They are voting…' : canVote && !picked ? 'Tap the imposter' : picked || p?.hasVoted ? 'Vote locked in' : 'Vote';
+  const title = phase === 'GALLERY' ? 'Glow-up gallery' : phase === 'DISCUSS' ? 'Discuss out loud' : canVote && !picked ? (me.isImposter ? 'Frame someone' : 'Tap the imposter') : picked || p?.hasVoted ? 'Vote locked in' : 'Vote';
   return (
     <div className="phase">
       <Rise style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', gap: 8 }}>
         <h2 className="display-sm">{title}</h2>
         {phase === 'DISCUSS' && me.isHost && <Button variant="ghost" size="sm" onClick={() => send().emit('host:skip')}>Skip</Button>}
       </Rise>
-      {phase === 'VOTE' && me.isImposter && <Rise><p className="dim" style={{ fontWeight: 700 }}>Sit tight. If they pick you, you get one steal.</p></Rise>}
+      {phase === 'VOTE' && me.isImposter && <Rise><p className="dim" style={{ fontWeight: 800 }}>You're the imposter: vote for someone else to throw them off. If they catch you, you get one steal.</p></Rise>}
       <div className="gallery gallery--phone">
         {r.drawings.map((d) => (
           <motion.div key={d.playerId} variants={childVariants(rm)}>
             <DrawingTile drawing={d} player={view.byId.get(d.playerId)} layoutId={`tile-${r.index}-${d.playerId}`} size={240} revealDelay={phase === 'GALLERY' ? 1 + r.drawings.indexOf(d) * 0.45 : 0}
               selectable={canVote && d.playerId !== me.playerId && !picked} selected={picked === d.playerId}
-              dim={phase === 'VOTE' && (d.playerId === me.playerId && !me.isImposter)} onSelect={() => vote(d.playerId)} />
+              dim={phase === 'VOTE' && d.playerId === me.playerId} onSelect={() => vote(d.playerId)} />
           </motion.div>
         ))}
       </div>

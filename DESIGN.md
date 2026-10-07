@@ -1,25 +1,25 @@
-# Sketchy design system: "Neon Stage"
+# Sketchy design system: "Sticker Park"
 
 ## Visual direction
 
-A dark TV-studio stage lit by neon. Every phase is a segment of one continuous game show: a title card slams in, the set rises up, the cast strip stays on screen, and the big moments get stamps, spotlights and confetti.
+A bright pastel playground drawn with a thick ink pen: a sky-blue backdrop with drifting clouds and rolling hills, chunky white cards with hard offset shadows, rounded display type, and a round yellow mascot who doubles as the AI judge. It is the look of a cute mobile mini-game, not a website.
 
 Why it fits a drawing imposter game:
 
-1. The stage is dark so the only bright things are the drawings. Cream paper tiles pop like lit canvases, which makes the gallery the star of every round.
-2. A game show has a host voice and a verdict. Neon stamps, a spotlight sweep and the judge's typed-out roast give the AI a persona rather than a loading spinner.
-3. Suspense needs contrast. One red stamp (IMPOSTER) against cyan and magenta reads instantly from across a room or in a tiny video-call tile.
-4. Neon reads at thumbnail size. The cover image, the result card and the phone header all survive being small.
-5. Rare pulls need a rare color. Gold is reserved for Golden frames, the podium and awards, so a Golden glow-up feels like an event.
+1. Everything is already a drawing. Ink outlines on every card, button and cloud make the players' sketches feel native to the world instead of pasted onto a UI.
+2. The warmth lowers the stakes. Accusing a friend of faking is funnier on a sunny hill with a smiling mascot than in a dark interrogation room, and the IMPOSTER stamp lands harder against pastel.
+3. Thick outlines and flat fills survive any screen: a 5-inch phone, a TV across the room, a video-call tile, a thumbnail on the submission page.
+4. The mascot gives the AI a face. It wears glasses as the judge, a mask on the imposter's phone, a sweat drop on the vote screen, so the "AI as a character" idea is visible, not just claimed.
+5. Nostalgia is a hook. The sticker-book style recalls the handheld games people grew up with, and a game that feels familiar in the first two seconds is one a judge keeps playing.
 
 ## Tokens (`client/src/design/tokens.css`, mirrored in `tokens.ts`)
 
-- **Color:** ink `#0B0A1F`, surface `#1E1B4B`, text `#FFFFFF` / dim `#C9C5F0` / mute `#9A95D6` (all ≥ 5.6:1 on ink). Neon: magenta `#FF3D8A`, cyan `#22E4FF`, lime `#C6FF3D`, violet `#8B5CF6`, gold `#FFC83D`. Semantic: red `#FF4D4D` (imposter), green `#3DFF9C` (innocent), paper `#FFF9EF`. Buttons put ink text on neon fills for AA contrast.
-- **Gradients:** stage (spotlight radial), neon (magenta → violet → cyan), gold, shine sweep, spot.
-- **Type:** Bungee for display (`--t-display-xl/lg/md/sm`, fluid clamps), Nunito for body (18/16/14/12).
-- **Spacing:** 4, 8, 12, 16, 24, 32, 48, 64. **Radii:** 8, 14, 22, 32, pill. **Shadows:** card, pop, and neon glows (magenta, cyan, gold, red, green).
-- **Z-layers:** base 0, tile 10, rail 20, overlay 50, modal 100, stamp 150, toast 200, fx 300.
-- **Tap targets:** `--tap: 44px`; buttons are 52px tall by default.
+- **Color:** ink `#2B2540` (outlines, primary buttons, text; 12.4:1 on white), surface `#FFFFFF`, surface-2 `#F3F0FF`, text dim `#5A5478` (6.5:1), text mute `#777194` (4.6:1). Sky `#BDE4FF` → `#E3F5FF`, grass `#A9EC84`, hill `#B9F09A`. Stickers: pink `#FF7AB0`, blue `#6CC1FF`, purple `#B48BFF`, yellow `#FFD84D`, lime `#BDF26E`, orange `#FFB15C`. Semantic: red `#FF5C5C` (imposter), green `#3FD37F` (innocent), gold `#FFC83D` (Golden frames, podium), paper `#FFFDF6`. Every pastel fill carries ink text and an ink outline for AA contrast.
+- **Outline and shadow:** `--ol: 3px solid ink`; cards get a hard `0 6px 0` shadow; buttons get `0 5px 0 ink` and press down 4 px on tap.
+- **Type:** Fredoka 700 for display (`--t-display-xl/lg/md/sm`, fluid clamps), Nunito 700 to 900 for body (18/16/14/12).
+- **Spacing:** 4, 8, 12, 16, 24, 32, 48, 64. **Radii:** 10, 16, 24, 32, pill.
+- **Z-layers:** base 0, scene 1, tile 10, rail 20, overlay 50, modal 100, stamp 150, toast 200, fx 300.
+- **Tap targets:** `--tap: 44px`; buttons are 56px tall by default.
 
 ## Motion tokens (`client/src/design/motion.ts`)
 
@@ -30,7 +30,7 @@ Why it fits a drawing imposter game:
 
 ## Components (`client/src/design/components/`)
 
-Button, Card, Avatar (shared element), Timer (pill, compact, ring), DrawingTile (shared element, glow-up choreography, golden and fallback states), MatchMeter (spin-up, type-out, fog state), Toast (+provider), Modal, Stamp, ScoreBurst (flying points layer), Confetti, SketchCanvas (vector replay).
+Button, Card, Avatar (shared element), Timer (clock pill, compact, ring), DrawingTile (shared element, glow-up choreography, golden and fallback states), MatchMeter (spin-up, type-out, fog state), Toast (+provider), Modal, Stamp, ScoreBurst (flying points layer), Confetti, SketchCanvas (vector replay), Scenery (clouds and hills), Mascot (happy, judge, sus, imposter, think, wow).
 
 ## The one transition system (`client/src/shell/PhaseStage.tsx`)
 

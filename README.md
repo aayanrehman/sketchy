@@ -4,7 +4,7 @@
 
 A drawing imposter party game for 4 to 8 players with an AI judge. Everyone draws the same secret prompt except one imposter, who draws a close-but-different one. The AI turns every sketch into art, the group votes on the imposter, and then the AI judge reveals how well each drawing matched the real prompt.
 
-Built from the [Sketchy PRD & Build Kit](https://claude.ai/artifact/U5pVMUth1WjgvvbC5LvtM9). Gameplay, phases, timers, scoring and prompt pairs follow the PRD exactly. The visual and motion system is documented in [DESIGN.md](DESIGN.md).
+Built from the [Sketchy PRD & Build Kit](https://claude.ai/artifact/U5pVMUth1WjgvvbC5LvtM9). Gameplay, phases, timers, scoring and prompt pairs follow the PRD exactly. The visual and motion system is documented in [DESIGN.md](DESIGN.md); PRD feasibility notes, open interpretations and the challenge scorecard are in [docs/PRD-NOTES.md](docs/PRD-NOTES.md).
 
 ## Run it
 
@@ -20,6 +20,7 @@ Open http://localhost:5173 and:
 - **Join a game** on each phone at `/play` with the code. Four players are needed to start. The first player to join is the host and sees the Start button; the main screen can also start.
 - **Try it solo** (`/demo`) plays two rounds against three bots in one tab, once as an artist and once as the imposter. On a wide screen the main-screen stage sits beside the phone view.
 - `/studio` is the hidden tool for recording bot sketches with their real glow-ups and judge scores.
+- `/cover` renders a 1200×630 composition to screenshot for the submission's cover image.
 
 To test with phones on your network, Vite listens on all interfaces: use `http://<your-ip>:5173/play`.
 

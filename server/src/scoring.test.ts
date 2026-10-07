@@ -48,6 +48,16 @@ test('escape gives +200 and fallback judge skips perfect disguise', () => {
   assert.equal(players.get('imp')!.score, 200);
   assert.equal(players.get('a')!.score, 50);
 });
+test('the imposter\'s own vote never scores and can swing a tie', () => {
+  const players = new Map([['imp', player('imp')], ['a', player('a')], ['b', player('b')], ['c', player('c')]]);
+  const r = round({ votes: { a: 'imp', b: 'c', c: 'imp', imp: 'c' } });
+  resolveVotes(r);
+  assert.equal(r.caught, false); assert.equal(r.escapeReason, 'tie');
+  scoreRound(r, players);
+  assert.equal(players.get('imp')!.score, 200);   // escaped
+  assert.equal(players.get('a')!.score, 100);     // still voted correctly
+  assert.equal(players.get('b')!.score, 0);
+});
 test('imposter fled gives artists +50', () => {
   const players = new Map([['imp', player('imp')], ['a', player('a')], ['b', player('b')], ['c', player('c')]]);
   const r = round({ fled: true });

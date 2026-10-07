@@ -4,7 +4,7 @@ import { PhaseStage } from '@/shell/PhaseStage';
 import { useRoom } from '@/state/useRoom';
 import { socket, saveToken, loadToken, saveName, loadName } from '@/net/socket';
 import { unlockAudio } from '@/sound/sfx';
-import { Button, Card } from '@/design/components';
+import { Button, Card, Mascot, Scenery } from '@/design/components';
 import { LobbyPhone } from '@/moments/Lobby';
 import { HowToPhone } from '@/moments/HowToPhase';
 import { PromptPhone } from '@/moments/Prompt';
@@ -53,8 +53,10 @@ export function PlayScreen() {
   if (!joined || !view.room || !view.me) {
     return (
       <div className="landing">
+        <Scenery density={3} />
         <form className="landing__inner" onSubmit={(e) => { e.preventDefault(); unlockAudio(); if (code.length === 4 && name.trim()) join(code, name.trim()); }}>
-          <h1 className="landing__logo neon-text">SKETCHY</h1>
+          <div className="landing__hero"><Mascot mood="happy" size={110} float /></div>
+          <h1 className="landing__logo gold-text">SKETCHY</h1>
           <Card padLg style={{ display: 'grid', gap: 12 }}>
             <label className="sr-only" htmlFor="code">Room code</label>
             <input id="code" className="field field--code" placeholder="ROOM CODE" value={code} maxLength={4} autoCapitalize="characters" autoComplete="off" onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z2-9]/g, ''))} />

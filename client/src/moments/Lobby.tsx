@@ -1,9 +1,17 @@
 import { motion, useReducedMotion } from 'framer-motion';
+import { useEffect, useRef } from 'react';
+import QRCode from 'qrcode';
 import { MIN_PLAYERS, MAX_PLAYERS } from '@shared/types';
 import { Avatar, Button, Card } from '@/design/components';
 import { Rise } from '@/shell/PhaseStage';
 import { childVariants } from '@/design/motion';
 import { send, type MomentProps } from './common';
+
+function JoinQr({ url }: { url: string }) {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => { if (ref.current) QRCode.toCanvas(ref.current, url, { width: 120, margin: 0, color: { dark: '#2B2540', light: '#FFFFFF' } }).catch(() => {}); }, [url]);
+  return <canvas ref={ref} className="lobby__qr" aria-label="QR code to join" />;
+}
 
 export function LobbyMain({ view }: MomentProps) {
   const rm = !!useReducedMotion();
@@ -12,8 +20,13 @@ export function LobbyMain({ view }: MomentProps) {
   const url = `${location.origin}/play`;
   return (
     <div className="lobby">
-      <Rise><p className="lobby__url">Join at <b className="neon-text">{url.replace(/^https?:\/\//, '')}</b> with code</p></Rise>
-      <Rise><div className="lobby__code" aria-label={`Room code ${room.code.split('').join(' ')}`}>{room.code}</div></Rise>
+      <Rise><Card className="lobby__join">
+        <JoinQr url={`${url}?code=${room.code}`} />
+        <div>
+          <p className="lobby__url">Scan, or go to <b>{url.replace(/^https?:\/\//, '')}</b> and enter</p>
+          <div className="lobby__code" aria-label={`Room code ${room.code.split('').join(' ')}`}>{room.code}</div>
+        </div>
+      </Card></Rise>
       <Rise className="lobby__cast">
         {room.players.map((p) => <motion.div key={p.id} variants={childVariants(rm)}><Avatar player={p} isHost={p.id === room.hostId} /></motion.div>)}
         {Array.from({ length: Math.max(0, MIN_PLAYERS - room.players.length) }, (_, i) => <div key={i} className="lobby__slot" aria-hidden />)}

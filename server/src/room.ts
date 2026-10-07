@@ -266,7 +266,7 @@ export class Room {
       case 'HOW_TO': if (active.length && active.every((p) => p.readyHowTo)) this.advance(); break;
       case 'DRAW': if (r && participants.every((p) => p.hasSubmitted)) this.advance(); break;
       case 'GALLERY': if (r && r.drawings.every((d) => d.glowStatus !== 'pending')) this.shorten(Math.max(0, GALLERY_MIN_MS - (Date.now() - this.phaseStartedAt))); break;
-      case 'VOTE': if (r && participants.filter((p) => p.id !== r.imposterId).every((p) => p.hasVoted)) this.advance(); break;
+      case 'VOTE': if (r && participants.every((p) => p.hasVoted)) this.advance(); break;
       case 'STEAL': if (r && r.stealPick !== null) this.shorten(STEAL_REVEAL_MS); break;
     }
   }
@@ -397,7 +397,7 @@ export class Room {
     const r = this.currentRound(); const p = this.seats.get(voterId)?.player;
     if (!r || !p || this.phase !== 'VOTE' || p.hasVoted || voterId === targetId) return;
     if (!r.participantIds.includes(voterId) || !r.participantIds.includes(targetId)) return;
-    if (voterId === r.imposterId) return; // the imposter watches the vote
+    // The imposter votes too (to frame someone); their vote can never earn points since self-votes are blocked.
     r.votes[voterId] = targetId; p.hasVoted = true;
     this.touch(); this.checkEarlyEnd(); this.broadcast();
   }

@@ -53,6 +53,7 @@ export function Timer({ endsAt, serverOffset, variant = 'pill', urgentAt = 5, ti
   }
   return (
     <motion.div layoutId={layoutId} className={`timer ${compact ? 'timer--compact' : ''} ${urgent ? 'timer--urgent' : ''}`} transition={t.layout(rm)} aria-label={`${sec} seconds left`}>
+      <span className="timer__clock" aria-hidden><i style={{ ['--hand' as any]: `${(1 - frac) * 360}deg` }} /><b /></span>
       <motion.span className="timer__digits" key={sec} initial={{ scale: urgent && !rm ? 1.25 : 1 }} animate={{ scale: 1 }} transition={t.snap(rm)}>{sec}</motion.span>
       <div className="timer__bar"><div className="timer__fill" style={{ transform: `scaleX(${frac})`, transition: `transform 250ms linear` }} /></div>
     </motion.div>

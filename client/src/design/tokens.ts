@@ -1,11 +1,12 @@
-/** JS mirror of tokens.css for code that needs raw values (canvas, confetti, flying points). */
+/** JS mirror of tokens.css for code that needs raw values (canvas, confetti, flying points, share card). */
 export const color = {
-  ink: '#0B0A1F', ink2: '#151338', surface: '#1E1B4B', surface2: '#2B2768', text: '#FFFFFF', textDim: '#C9C5F0', textMute: '#9A95D6',
-  magenta: '#FF3D8A', cyan: '#22E4FF', lime: '#C6FF3D', violet: '#8B5CF6', gold: '#FFC83D', gold2: '#FFF1B8',
-  red: '#FF4D4D', green: '#3DFF9C', paper: '#FFF9EF',
+  sky: '#BDE4FF', sky2: '#E3F5FF', grass: '#A9EC84', grass2: '#7ED35C',
+  ink: '#2B2540', surface: '#FFFFFF', surface2: '#F3F0FF', text: '#2B2540', textDim: '#5A5478', textMute: '#777194', onInk: '#FFFFFF',
+  pink: '#FF7AB0', blue: '#6CC1FF', purple: '#B48BFF', yellow: '#FFD84D', lime: '#BDF26E', orange: '#FFB15C',
+  gold: '#FFC83D', gold2: '#FFF1B8', red: '#FF5C5C', green: '#3FD37F', paper: '#FFFDF6',
 } as const;
 
-export const confettiPalette = [color.magenta, color.cyan, color.lime, color.violet, color.gold, '#FFFFFF'];
+export const confettiPalette = [color.pink, color.blue, color.purple, color.yellow, color.lime, color.orange];
 
 /** Drawing palette: 6 colorblind-safe (Okabe-Ito) base colors, plus unlockables by level. */
 export const INK_COLORS = ['#111111', '#0072B2', '#E69F00', '#56B4E9', '#009E73', '#D55E00'];

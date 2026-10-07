@@ -56,7 +56,7 @@ export function ScoresMoment({ view, phone }: MomentProps & { phone?: boolean })
           const mine = r.awards.filter((a) => a.playerId === p.id);
           const delta = mine.reduce((s, a) => s + a.points, 0);
           return (
-            <motion.div key={p.id} layout="position" className="score-row" data-scorerow={p.id} style={{ boxShadow: me?.playerId === p.id ? '0 0 0 2px var(--c-cyan) inset' : undefined }}>
+            <motion.div key={p.id} layout="position" className={`score-row ${me?.playerId === p.id ? 'score-row--me' : ''}`} data-scorerow={p.id}>
               <Avatar player={p} size="sm" layoutPrefix="score" />
               <div>
                 <div className="score-row__name">#{i + 1} {p.name} {p.id === r.imposterId && <span className="chip chip--red" style={{ fontSize: 10, padding: '2px 8px' }}>IMPOSTER</span>}</div>
