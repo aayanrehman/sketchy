@@ -319,3 +319,17 @@
 
 /* Sound button on the pre-game pages (home, join, name entry, host setup). */
 .corner-sound { position: absolute; top: calc(var(--s-3) + var(--safe-t)); right: var(--gutter); z-index: var(--z-modal); }
+
+/* Soft fade between screens. */
+.route { animation: sk-route-in .32s cubic-bezier(.2,0,0,1) both; }
+@keyframes sk-route-in { from { opacity: 0; transform: translateY(6px); } }
+@media (prefers-reduced-motion: reduce) { .route { animation-duration: .01s; } }
+
+/* Calm "getting ready" screen used between pages (host setup, starting the demo, joining). */
+.loading { min-height: 100dvh; display: grid; place-items: center; background: var(--g-stage); }
+.loading__in { display: grid; justify-items: center; gap: var(--s-3); text-align: center; }
+.loading__in p { font-family: var(--f-display); font-weight: 700; font-size: var(--t-display-sm); color: var(--c-ink); }
+.loading__dots { display: flex; gap: 8px; }
+.loading__dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--c-ink); opacity: .25; animation: sk-dot 1.2s ease-in-out infinite; }
+.loading__dots i:nth-child(2) { animation-delay: .15s; } .loading__dots i:nth-child(3) { animation-delay: .3s; }
+@keyframes sk-dot { 40% { opacity: 1; transform: translateY(-4px); } }

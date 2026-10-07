@@ -22,4 +22,10 @@ window.addEventListener('keydown', unlock, { once: true });
 startMusic();
 interceptLinks();
 
+// Fade the HTML splash once fonts are in (calm, but never longer than ~2 s on a slow connection).
+const t0 = performance.now();
+Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 2000))]).then(() => {
+  setTimeout(() => { const s = document.getElementById('splash'); s?.classList.add('out'); setTimeout(() => s?.remove(), 500); }, Math.max(0, 450 - (performance.now() - t0)));
+});
+
 createRoot(document.getElementById('root')!).render(<React.StrictMode><ConvexProvider client={convex}><App /></ConvexProvider></React.StrictMode>);

@@ -1,3 +1,4 @@
+import { Loading } from '@/shell/Loading';
 import { SoundControl } from '@/design/components';
 import { useEffect, useState } from 'react';
 import { PhoneShell } from '@/shell/PhoneShell';
@@ -47,6 +48,7 @@ export function PlayScreen() {
     // eslint-disable-next-line
   }, []);
 
+  if ((joined || joining) && !err && (!view.room || !view.me)) return <Loading label="Joining the room" />;
   if (!joined || !view.room || !view.me) {
     return (
       <div className="landing"><div className="corner-sound"><SoundControl /></div>

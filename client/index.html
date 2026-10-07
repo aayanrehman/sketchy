@@ -7,8 +7,25 @@
     <title>Sketchy</title>
     <meta name="description" content="One of you is drawing something different. The AI knows who." />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='52' r='42' fill='%23FFD84D' stroke='%232B2540' stroke-width='6'/%3E%3Ccircle cx='37' cy='48' r='5' fill='%232B2540'/%3E%3Ccircle cx='63' cy='48' r='5' fill='%232B2540'/%3E%3Cpath d='M38 66 Q50 78 62 66' stroke='%232B2540' stroke-width='6' fill='none' stroke-linecap='round'/%3E%3C/svg%3E" />
+    <link rel="preload" as="image" href="/mascot/happy.webp" />
+    <link rel="preload" as="image" href="/mascot/think.webp" />
+    <style>
+      /* Instant splash: painted before any JS loads, faded out by main.tsx once fonts and the app are ready. */
+      #splash { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; background: linear-gradient(180deg, #BDE4FF 0%, #E3F5FF 75%); transition: opacity .45s ease, visibility .45s; }
+      #splash.out { opacity: 0; visibility: hidden; }
+      #splash .s-in { display: grid; justify-items: center; gap: 18px; animation: s-rise .6s cubic-bezier(.2,0,0,1) both; }
+      #splash img { width: 132px; height: 132px; animation: s-bob 1.6s ease-in-out infinite; }
+      #splash .s-dots { display: flex; gap: 8px; }
+      #splash .s-dots i { width: 10px; height: 10px; border-radius: 50%; background: #2B2540; opacity: .25; animation: s-dot 1.2s ease-in-out infinite; }
+      #splash .s-dots i:nth-child(2) { animation-delay: .15s; } #splash .s-dots i:nth-child(3) { animation-delay: .3s; }
+      @keyframes s-bob { 50% { transform: translateY(-8px) rotate(-3deg); } }
+      @keyframes s-dot { 40% { opacity: 1; transform: translateY(-4px); } }
+      @keyframes s-rise { from { opacity: 0; transform: translateY(10px); } }
+      @media (prefers-reduced-motion: reduce) { #splash *, #splash { animation: none !important; transition: opacity .2s; } }
+    </style>
   </head>
   <body>
+    <div id="splash" aria-hidden="true"><div class="s-in"><img src="/mascot/happy.webp" alt="" /><div class="s-dots"><i></i><i></i><i></i></div></div></div>
     <div id="root"></div>
     <script type="module" src="/src/main.tsx"></script>
   </body>

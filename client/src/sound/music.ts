@@ -13,12 +13,12 @@ const PROGS: Prog[] = [
   { key: 0, chords: [[38, 53, 57, 60, 64], [43, 53, 59, 64, 69], [36, 52, 55, 59, 62], [45, 55, 60, 64, 71]] }, // C: Dm9 G13 Cmaj9 Am9
   { key: 5, chords: [[43, 58, 62, 65, 69], [36, 52, 58, 62, 67], [41, 57, 60, 64, 67], [38, 53, 57, 60, 64]] }, // F: Gm9 C9 Fmaj9 Dm9
   { key: 0, chords: [[41, 57, 60, 64, 67], [40, 55, 59, 62, 66], [38, 53, 57, 60, 64], [36, 52, 55, 59, 62]] }, // Fmaj9 Em9 Dm9 Cmaj9
-  { key: 3, chords: [[41, 56, 60, 63, 67], [46, 56, 62, 65, 67], [39, 55, 58, 62, 65], [36, 55, 58, 62, 63]] }, // Eb: Fm9 Bb13 Ebmaj9 Cm9
 ];
 const PENTA = [0, 2, 4, 7, 9];
 const MOOD = {
-  chill: { bpm: 74, swing: 0.58, vol: 0.17, kick: [0, 10], mel: 0.06, walk: false },
-  upbeat: { bpm: 88, swing: 0.56, vol: 0.17, kick: [0, 8, 10], mel: 0.09, walk: true },
+  // Same tempo and key family in both moods so a switch never sounds like a different song; upbeat just adds movement.
+  chill: { bpm: 76, swing: 0.58, vol: 0.17, kick: [0, 10], mel: 0.05, walk: false },
+  upbeat: { bpm: 76, swing: 0.58, vol: 0.17, kick: [0, 8, 10], mel: 0.08, walk: true },
 };
 
 let c: AudioContext | null = null;
@@ -65,8 +65,16 @@ function schedule(i: number, bar: number, t: number) {
   if (i % 2 === 0 && Math.random() < m.mel) rhodes(72 + prog.key + pick(PENTA), t, beat * 1.5, 0.05);
 }
 
+// Only one tab plays: the one you last interacted with. Others fade out, so a host screen and a player tab
+// on the same computer never stack two copies of the music.
+const TAB = Math.random().toString(36).slice(2);
+let owner = true;
+const channel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel('sketchy-music') : null;
+function claim() { owner = true; channel?.postMessage(TAB); level(); }
+if (channel) channel.onmessage = (e) => { if (e.data !== TAB && owner) { owner = false; level(); } };
+
 function level() {
-  if (c) out.gain.setTargetAtTime(isMuted() ? 0 : MOOD[mood].vol * getVolume('music'), c.currentTime, 0.15); // ~0.5 s fade
+  if (c) out.gain.setTargetAtTime(isMuted() || !owner ? 0 : MOOD[mood].vol * getVolume('music'), c.currentTime, 0.15); // ~0.5 s fade
 }
 function tick() {
   try {
@@ -79,7 +87,7 @@ function tick() {
         if (bar % 8 === 0 && bar > 0) prog = pick(PROGS.filter((p) => p !== prog));
       }
       const m = MOOD[mood], sd = 15 / m.bpm;
-      if (!isMuted()) schedule(i, bar, nextT + (step % 2 ? (m.swing - 0.5) * 2 * sd : 0));
+      if (!isMuted() && owner) schedule(i, bar, nextT + (step % 2 ? (m.swing - 0.5) * 2 * sd : 0));
       nextT += sd; step++;
     }
   } catch { /* audio is never allowed to break the game */ }
@@ -102,7 +110,8 @@ export function startMusic() {
     lfo = c.createOscillator(); lfo.frequency.value = 0.4; flutter = c.createGain(); flutter.gain.value = 5; lfo.connect(flutter); lfo.start();
     step = 0; prog = PROGS[0];
     const offM = onMuteChange(level), offV = onVolumeChange(level); unsub = () => { offM(); offV(); }; document.addEventListener('visibilitychange', vis);
-    level(); vis();
+    window.addEventListener('pointerdown', claim); window.addEventListener('keydown', claim); window.addEventListener('focus', claim);
+    claim(); vis();
   } catch { /* audio is never allowed to break the game */ }
 }
 
@@ -115,6 +124,7 @@ export function stopMusic() {
   try {
     if (!c) return;
     clearInterval(timer); timer = undefined; unsub?.(); document.removeEventListener('visibilitychange', vis);
+    window.removeEventListener('pointerdown', claim); window.removeEventListener('keydown', claim); window.removeEventListener('focus', claim);
     const t = c.currentTime + 0.6, o = out;
     o.gain.setTargetAtTime(0, c.currentTime, 0.1); lfo.stop(t);
     setTimeout(() => o.disconnect(), 700);

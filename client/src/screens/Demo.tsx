@@ -1,3 +1,4 @@
+import { Loading } from '@/shell/Loading';
 import { SoundControl } from '@/design/components';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'convex/react';
@@ -50,6 +51,7 @@ export function Demo() {
     }).catch(() => { setStarted(false); setError('Could not start the demo. Please try again.'); });
   };
 
+  if (started && !error && (!view.room || !view.me)) return <Loading label="Setting up your game" />;
   if (!started || !view.room || !view.me) {
     return (
       <div className="landing"><div className="corner-sound"><SoundControl /></div>

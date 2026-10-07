@@ -17,7 +17,7 @@ export default function App() {
   return (
     <ErrorBoundary>
       <ToastProvider>
-        <ScoreBurstLayer><div key={path} style={{ display: 'contents' }}>{screen}</div></ScoreBurstLayer>
+        <ScoreBurstLayer><div key={path} className="route">{screen}</div></ScoreBurstLayer>
       </ToastProvider>
     </ErrorBoundary>
   );
