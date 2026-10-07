@@ -1,0 +1,45 @@
+/* Moment polish: draw head + countdown, prompt card copy, score summary, unmask bubbles, highlight reel. */
+
+/* ---- Draw head (kept compact: ~56px so the canvas sizing in draw.css still fits) ---- */
+.draw-head--big { display: grid; gap: 2px; justify-items: start; max-height: 60px; }
+.draw-head__row { display: flex; align-items: center; gap: var(--s-2); min-width: 0; }
+.draw-head__label { font-family: var(--f-display); font-weight: 700; font-size: var(--t-body-xs); letter-spacing: 0.16em; color: var(--c-text-mute); }
+.draw-head .draw-prompt.draw-prompt--big { font-size: var(--t-display-md); line-height: 1.1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; }
+.draw-head__chip { font-size: 11px; padding: 2px 8px; }
+
+/* ---- 3-2-1 Go! (purely visual; never blocks the canvas) ---- */
+.countdown { position: fixed; inset: 0; display: grid; place-items: center; pointer-events: none; z-index: var(--z-overlay); }
+.countdown__num {
+  display: grid; place-items: center; min-width: 140px; height: 140px; padding: 0 var(--s-5);
+  border-radius: var(--r-pill); border: var(--ol); background: var(--c-yellow); box-shadow: var(--sh-pop);
+  font-family: var(--f-display); font-weight: 700; font-size: 84px; line-height: 1; color: var(--c-ink);
+}
+.countdown__num--go { background: var(--c-lime); }
+.draw-phase > .countdown { width: auto; }
+
+/* ---- Prompt phase ---- */
+.prompt-card__hint { margin: 0; max-width: 34ch; color: var(--c-text-dim); font-weight: 800; }
+
+/* ---- Scores ---- */
+.score-summary { margin: 0; padding: var(--s-2) var(--s-4); border-radius: var(--r-pill); border: var(--ol); background: var(--c-surface); box-shadow: var(--sh-card); font-family: var(--f-display); font-weight: 700; font-size: var(--t-display-sm); }
+.score-summary--plus { background: var(--c-lime); }
+
+/* ---- Unmask viewer bubble ---- */
+.unmask-title { position: relative; display: grid; justify-items: center; }
+.unmask-bubble {
+  position: absolute; top: -6px; left: calc(50% + 7ch); white-space: nowrap;
+  padding: 4px 12px; border-radius: var(--r-pill); border: var(--ol); box-shadow: var(--sh-card);
+  font-family: var(--f-display); font-weight: 700; font-size: var(--t-body-md); color: var(--c-ink);
+}
+.unmask-bubble--win { background: var(--c-lime); }
+.unmask-bubble--fooled { background: var(--c-pink); }
+@media (max-width: 560px) { .unmask-bubble { position: static; margin-top: var(--s-1); } }
+
+/* ---- Final: share + highlight reel ---- */
+.reel { width: 100%; max-width: 1100px; display: grid; gap: var(--s-3); justify-items: center; }
+.reel__strip { width: 100%; display: flex; gap: var(--s-3); overflow-x: auto; padding: 14px var(--s-1) var(--s-3); scroll-snap-type: x mandatory; justify-content: safe center; }
+.reel__item { flex: 0 0 168px; scroll-snap-align: start; display: grid; gap: 6px; margin: 0; padding: var(--s-2); border-radius: var(--r-md); border: var(--ol); background: var(--c-surface); box-shadow: var(--sh-card); position: relative; }
+.reel__item img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: var(--r-sm); border: 2px solid var(--c-ink); background: var(--c-paper); display: block; }
+.reel__name { font-weight: 900; font-size: var(--t-body-sm); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reel__prompt { font-size: var(--t-body-xs); color: var(--c-text-dim); font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.reel__tag { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; padding: 2px 8px; }

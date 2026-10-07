@@ -19,7 +19,7 @@ The mission requires a live, reusable game with room codes, no player login or a
 | Rubric (25% each) | Evidence and remaining checks |
 | --- | --- |
 | Execution | Authoritative synchronized rooms, private prompts, full gameplay, reconnects, replay, tested scoring. Public deployment and live AI still need verification. |
-| Creativity | Drawing-based social deduction, prompt-preserving sticker transformations, a caught-player steal, and a separate raw-sketch judge. Judge evaluation is subjective. |
+| Creativity | Drawing-based social deduction, sketch-conditioned sticker transformations, a caught-player steal, and a separate raw-sketch judge. Judge evaluation is subjective. |
 | Usefulness / Value | A reusable party game with QR/code joining, built-in guidance, solo onboarding and downloadable results. Real group playtesting remains useful. |
 | Polish & Thoughtfulness | Illustrated characters, coordinated scenery, small-phone layouts, accessible dialogs, reduced motion, and designed pending/blank/refusal states. |
 
@@ -27,36 +27,29 @@ These checks support the submission; they are not a prediction or guarantee of a
 
 ## What ships
 
-- Phone drawing controller and synchronized main screen; 4–8 players, unchanged PRD rules and scoring.
+- Phone drawing controller and synchronized main screen; 4–8 players, documented rules and validated scoring.
 - Two-round solo demo: artist first, imposter second. Prepared cat/frog artwork ships with the code. Bot scores are examples and labeled accordingly.
 - Eight SVG avatar faces, three illustrated award badges, refined Blotto mascot, phone HUD, two-column TV verdict, composed landing page and 1200×630 key-art cover.
 - Local Fredoka/Nunito fonts. No Google Fonts network dependency.
-- Compressed WebP generation served through file URLs, bounded judge cache, designed fallbacks, and protected production studio.
+- Compressed WebP generation served through file URLs, bounded judge cache, designed fallbacks, and studio protected in every environment.
 - Render blueprint with persistent media storage; Docker alternative.
 
-## Verification completed in the creative pass
+## Current verification — October 7, 2026
 
-`npm run typecheck`, `npm test` (16 passing tests), and `npm run build` passed. An eight-player Socket.IO run completed all three rounds, preserved a reconnected seat, rejected a ninth player, and reset all scores for replay. Browser runs at 390×844 and 1366×820 completed both demo rounds through every phase and downloaded valid PNG result cards. The wide run used reduced motion. No page errors, broken route images, or horizontal overflow were observed on the main app routes. `/cover` intentionally uses a fixed 1200×630 canvas.
+Typecheck, production build, and 31 tests passed. The Socket.IO test completes two eight-player, three-round games and checks creator authority, read-only spectators, reconnect, malformed input and replay. Browser automation checks 13 states at 320×568, 390×844, 768×1024 and 1440×1000, drawing/undo, discussion, all eight verdicts, PNG download, rematch and refresh. The two-round solo demo and replay passed. These are automated checks, not human playtests.
 
-The component audit exercised 11 phases with eight players and long names at 320×568, 390×844, 768×1024 and 1366×820. It included pending art, an image fallback, a judge fallback, blank drawings, Golden frames, and reduced motion. Phone scoreboard and verdict-column overflows were corrected. Dialogs close with Escape and restore focus; the modal layer covers notifications. Held-pointer submission includes the unfinished stroke. Status checks/stars are SVGs rather than OS-dependent glyphs. CI runs typecheck, tests and production build for pushes and pull requests.
+One live fal.ai smoke test succeeded with `gpt-image-1-mini` editing (11.7 s) and a GPT-4.1 mini rating of the original (2.9 s). Image fidelity, rating stability and real group latency need broader evaluation. See [the evidence ledger](RELEASE_EVIDENCE.md).
 
-## Before submitting the public link
+## Remaining release gates
 
-1. Deploy one long-lived Node instance from the finished branch with `OPENAI_API_KEY`, `STUDIO_KEY`, and persistent `MEDIA_DIR`. Render's blueprint defines the disk.
-2. Confirm `/api/health` returns `aiMode: "openai"`. Preview mode is functional, but does not demonstrate live AI.
-3. Open `/studio`, provide the studio key, and generate one nonblank sketch. Confirm the image edit returns a working `/media/…webp` URL and the judge returns a score. A successful image response includes `elapsedMs`; the server logs image latency and bytes. `/api/proof` reports whether both configured models are available, but model listing alone does not verify generation.
-4. Play one real round with four devices. Measure several buzzer-time submissions. The 25 s image timeout is intentionally unchanged; a 20 s gallery cannot guarantee every late drawing is ready before Discuss. Only real testing can establish the practical latency and cost.
-5. For a showcase with bot scores genuinely recorded by this app's judge, replace the bundled prepared fixtures through `/studio`: three real sketches and one decoy for each of pairs 2 and 9. Check art subject preservation. Do not give the player prompt to the glow-up model.
-6. Verify saved art URLs survive a server redeploy on the chosen volume. Rooms themselves are intentionally in memory and do not survive server restart.
-7. Record the demo and capture `/cover` at 1200×630. A phone recording can show the entire game; a wide recording shows the synchronized stage next to the drawing controller.
+1. Approve and deploy the prepared Render Starter service plus 1 GB disk in workspace aayanreh. Configure FAL_KEY in Render’s secret manager, then enable live calls within an approved request/billing budget.
+2. Verify the public URL, HTTPS/WebSocket joins, full group game/rematch, reconnect and controlled restart. Rooms intentionally end on restart; media and the daily request ledger must survive on the disk.
+3. Complete the human-labeled sketch evaluation and at least two first-time group playtests, including remote discussion and eight-player play where practical. Do not substitute bots for participants.
+4. Capture a short real gameplay recording; update this page with the verified URL and deployed commit. The restored 1200×630 cover is available.
+5. The owner reviews and submits the title, cover, description and working URL through Handshake. No entry has been submitted.
 
-## Suggested short demo
+## Suggested recording
 
-Open Sketchy → Try it solo → enter a name → draw → submit → see raw sketches become stickers → vote for the odd one out → watch the reveal and Match % verdict → show the imposter round and the result-card download. For multiplayer, host on a laptop, scan the QR on phones, and show synchronized submissions and votes.
+Host on a laptop → join phones by QR/code → show private prompts and drawing → compare originals and AI interpretations → discuss and vote → show caught-player steal → navigate the evidence recap → download the result card → rematch. Avoid displaying host credentials, API keys or studio secrets.
 
-## API references checked
-
-- [OpenAI image edits](https://developers.openai.com/api/reference/resources/images/methods/edit): GPT image edit endpoint supports WebP output and `output_compression`. The configured model remains an environment variable.
-- [Render persistent disks](https://render.com/docs/disks) and [Blueprint syntax](https://render.com/docs/blueprint-spec): only files under the mounted disk survive redeploys.
-
-No live OpenAI latency, cost, or generated score is claimed by the unkeyed verification run.
+Public hosting, human playtest outcomes and contest readiness are not yet claimed.

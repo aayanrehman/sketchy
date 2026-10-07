@@ -9,3 +9,12 @@ server/data/demo/*.json
 .DS_Store
 
 tmp/
+server/data/ai-budget.json
+server/data/ai-budget.json.tmp
+artifacts/
+playwright-report/
+test-results/
+
+.env.*
+!.env.example
+.vercel

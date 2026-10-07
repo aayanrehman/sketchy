@@ -1,5 +1,9 @@
-import type { Award, Round, Player } from '../../shared/types';
+import type { Award, Round, Player, Drawing } from '../../shared/types';
 import { median } from './util';
+
+export function validScore(d: Drawing | undefined): d is Drawing & { match: number } {
+  return !!d && !d.blank && d.judgeStatus === 'done' && Number.isFinite(d.match) && d.match! >= 0 && d.match! <= 100;
+}
 
 /** Pure scoring per the PRD table. Mutates player score/streak and returns the awards. */
 export function scoreRound(round: Round, players: Map<string, Player>): Award[] {
@@ -36,8 +40,8 @@ export function scoreRound(round: Round, players: Map<string, Player>): Award[] 
 
     const byId = new Map(round.drawings.map((d) => [d.playerId, d]));
     const impD = byId.get(imposter.id);
-    const artistScores = artists.map((id) => byId.get(id)).filter((d) => d && d.judgeStatus === 'done' && typeof d.match === 'number').map((d) => d!.match as number);
-    if (impD && impD.judgeStatus === 'done' && typeof impD.match === 'number' && artistScores.length) {
+    const artistScores = artists.map((id) => byId.get(id)).filter(validScore).map((d) => d.match);
+    if (validScore(impD) && artistScores.length) {
       if (impD.match >= median(artistScores)) {
         imposter.score += 100; awards.push({ playerId: imposter.id, points: 100, reason: 'perfect_disguise' });
       }
@@ -46,7 +50,7 @@ export function scoreRound(round: Round, players: Map<string, Player>): Award[] 
       const top = Math.max(...artistScores);
       for (const id of artists) {
         const d = byId.get(id);
-        if (d && d.judgeStatus === 'done' && d.match === top) {
+        if (validScore(d) && d.match === top) {
           const p = players.get(id); if (!p) continue;
           p.score += 50; awards.push({ playerId: id, points: 50, reason: 'judges_favorite' });
         }

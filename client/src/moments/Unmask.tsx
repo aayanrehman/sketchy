@@ -4,7 +4,9 @@ import { DrawingTile, Stamp } from '@/design/components';
 import { Rise } from '@/shell/PhaseStage';
 import { ease, dur, durRM } from '@/design/motion';
 import { useSfx } from '@/sound/useSfx';
-import { galleryCols, phaseElapsed, type MomentProps } from './common';
+import { phaseElapsed, type MomentProps } from './common';
+import { useFitGrid } from '@/design/useFitGrid';
+import './polish.css';
 
 /**
  * UNMASK choreography (9 s, synced to the server clock):
@@ -25,6 +27,7 @@ export function UnmaskMoment({ view, phone }: MomentProps & { phone?: boolean })
   for (const t of Object.values(r.votes)) counts.set(t, (counts.get(t) || 0) + 1);
   const target = r.revealedId;
   const D = rm ? durRM : dur;
+  const grid = useFitGrid(tiles.length, { gap: 12, reserve: 64 });
 
   useEffect(() => {
     const el = phaseElapsed(view);
@@ -67,12 +70,27 @@ export function UnmaskMoment({ view, phone }: MomentProps & { phone?: boolean })
     : r.escapeReason === 'novotes' ? `Nobody voted! The imposter escapes. +200 to ${imposterName}`
     : `${view.byId.get(target!)?.name} was innocent! The imposter escapes. +200`;
 
+  // Viewer's own result, shown as a small bubble once the stamp lands. Scoring runs after this phase,
+  // so mirror its rule: +100, or +150 when this extends a correct-vote streak.
+  const myVote = view.me && view.me.playerId !== r.imposterId ? r.votes[view.me.playerId] : undefined;
+  const myStreak = view.me ? view.byId.get(view.me.playerId)?.streak || 0 : 0;
+  const bubble = !myVote ? null : myVote === r.imposterId ? { win: true, text: `+${myStreak >= 1 ? 150 : 100} nice catch!` } : { win: false, text: 'Fooled!' };
+
   return (
     <div ref={wrap} className={`unmask-wrap ${step === 'stamped' && !rm ? 'unmask-wrap--shake' : ''}`}>
-      <Rise><h2 className="display-md phase__title">{step === 'roll' ? 'The votes are in…' : r.caught ? 'Caught!' : 'Escaped!'}</h2></Rise>
-      <div className={`gallery ${phone ? 'gallery--phone' : galleryCols(tiles.length)}`}>
+      <Rise className="unmask-title">
+        <h2 className="display-md phase__title">{step === 'roll' ? 'The votes are in…' : r.caught ? 'Caught!' : 'Escaped!'}</h2>
+        <AnimatePresence>
+          {stamped && bubble && (
+            <motion.span key="bubble" className={`unmask-bubble ${bubble.win ? 'unmask-bubble--win' : 'unmask-bubble--fooled'}`}
+              initial={{ opacity: 0, scale: rm ? 1 : 0.3, rotate: rm ? 0 : -12 }} animate={{ opacity: 1, scale: 1, rotate: rm ? 0 : -6 }}
+              transition={{ delay: rm ? 0 : 0.35, duration: D.base, ease: ease.bounce }}>{bubble.text}</motion.span>
+          )}
+        </AnimatePresence>
+      </Rise>
+      <div ref={grid.ref} style={grid.style}>
         {tiles.map((d) => (
-          <DrawingTile key={d.playerId} drawing={d} player={view.byId.get(d.playerId)} layoutId={`tile-${r.index}-${d.playerId}`} size={phone ? 240 : 320}
+          <DrawingTile key={d.playerId} drawing={d} player={view.byId.get(d.playerId)} layoutId={`tile-${r.index}-${d.playerId}`} size={grid.size}
             spot={spot === d.playerId} dim={step === 'roll' ? spot !== d.playerId : stamped && target !== d.playerId}
             votes={counts.get(d.playerId)} showVotes={stamped}>
             {stamped && target === d.playerId && <Stamp kind={kind === 'escaped' ? 'innocent' : kind} sm />}

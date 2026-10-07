@@ -6,6 +6,8 @@ import path from 'node:path';
 
 const mediaDir = await fs.mkdtemp(path.join(os.tmpdir(), 'sketchy-ai-test-'));
 process.env.AI_MODE = 'openai';
+process.env.LIVE_AI_ENABLED = 'true';
+process.env.AI_BUDGET_FILE = path.join(mediaDir, 'budget.json');
 process.env.OPENAI_API_KEY = 'test-key-never-sent';
 process.env.MEDIA_DIR = mediaDir;
 const { glowUp, judge, setForcedFailures } = await import('./ai');
@@ -37,15 +39,15 @@ test('image refusal and malformed upstream output have designed fallbacks', asyn
   globalThis.fetch = async () => Response.json({ data: [] });
   assert.equal((await glowUp(png)).status, 'fallback');
 });
-test('judge uses raw sketch and schema, clamps score, and caches successful results', async () => {
+test('judge uses raw sketch and schema, validates score, and caches successful results', async () => {
   let calls = 0;
   globalThis.fetch = async (_url, options) => {
     calls++; const body = JSON.parse(String(options!.body));
     assert.equal(body.response_format.json_schema.strict, true);
     assert.equal(body.messages[1].content[1].image_url.url, png);
-    return Response.json({ choices: [{ message: { content: JSON.stringify({ match: 104, sees: 'a cat DJ', roast: 'Tiny paws, big tunes.' }) } }] });
+    return Response.json({ choices: [{ message: { content: JSON.stringify({ match: 84, sees: 'a cat DJ', roast: 'Tiny paws, big tunes.' }) } }] });
   };
-  const result = await judge(png, 'a cat DJ', false, 'TEST'); assert.equal(result.match, 100);
+  const result = await judge(png, 'a cat DJ', false, 'TEST'); assert.equal(result.match, 84);
   await judge(png, 'a cat DJ', false, 'TEST'); assert.equal(calls, 1);
   setForcedFailures('TEST', ['judge']);
   assert.equal((await judge(png, 'a cat DJ', false, 'TEST')).status, 'fallback');
@@ -53,7 +55,7 @@ test('judge uses raw sketch and schema, clamps score, and caches successful resu
 });
 test('blank drawings do not spend API calls', async () => {
   globalThis.fetch = async () => { throw new Error('Must not call network'); };
-  const result = await judge('', 'anything', true); assert.equal(result.match, 0); assert.equal(result.roast, 'Bold choice.');
+  const result = await judge('', 'anything', true); assert.equal(result.match, undefined); assert.equal(result.status, 'fallback');
 });
 test('judge invalid JSON and refusals do not crash gameplay or poison cache', async () => {
   globalThis.fetch = async () => Response.json({ choices: [{ message: { content: 'nope' } }] });

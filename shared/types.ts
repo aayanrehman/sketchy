@@ -57,7 +57,7 @@ export interface PromptPair {
   theme: string;
   real: string;
   decoy: string;
-  stealDecoys: [string, string];
+  stealDecoys: [string, string, string];
 }
 
 export interface Award { playerId: string; points: number; reason: AwardReason }
@@ -82,6 +82,8 @@ export interface Round {
   stealPick: string | null;
   stealCorrect: boolean | null;
   fled: boolean;
+  /** Players in a tie-break revote (only when the imposter was one of the tied). */
+  revote?: string[];
   awards: Award[];
 }
 
@@ -114,9 +116,12 @@ export interface PublicRoom {
   phaseStartedAt: number;
   players: Player[];
   rounds: Round[];           // current + past rounds, secrets stripped by phase
+  gameId?: string;
+  chat?: { id: string; playerId: string; text: string }[];
+  verdictReady?: string[];
   aiImageCount: number;
   finalAwards: FinalAward[];
-  aiMode: 'openai' | 'mock' | 'off';
+  aiMode: 'openai' | 'fal' | 'mock' | 'off';
 }
 
 export interface MeView {
@@ -131,6 +136,7 @@ export interface StateMessage {
   room: PublicRoom;
   me: MeView | null;
   serverNow: number;
+  canHost?: boolean;
 }
 
 export type ToastKind = 'join' | 'leave' | 'host' | 'streak' | 'golden' | 'info' | 'fled';
@@ -138,10 +144,13 @@ export interface ToastMessage { id: string; kind: ToastKind; text: string; playe
 
 // Socket events
 export interface ClientToServer {
-  'screen:create': (cb: (res: { ok: true; code: string } | { ok: false; error: string }) => void) => void;
-  'screen:watch': (p: { code: string }, cb: (res: { ok: boolean; error?: string }) => void) => void;
-  'join': (p: { code: string; name: string; token?: string }, cb: (res: { ok: true; token: string; playerId: string } | { ok: false; error: string }) => void) => void;
+  'screen:create': (cb: (res: { ok: true; code: string; hostToken: string } | { ok: false; error: string }) => void) => void;
+  'screen:watch': (p: { code: string; hostToken?: string }, cb: (res: { ok: boolean; error?: string }) => void) => void;
+  'join': (p: { code: string; name: string; token?: string; hostToken?: string }, cb: (res: { ok: true; token: string; playerId: string } | { ok: false; error: string }) => void) => void;
   'demo:create': (p: { name: string }, cb: (res: { ok: true; code: string; token: string; playerId: string } | { ok: false; error: string }) => void) => void;
+  'host:assign': (p: { playerId: string }) => void;
+  'chat:send': (p: { text: string }) => void;
+  'verdict:ready': () => void;
   'host:start': () => void;
   'host:skip': () => void;
   'host:playAgain': () => void;

@@ -67,7 +67,7 @@ export function MatchMeter({ drawing, player, isImposter, isYou, run, slow, onDo
         <div className="meter__text">{typed.startsWith('Sees:') ? <><b>{typed.split('. ')[0]}.</b> {typed.split('. ').slice(1).join('. ')}</> : typed}</div>
       </div>
       <div className="meter__num" aria-live="polite">
-        {fog ? <>?? <span className={`meter__fog ${rm ? 'rm-still' : ''}`} aria-hidden /></> : `${run ? n : 0}%`}
+        {fog ? <span style={{ fontSize: 13 }}>Unscored</span> : <>{run ? n : 0}<small style={{ fontSize: 13 }}>/100</small></>}
       </div>
     </motion.div>
   );

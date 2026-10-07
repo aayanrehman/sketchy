@@ -40,10 +40,10 @@ export const DrawCanvas = forwardRef<DrawHandle, Props>(function DrawCanvas({ ex
 
   const pos = (e: PointerEvent | React.PointerEvent): Point => {
     const c = canvasRef.current!; const r = c.getBoundingClientRect();
-    return { x: Math.round(((e.clientX - r.left) / r.width) * CANVAS_SIZE), y: Math.round(((e.clientY - r.top) / r.height) * CANVAS_SIZE) };
+    return { x: Math.max(0, Math.min(CANVAS_SIZE, Math.round(((e.clientX - r.left) / r.width) * CANVAS_SIZE))), y: Math.max(0, Math.min(CANVAS_SIZE, Math.round(((e.clientY - r.top) / r.height) * CANVAS_SIZE))) };
   };
   const drawSegment = (p: Point) => {
-    const c = canvasRef.current; const s = current.current; if (!c || !s) return;
+    const c = canvasRef.current; const s = current.current; if (!c || !s || s.points.length >= 2000) return;
     const ctx = c.getContext('2d'); if (!ctx) return;
     const prev = s.points[s.points.length - 1];
     ctx.strokeStyle = s.color; ctx.lineWidth = s.size; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
@@ -51,11 +51,11 @@ export const DrawCanvas = forwardRef<DrawHandle, Props>(function DrawCanvas({ ex
     s.points.push(p);
   };
   const onDown = (e: React.PointerEvent) => {
-    if (disabled || !e.isPrimary || current.current) return;
+    if (strokes.current.length >= 500 || strokes.current.reduce((n, s) => n + s.points.length, 0) >= 18000 || disabled || !e.isPrimary || current.current) return;
     (e.target as Element).setPointerCapture(e.pointerId);
     const p = pos(e);
     current.current = { color, size, points: [p] };
-    drawSegment({ x: p.x + 0.01, y: p.y });
+    drawSegment({ x: Math.min(CANVAS_SIZE, p.x + 0.01), y: p.y });
   };
   const onMove = (e: React.PointerEvent) => { if (!current.current) return; drawSegment(pos(e)); };
   const onUp = () => {

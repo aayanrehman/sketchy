@@ -7,7 +7,7 @@ export function Confetti({ burst, gold }: { burst: number; gold?: boolean }) {
   const ref = useRef<HTMLCanvasElement>(null);
   const rm = !!useReducedMotion();
   useEffect(() => {
-    if (!burst) return;
+    if (!burst || rm) return;
     const c = ref.current; if (!c) return;
     const ctx = c.getContext('2d'); if (!ctx) return;
     const dpr = Math.min(2, window.devicePixelRatio || 1);

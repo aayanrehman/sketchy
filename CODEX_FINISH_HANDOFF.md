@@ -126,3 +126,12 @@ Completion gates:
 If a dependency prevents a gate, finish the remaining authorized work, provide the exact access/input needed and a runnable continuation. Do not mark the app fully finished or contest-ready while gates are blocked. Do not claim a prize score or leaderboard position from this checklist.
 
 Final delivery: playable URL, repository branch/commit, implemented behavior, meaningful validation, release evidence ledger, live AI latency/cost/fidelity findings, real playtest findings and remaining limitations. A beautiful screenshot alone is not completion.
+
+
+## Local continuation — October 7, 2026
+
+Source ZIP restored; fixes are on codex/finish-sketchy-submission. Read docs/RELEASE_EVIDENCE.md for current test results and outstanding gates. The user selected OpenAI gpt-image-1-mini and asked to prepare Render. The key was entered privately into ignored .env; never print it. A live smoke request returned HTTP 429 credit_balance_exhausted for image editing and HTTP 429 for judging; further calls were stopped pending billing. No live fidelity or successful-generation claim is supported. Render account is connected, workspace confirmation and paid plan approval pending. No contest submission authorized.
+
+### Continuation update — October 7, fal switch
+
+User chose fal.ai after the direct OpenAI project returned exhausted credit. Private loopback setup saved FAL_KEY without exposing it; AI_MODE=fal now routes both editing and raw-sketch judging through fal. Successful live smoke: image 11,727 ms, judge 2,896 ms, provider-reported judge cost $0.0002792. Human evaluation and group tests remain unperformed. User confirmed Render workspace aayanreh; paid service creation still needs approval. Current source/evidence is described in README and docs/RELEASE_EVIDENCE.md, superseding earlier continuation notes.

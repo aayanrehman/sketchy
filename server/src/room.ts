@@ -3,13 +3,13 @@ import type {
   FinalAward, ToastMessage, ToastKind,
 } from '../../shared/types';
 import {
-  PHASE_MS, VERDICT_BASE_MS, VERDICT_PER_DRAWING_MS, MIN_PLAYERS, MAX_PLAYERS, TOTAL_ROUNDS,
+  PHASE_MS, MIN_PLAYERS, MAX_PLAYERS, TOTAL_ROUNDS,
   GLOWUP_ROOM_CAP, GOLDEN_ODDS,
 } from '../../shared/types';
 import { PROMPT_PAIRS } from '../../shared/prompts';
 import { uid, shuffle, pick, PLAYER_COLORS, PLAYER_AVATARS } from './util';
 import { glowUp, judge, AI_MODE } from './ai';
-import { scoreRound, resolveVotes } from './scoring';
+import { scoreRound, resolveVotes, validScore } from './scoring';
 
 export interface Seat { player: Player; token: string; socketIds: Set<string> }
 export type Emitter = (code: string, build: (seat: Seat | null) => StateMessage, toast?: ToastMessage) => void;
@@ -19,7 +19,7 @@ const IMPOSTER_GRACE_MS = 8_000;
 const LOBBY_DROP_MS = 15_000;
 const STEAL_REVEAL_MS = 2_800;
 /** The gallery stays up at least this long so the glow-up morph is seen, even if the AI was fast. */
-const GALLERY_MIN_MS = 7_000;
+const GALLERY_MIN_MS = 4_000;
 const BOT_GLOW_DELAY_MS = [1_500, 6_000];
 export const ROOM_IDLE_MS = 2 * 60 * 60 * 1000;
 
@@ -31,6 +31,12 @@ export class Room {
   code: string;
   isDemo: boolean;
   hostId: string | null = null;
+  readonly hostToken = uid(32);
+  gameId = uid(16);
+  private destroyed = false;
+  private frozen = new Map<Round, Drawing[]>();
+  chat: { id: string; playerId: string; text: string }[] = [];
+  verdictReady = new Set<string>();
   round = 0;
   totalRounds = TOTAL_ROUNDS;
   phase: Phase = 'LOBBY';
@@ -51,13 +57,14 @@ export class Room {
   private lobbyDrops = new Map<string, NodeJS.Timeout>();
   /** Hooks for the demo director. */
   onPhase: ((phase: Phase) => void) | null = null;
+  onDestroy: (() => void) | null = null;
   /** Demo: force who is imposter per round index. */
   forcedImposters: Record<number, string> = {};
   forcedPairs: Record<number, number> = {};
   /** Pre-made drawing payloads for bots (demo). */
   botContent: ((round: Round, playerId: string) => Partial<Drawing> | null) | null = null;
 
-  constructor(code: string, private emit: Emitter, isDemo = false) {
+  constructor(code: string, private emit: Emitter, isDemo = false, private ai = { glowUp, judge }) {
     this.code = code;
     this.isDemo = isDemo;
   }
@@ -75,8 +82,9 @@ export class Room {
     let clean = name.trim().slice(0, 12) || 'Player';
     const names = new Set(this.players.map((p) => p.name.toLowerCase()));
     if (names.has(clean.toLowerCase())) {
-      let n = 2; while (names.has(`${clean} ${n}`.toLowerCase())) n++;
-      clean = `${clean} ${n}`;
+      const stem = clean.slice(0, 9);
+      let n = 2; while (names.has(`${stem} ${n}`.toLowerCase())) n++;
+      clean = `${stem} ${n}`;
     }
     const idx = this.order.length;
     const usedColors = new Set(this.players.map((p) => p.color));
@@ -91,7 +99,7 @@ export class Room {
     const seat: Seat = { player, token: uid(16), socketIds: new Set() };
     this.seats.set(player.id, seat);
     this.order.push(player.id);
-    if (!this.hostId && !isBot) this.hostId = player.id;
+    if (this.isDemo && !this.hostId && !isBot) this.hostId = player.id;
     this.touch();
     return { seat };
   }
@@ -120,7 +128,7 @@ export class Room {
       seat.socketIds.delete(socketId);
       if (seat.socketIds.size === 0) {
         seat.player.connected = false;
-        this.onPlayerGone(seat);
+        if (!this.destroyed) this.onPlayerGone(seat);
       }
       return seat;
     }
@@ -130,6 +138,7 @@ export class Room {
 
   removePlayer(playerId: string) {
     const seat = this.seats.get(playerId); if (!seat) return;
+    if (this.currentRound()?.imposterId === playerId && ['PROMPT','DRAW','GALLERY','DISCUSS','VOTE'].includes(this.phase)) this.imposterFled();
     this.seats.delete(playerId);
     this.order = this.order.filter((id) => id !== playerId);
     if (this.hostId === playerId) this.passHost();
@@ -157,8 +166,8 @@ export class Room {
   }
 
   private passHost() {
-    const next = this.players.find((p) => p.connected && !p.isBot && p.id !== this.hostId);
-    if (!next) { if (!this.players.some((p) => p.id === this.hostId)) this.hostId = this.players.find((p) => !p.isBot)?.id || null; return; }
+    const next = undefined as Player | undefined; // Only the creator can explicitly delegate host authority.
+    if (!next) { if (!this.seats.has(this.hostId || '')) this.hostId = null; return; }
     this.hostId = next.id;
     this.broadcast({ id: uid(4), kind: 'host', text: `${next.name} is now the host`, playerId: next.id });
   }
@@ -166,6 +175,17 @@ export class Room {
   // ---------- phases ----------
   private setPhase(phase: Phase, ms: number | null) {
     if (this.timer) { clearTimeout(this.timer); this.timer = null; }
+    if (phase === 'DISCUSS' && this.currentRound()) {
+      const r = this.currentRound()!;
+      this.frozen.set(r, r.drawings.map(d => ({ ...d, glowStatus: d.glowStatus === 'pending' ? 'fallback' : d.glowStatus })));
+    }
+    if (['UNMASK','VERDICT','SCORES','FINAL'].includes(phase) && this.imposterGrace) { clearTimeout(this.imposterGrace); this.imposterGrace = null; }
+    if (phase === 'VERDICT') {
+      this.verdictReady.clear();
+      for (const d of this.currentRound()?.drawings || []) if (d.judgeStatus === 'pending') {
+        d.judgeStatus = 'fallback'; d.match = undefined; d.roast = JUDGE_FOG;
+      }
+    }
     this.phase = phase;
     this.phaseStartedAt = Date.now();
     this.phaseEndsAt = ms ? Date.now() + ms : null;
@@ -186,6 +206,7 @@ export class Room {
   }
 
   canStart(): string | null {
+    if (this.destroyed) return 'This room has ended';
     if (this.phase !== 'LOBBY' && this.phase !== 'FINAL') return 'Already started';
     if (this.activePlayers.length < MIN_PLAYERS) return `Need ${MIN_PLAYERS} players (or try Demo Mode)`;
     return null;
@@ -195,7 +216,9 @@ export class Room {
     const err = this.canStart(); if (err) return err;
     for (const p of this.players) { p.score = 0; p.streak = 0; p.readyHowTo = false; p.spectator = false; }
     this.round = 0; this.rounds = []; this.finalAwards = []; this.imposterHistory = [];
-    this.setPhase('HOW_TO', PHASE_MS.HOW_TO);
+    if (this.imposterGrace) { clearTimeout(this.imposterGrace); this.imposterGrace = null; }
+    this.gameId = uid(16); this.aiImageCount = 0; this.frozen.clear(); this.chat = [];
+    this.setPhase('HOW_TO', null);
     return null;
   }
 
@@ -203,6 +226,8 @@ export class Room {
     if (this.phase !== 'FINAL') return;
     for (const p of this.players) { p.score = 0; p.streak = 0; p.spectator = false; p.readyHowTo = false; }
     this.round = 0; this.rounds = []; this.finalAwards = [];
+    if (this.imposterGrace) { clearTimeout(this.imposterGrace); this.imposterGrace = null; }
+    this.gameId = uid(16); this.aiImageCount = 0; this.frozen.clear(); this.chat = [];
     this.setPhase('LOBBY', null);
   }
 
@@ -235,14 +260,19 @@ export class Room {
     this.round += 1;
     for (const p of this.players) { p.spectator = false; p.hasSubmitted = false; p.hasVoted = false; }
     const ids = this.activePlayers.map((p) => p.id);
-    const pair = this.pickPair();
+    const source = this.pickPair();
+    // Randomize the real answer among all four candidates in human games. A theme or
+    // knowledge of the source catalog must not reveal which option is correct.
+    const candidates = shuffle([source.real, ...source.stealDecoys]);
+    const pair = this.isDemo || this.forcedPairs[this.round] ? source : { ...source, real: candidates[0], stealDecoys: candidates.slice(1) as [string, string, string] };
+    this.chat = [];
     this.usedPairIds.push(pair.id);
     const imposterId = this.pickImposter(ids);
     this.imposterHistory.push(imposterId);
     const round: Round = {
       index: this.round, promptPairId: pair.id, theme: pair.theme, realPrompt: pair.real, decoyPrompt: pair.decoy,
       imposterId, participantIds: ids, drawings: [], votes: {}, revealedId: null, caught: null, escapeReason: null,
-      stealOptions: shuffle([pair.real, pair.decoy, ...pair.stealDecoys]), stealPick: null, stealCorrect: null,
+      stealOptions: shuffle([pair.real, ...pair.stealDecoys]), stealPick: null, stealCorrect: null,
       fled: false, awards: [],
     };
     this.rounds.push(round);
@@ -250,7 +280,7 @@ export class Room {
   }
 
   private imposterFled() {
-    const r = this.currentRound(); if (!r || r.fled) return;
+    const r = this.currentRound(); if (!r || r.fled || !['PROMPT','DRAW','GALLERY','DISCUSS','VOTE'].includes(this.phase)) return;
     r.fled = true; r.caught = false;
     r.awards = scoreRound(r, this.playersMap());
     this.broadcast({ id: uid(4), kind: 'fled', text: 'The imposter fled! Artists get +50' });
@@ -267,6 +297,7 @@ export class Room {
       case 'DRAW': if (r && participants.every((p) => p.hasSubmitted)) this.advance(); break;
       case 'GALLERY': if (r && r.drawings.every((d) => d.glowStatus !== 'pending')) this.shorten(Math.max(0, GALLERY_MIN_MS - (Date.now() - this.phaseStartedAt))); break;
       case 'VOTE': if (r && participants.every((p) => p.hasVoted)) this.advance(); break;
+      case 'VERDICT': if (participants.filter(p => !p.isBot).length && participants.filter(p => !p.isBot).every(p => this.verdictReady.has(p.id))) this.advance(); break;
       case 'STEAL': if (r && r.stealPick !== null) this.shorten(STEAL_REVEAL_MS); break;
     }
   }
@@ -294,12 +325,12 @@ export class Room {
       case 'UNMASK': {
         if (!r) return;
         if (r.caught) return this.setPhase('STEAL', PHASE_MS.STEAL);
-        return this.setPhase('VERDICT', VERDICT_BASE_MS + VERDICT_PER_DRAWING_MS * r.drawings.length);
+        return this.setPhase('VERDICT', null);
       }
       case 'STEAL': {
         if (!r) return;
         if (r.stealPick === null) r.stealCorrect = false;
-        return this.setPhase('VERDICT', VERDICT_BASE_MS + VERDICT_PER_DRAWING_MS * r.drawings.length);
+        return this.setPhase('VERDICT', null);
       }
       case 'VERDICT': {
         if (!r) return;
@@ -320,7 +351,7 @@ export class Room {
     for (const p of this.players) byPlayer.set(p.id, { asImp: [], asArt: [], susVotes: 0 });
     for (const r of this.rounds) {
       for (const d of r.drawings) {
-        if (d.judgeStatus !== 'done' || typeof d.match !== 'number') continue;
+        if (!validScore(d)) continue;
         const b = byPlayer.get(d.playerId); if (!b) continue;
         (d.playerId === r.imposterId ? b.asImp : b.asArt).push(d.match);
       }
@@ -333,8 +364,8 @@ export class Room {
       return bestV > 0 ? { id: bestId!, v: bestV } : null;
     };
     const out: FinalAward[] = [];
-    const bd = best((b) => avg(b.asImp)); if (bd) out.push({ title: 'Best Disguise', playerId: bd.id, detail: `${Math.round(bd.v)}% match as the imposter` });
-    const jp = best((b) => avg(b.asArt)); if (jp) out.push({ title: "Judge's Pet", playerId: jp.id, detail: `${Math.round(jp.v)}% average match` });
+    const bd = best((b) => avg(b.asImp)); if (bd) out.push({ title: 'Best Disguise', playerId: bd.id, detail: `${Math.round(bd.v)}/100 AI match as the imposter` });
+    const jp = best((b) => avg(b.asArt)); if (jp) out.push({ title: "Judge's Pet", playerId: jp.id, detail: `${Math.round(jp.v)}/100 average AI match` });
     const ms = best((b) => b.susVotes); if (ms) out.push({ title: 'Most Sus Innocent', playerId: ms.id, detail: `${ms.v} wrongful vote${ms.v === 1 ? '' : 's'}` });
     this.finalAwards = out;
   }
@@ -342,10 +373,12 @@ export class Room {
   // ---------- actions ----------
   submitDrawing(playerId: string, strokes: Stroke[], png: string, auto = false) {
     const r = this.currentRound(); const p = this.seats.get(playerId)?.player;
-    if (!r || !p || this.phase !== 'DRAW' || p.hasSubmitted || !r.participantIds.includes(playerId)) return;
-    const blank = strokes.length === 0 || !png;
+    if (!r || !p || this.phase !== 'DRAW' || (!auto && !!this.phaseEndsAt && Date.now() >= this.phaseEndsAt) || p.hasSubmitted || !r.participantIds.includes(playerId)) return;
+    const blank = !png || !strokes.some(s => s.points.length > 0 && !['#fff', '#ffffff', '#fffdf7'].includes(s.color.toLowerCase()));
+    const gameId = this.gameId;
+    const validJob = () => !this.destroyed && this.gameId === gameId && this.rounds.includes(r);
     const d: Drawing = {
-      playerId, strokes, pngUrl: png, glowStatus: 'pending', golden: false, judgeStatus: 'pending', blank,
+      playerId, strokes, glowStatus: 'pending', golden: false, judgeStatus: 'pending', blank,
     };
     p.hasSubmitted = true;
     r.drawings.push(d);
@@ -358,6 +391,7 @@ export class Room {
       // Bots' art arrives like real AI art: after a short delay, so the glow-up choreography plays.
       const delay = BOT_GLOW_DELAY_MS[0] + Math.random() * (BOT_GLOW_DELAY_MS[1] - BOT_GLOW_DELAY_MS[0]);
       setTimeout(() => {
+        if (!validJob()) return;
         d.glowStatus = glowStatus || 'done'; d.glowUrl = glowUrl; d.golden = !!golden;
         if (d.golden) this.toast('golden', `${p.name} pulled a Golden frame!`, p.id);
         this.checkEarlyEnd(); this.broadcast();
@@ -367,35 +401,37 @@ export class Room {
     // Both AI jobs start the moment a drawing is submitted, in parallel.
     if (blank) {
       d.glowStatus = 'fallback';
-      d.judgeStatus = 'done'; d.match = 0; d.sees = 'a blank canvas'; d.roast = 'Bold choice.';
+      d.judgeStatus = 'fallback'; d.match = undefined; d.sees = 'a blank canvas'; d.roast = 'Bold choice.';
     } else {
       if (this.aiImageCount >= GLOWUP_ROOM_CAP || AI_MODE === 'off') {
         d.glowStatus = 'fallback';
       } else {
         this.aiImageCount += 1;
-        glowUp(png, this.code).then((res) => {
+        this.ai.glowUp(png, this.code).then((res) => {
+          if (!validJob()) return;
           d.glowStatus = res.status;
           if (res.status === 'done') {
             d.glowUrl = res.glowUrl; d.glowMock = !!res.mock;
             d.golden = Math.random() < GOLDEN_ODDS;
             if (d.golden) this.toast('golden', `${p.name} pulled a Golden frame!`, p.id);
-          } else if (res.reason && res.reason !== 'disabled') console.log(`[ai] glow fallback for ${p.name}: ${res.reason}`);
+          } 
           this.checkEarlyEnd(); this.broadcast();
         });
       }
-      judge(png, r.realPrompt, blank, this.code).then((res) => {
+      this.ai.judge(png, r.realPrompt, blank, this.code).then((res) => {
+        if (!validJob() || d.judgeStatus !== 'pending') return;
         if (res.status === 'done') { d.judgeStatus = 'done'; d.match = res.match; d.sees = res.sees; d.roast = res.roast; }
-        else { d.judgeStatus = 'fallback'; d.match = -1; d.roast = JUDGE_FOG; if (res.reason !== 'disabled') console.log(`[ai] judge fallback for ${p.name}: ${res.reason}`); }
+        else { d.judgeStatus = 'fallback'; d.match = -1; d.roast = JUDGE_FOG;  }
         this.broadcast();
       });
     }
-    this.checkEarlyEnd();
+    if (!auto) this.checkEarlyEnd();
     this.broadcast();
   }
 
   vote(voterId: string, targetId: string) {
     const r = this.currentRound(); const p = this.seats.get(voterId)?.player;
-    if (!r || !p || this.phase !== 'VOTE' || p.hasVoted || voterId === targetId) return;
+    if (!r || !p || this.phase !== 'VOTE' || (!!this.phaseEndsAt && Date.now() >= this.phaseEndsAt) || p.hasVoted || voterId === targetId) return;
     if (!r.participantIds.includes(voterId) || !r.participantIds.includes(targetId)) return;
     // The imposter votes too (to frame someone); their vote can never earn points since self-votes are blocked.
     r.votes[voterId] = targetId; p.hasVoted = true;
@@ -404,7 +440,7 @@ export class Room {
 
   stealPick(playerId: string, option: string) {
     const r = this.currentRound();
-    if (!r || this.phase !== 'STEAL' || playerId !== r.imposterId || r.stealPick !== null) return;
+    if (!r || this.phase !== 'STEAL' || (!!this.phaseEndsAt && Date.now() >= this.phaseEndsAt) || playerId !== r.imposterId || r.stealPick !== null) return;
     if (!r.stealOptions.includes(option)) return;
     r.stealPick = option; r.stealCorrect = option === r.realPrompt;
     this.touch(); this.checkEarlyEnd(); this.broadcast();
@@ -424,19 +460,25 @@ export class Room {
   private publicRound(round: Round, viewerId: string | null): Round {
     const imp = this.revealImposter(round);
     const jud = this.revealJudge(round);
-    const past = round.index < this.round;
-    const showStrokes = past || !['PROMPT', 'DRAW'].includes(this.phase);
+    const answer = jud || (this.phase === 'STEAL' && round.stealPick !== null);
+    const showStrokes = round.index < this.round || !['PROMPT', 'DRAW'].includes(this.phase);
+    const drawings = !jud ? this.frozen.get(round) || round.drawings : round.drawings;
+    // Explicit allowlist: adding private fields to Round cannot silently publish them.
     return {
-      ...round,
-      promptPairId: imp ? round.promptPairId : 0,
-      realPrompt: imp ? round.realPrompt : '',
-      decoyPrompt: imp ? round.decoyPrompt : '',
+      index: round.index, theme: round.theme,
+      promptPairId: answer ? round.promptPairId : 0,
+      realPrompt: answer ? round.realPrompt : '',
+      decoyPrompt: answer ? round.decoyPrompt : '',
       imposterId: imp ? round.imposterId : '',
-      stealOptions: imp ? round.stealOptions : [],
-      votes: imp ? round.votes : Object.fromEntries(Object.keys(round.votes).map((k) => [k, ''])),
-      drawings: round.drawings.map((d) => ({
-        playerId: d.playerId,
-        strokes: showStrokes ? d.strokes : [],
+      participantIds: [...round.participantIds],
+      revealedId: imp ? round.revealedId : null, caught: imp ? round.caught : null,
+      escapeReason: imp ? round.escapeReason : null, fled: imp && round.fled,
+      stealOptions: imp ? [...round.stealOptions] : [],
+      stealPick: answer ? round.stealPick : null, stealCorrect: answer ? round.stealCorrect : null,
+      awards: jud ? round.awards.map(a => ({ ...a })) : [],
+      votes: imp ? { ...round.votes } : Object.fromEntries(Object.keys(round.votes).map(k => [k, ''])),
+      drawings: drawings.map(d => ({
+        playerId: d.playerId, strokes: showStrokes ? d.strokes : [],
         glowUrl: showStrokes ? d.glowUrl : undefined,
         glowStatus: d.glowStatus, glowMock: d.glowMock, golden: d.golden, blank: d.blank,
         judgeStatus: jud ? d.judgeStatus : 'pending',
@@ -445,9 +487,31 @@ export class Room {
     };
   }
 
+  assignHost(playerId: string) {
+    const p = this.seats.get(playerId)?.player;
+    if (!p || p.isBot) return;
+    this.hostId = playerId; this.broadcast();
+  }
+
+  sendChat(playerId: string, text: string) {
+    if (!['DISCUSS', 'VOTE'].includes(this.phase) || !this.currentRound()?.participantIds.includes(playerId)) return;
+    const clean = text.trim().slice(0, 240); if (!clean) return;
+    this.chat.push({ id: uid(8), playerId, text: clean });
+    this.chat = this.chat.slice(-50); this.touch(); this.broadcast();
+  }
+
+  readyVerdict(playerId: string) {
+    if (this.phase !== 'VERDICT' || !this.currentRound()?.participantIds.includes(playerId)) return;
+    this.verdictReady.add(playerId);
+    const humans = this.activePlayers.filter(p => p.connected && !p.isBot);
+    if (humans.length && humans.every(p => this.verdictReady.has(p.id))) this.advance();
+    else this.broadcast();
+  }
+
   build(seat: Seat | null): StateMessage {
     const viewerId = seat?.player.id || null;
     const room: PublicRoom = {
+      gameId: this.gameId, chat: this.chat, verdictReady: [...this.verdictReady],
       code: this.code, hostId: this.hostId, isDemo: this.isDemo, round: this.round, totalRounds: this.totalRounds,
       phase: this.phase, phaseEndsAt: this.phaseEndsAt, phaseStartedAt: this.phaseStartedAt,
       players: this.players, rounds: this.rounds.map((r) => this.publicRound(r, viewerId)),
@@ -470,6 +534,7 @@ export class Room {
   }
 
   destroy() {
+    this.destroyed = true; this.onDestroy?.(); this.onPhase = null;
     if (this.timer) clearTimeout(this.timer);
     if (this.hostGrace) clearTimeout(this.hostGrace);
     if (this.imposterGrace) clearTimeout(this.imposterGrace);

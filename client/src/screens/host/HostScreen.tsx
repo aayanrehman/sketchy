@@ -2,7 +2,8 @@ import { useEffect, useRef, useState } from 'react';
 import { MainShell } from '@/shell/MainShell';
 import { PhaseStage } from '@/shell/PhaseStage';
 import { useRoom } from '@/state/useRoom';
-import { socket } from '@/net/socket';
+import { convex, setSession, saveHostToken, loadHostToken } from '@/net/socket';
+import { api } from '../../../../convex/_generated/api';
 import { LobbyMain } from '@/moments/Lobby';
 import { HowToMain } from '@/moments/HowToPhase';
 import { PromptMain } from '@/moments/Prompt';
@@ -21,34 +22,23 @@ export function HostScreen() {
   const [err, setErr] = useState<string | null>(null);
   const creating = useRef(false);
   useEffect(() => {
-    const s = socket();
-    const go = () => {
-      const code = new URLSearchParams(location.search).get('code')?.toUpperCase();
-      if (code) s.timeout(10000).emit('screen:watch', { code }, (timeout: Error | null, r: { ok: boolean; error?: string }) => {
-        setErr(timeout ? 'Could not reach the game. Please try again.' : !r.ok ? r.error || 'Room not found' : null);
-      });
-      else if (!creating.current) {
-        creating.current = true;
-        s.timeout(10000).emit('screen:create', (timeout: Error | null, r: { ok: boolean; code?: string; error?: string }) => {
-          creating.current = false;
-          if (timeout) setErr('Could not create a room. Please try again.');
-          else if (r.ok) { history.replaceState(null, '', `/host?code=${r.code}`); setErr(null); }
-          else setErr(r.error || 'Could not create a room');
-        });
-      }
-    };
-    const fail = () => setErr('Could not connect to the game. Please try again.');
-    s.on('connect', go); s.on('connect_error', fail);
-    if (s.connected) go();
-    return () => { s.off('connect', go); s.off('connect_error', fail); };
+    const code = new URLSearchParams(location.search).get('code')?.toUpperCase();
+    if (code) { setSession({ code, hostToken: loadHostToken(code) }); return; }
+    if (creating.current) return;
+    creating.current = true;
+    convex.mutation(api.game.createScreen, {}).then((r) => {
+      saveHostToken(r.code, r.hostToken); history.replaceState(null, '', `/host?code=${r.code}`);
+      setSession({ code: r.code, hostToken: r.hostToken }); setErr(null);
+    }).catch(() => setErr('Could not create a room. Please try again.')).finally(() => { creating.current = false; });
   }, []);
 
-  if (err && !view.room) return <div className="landing"><Card padLg><h2 className="display-md">Hmm</h2><p className="dim" style={{ margin: '8px 0 16px' }}>{err}</p><Button onClick={() => { location.href = '/'; }}>Back</Button></Card></div>;
+  if (err) return <div className="landing"><Card padLg><h2 className="display-md">Hmm</h2><p className="dim" style={{ margin: '8px 0 16px' }}>{err}</p><Button onClick={() => { location.href = '/'; }}>Back</Button></Card></div>;
   if (!view.room) return <div className="landing"><div style={{ display: 'grid', justifyItems: 'center', gap: 12 }}><Mascot mood="think" size={120} float /><p className="display-md ink-text">Setting the stage…</p></div></div>;
   const room = view.room;
   const phase = room.phase;
   return (
     <MainShell room={room} hideRail={phase === 'LOBBY' || phase === 'FINAL'}>
+      {view.error && <div className="offline" role="alert">{view.error} <a href="/">Return home</a></div>}
       {!view.connected && <div className="offline" role="status">Reconnecting…</div>}
       <PhaseStage phase={phase} banner={phase === 'LOBBY' || phase === 'HOW_TO' ? null : undefined}>
         {phase === 'LOBBY' && <LobbyMain view={view} />}

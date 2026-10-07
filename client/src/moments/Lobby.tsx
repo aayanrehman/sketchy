@@ -28,11 +28,11 @@ export function LobbyMain({ view }: MomentProps) {
         </div>
       </Card></Rise>
       <Rise className="lobby__cast">
-        {room.players.map((p) => <motion.div key={p.id} variants={childVariants(rm)}><Avatar player={p} isHost={p.id === room.hostId} /></motion.div>)}
+        {room.players.map((p) => <motion.div key={p.id} variants={childVariants(rm)}><Avatar player={p} isHost={p.id === room.hostId} />{view.canHost && p.id !== room.hostId && <Button size="sm" variant="ghost" onClick={() => send().emit('host:assign', { playerId: p.id })}>Make host</Button>}</motion.div>)}
         {Array.from({ length: Math.max(0, MIN_PLAYERS - room.players.length) }, (_, i) => <div key={i} className="lobby__slot" aria-hidden />)}
       </Rise>
       <Rise>
-        {n < MIN_PLAYERS ? <p className="phase__sub">Need {MIN_PLAYERS} players (or try Demo Mode) · {n}/{MAX_PLAYERS}</p> : <Button size="lg" onClick={() => send().emit('host:start')}>Start the show</Button>}
+        {n < MIN_PLAYERS ? <p className="phase__sub">Need {MIN_PLAYERS} players (or try Demo Mode) · {n}/{MAX_PLAYERS}</p> : view.canHost ? <Button size="lg" onClick={() => send().emit('host:start')}>Start the show</Button> : <p className="phase__sub">Watching · Waiting for the host</p>}
       </Rise>
       <Rise><p className="mute" style={{ fontWeight: 700 }}>Playing on this phone? <a href={`/play?code=${room.code}`}>Join as a player</a></p></Rise>
     </div>

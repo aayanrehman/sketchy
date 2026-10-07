@@ -1,110 +1,80 @@
 # Sketchy
 
-**One of you is drawing something different. The AI knows who.**
+A drawing imposter party game for 4–8 people: draw a secret prompt, discuss the sketches, vote for the odd one out, and let a caught imposter attempt one steal. AI can turn raw sketches into sticker art and independently rate the original drawing. Two-round solo onboarding teaches both roles using explicitly labeled bot examples.
 
-A drawing imposter party game for 4 to 8 players with an AI judge. Everyone draws the same secret prompt except one imposter, who draws a close-but-different one. The AI turns every sketch into art, the group votes on the imposter, and then the AI judge reveals how well each drawing matched the real prompt.
+**Release status:** local gameplay and automated checks are available; public deployment, broader AI validation and first-time human group testing remain gates. See [release evidence](docs/RELEASE_EVIDENCE.md). There is no verified public URL yet.
 
-Built from the [Sketchy PRD & Build Kit](https://claude.ai/artifact/U5pVMUth1WjgvvbC5LvtM9). Gameplay, phases, timers, scoring and prompt pairs follow the PRD exactly. The visual and motion system is documented in [DESIGN.md](DESIGN.md); PRD feasibility notes, open interpretations and the challenge scorecard are in [docs/PRD-NOTES.md](docs/PRD-NOTES.md).
+## Run locally
 
-## Run it
+Requires Node 22 and npm.
 
-```bash
-npm install
-cp .env.example .env        # add OPENAI_API_KEY to use the real AI; leave empty for mock mode
-npm run dev                 # server on :3000, Vite client on :5173 (proxies sockets and /api)
+```sh
+npm ci
+npm run dev
 ```
 
-Open http://localhost:5173 and:
+Open http://localhost:5173. Host a game, then join its code on four to eight devices. The creator controls the game and can explicitly assign a player host. Merely knowing a room code only grants player/watch access, not host control. If the creator joins as a player from the same browser, their saved creator credential delegates host to that seat. Reopening the creator page from that browser restores its authority.
 
-- **Host a game** opens the main screen (`/host`) with a 4-letter room code.
-- **Join a game** on each phone at `/play` with the code. Four players are needed to start. The first player to join is the host and sees the Start button; the main screen can also start.
-- **Try it solo** (`/demo`) plays two rounds against three bots in one tab, once as an artist and once as the imposter. On a wide screen the main-screen stage sits beside the phone view.
-- `/studio` is the hidden tool for recording bot sketches with their real glow-ups and judge scores.
-- `/cover` renders a 1200×630 composition to screenshot for the submission's cover image.
+For a production-style local preview:
 
-To test with phones on your network, Vite listens on all interfaces: use `http://<your-ip>:5173/play`.
-
-Production build (one process serves everything):
-
-```bash
+```sh
 npm run build
-npm start                   # http://localhost:3000
+npm start
 ```
 
-Other scripts: `npm run typecheck`, `npm test` (16 tests covering scoring, prompt privacy, demo fixtures, and AI requests/fallbacks).
+Open http://localhost:3000. Both the frontend and Socket.IO use the same origin. `/demo` works solo, with prepared bot art and example ratings. No live AI is implied by demo completion.
 
-### Solo testing without 4 phones
+## Configure AI privately
 
-In dev, after joining a room from one phone, fill it with bots:
-
-```
-http://localhost:3000/api/debug/bots?code=ABCD
+```sh
+npm run setup:local
 ```
 
-### Forcing every AI fallback
+Open http://127.0.0.1:3001. Paste the fal.ai key into the masked field, choose a daily request cap, and save. This loopback-only one-time form validates Host, Origin and a CSRF token; it does not log the key or use browser storage. It writes the git-ignored `.env` with owner-only permissions. Close the setup process after use. Never commit `.env` or expose setup on a public origin.
 
-Set `AI_FORCE_FAIL` in `.env` to any of `glow,judge,safety` for the whole server, or per room in dev:
+Restart the game after changing configuration. The chosen image model is `gpt-image-1-mini`, low quality, 1024×1024, WebP output. Judge defaults to `gpt-4.1-mini`. Explicit environment settings are documented in [.env.example](.env.example). The fal integration uses `fal-ai/gpt-image-1-mini/edit` and `openrouter/router/vision` with `openai/gpt-4.1-mini`. Both passed one live smoke test; this does not establish broader fidelity or rating consistency. Set `SETUP_PROVIDER=openai` only to configure the optional direct OpenAI provider.
 
-```
-http://localhost:3000/api/debug/force?code=ABCD&kinds=glow        # "The AI was speechless." gold frame
-http://localhost:3000/api/debug/force?code=ABCD&kinds=judge       # Match % shows "??", "My glasses fogged up."
-http://localhost:3000/api/debug/force?code=ABCD&kinds=safety      # silent fallback, same as a refusal
-http://localhost:3000/api/debug/force?code=ABCD&kinds=            # clear
-```
+`LIVE_AI_ENABLED=true` is required for live calls. `AI_MODE=mock` uses illustrative results and `AI_MODE=off` leaves original art available with unscored ratings. A model-list response is not proof of working image edits.
 
-The per-room cap (24 glow-ups) is in `shared/types.ts` (`GLOWUP_ROOM_CAP`); lower it to test the cap fallback. A blank drawing always scores 0 with "Bold choice." without calling the AI.
+In `AI_MODE=fal`, both jobs use only `FAL_KEY`; the old OpenAI key is never used as a fallback. Direct OpenAI mode separately supports `JUDGE_BASE_URL` / `JUDGE_API_KEY`. fal image requests allow 75 seconds, direct OpenAI 25 seconds, and ratings 15 seconds; no phase waits indefinitely.
 
-## AI modes
+## Fairness and pacing
 
-| `AI_MODE` | What happens |
-| --- | --- |
-| `openai` (default when a key is set) | Glow-up via `POST /v1/images/edits` with the sketch only, never the prompt. Judge via a vision chat model with strict JSON output `{match, sees, roast}`, cached per drawing. 25 s and 15 s timeouts. |
-| `mock` (default without a key) | Glow-up echoes the sketch with a sticker treatment and an "AI PREVIEW" tag after 1.5 to 5 s. The judge returns a deterministic pseudo-score. Nothing leaves the server. |
-| `off` | Every drawing uses the designed fallback states. |
+- HOW_TO waits for connected players to acknowledge instructions. VERDICT lets each player navigate all results and continue when ready.
+- Raw sketches are the source of truth and visible by default. Optional AI edits may change clues. Everyone receives the same frozen image evidence from discussion through voting; late edits appear only afterwards.
+- Before a steal resolves, public payloads contain four possible choices but no real answer, decoy, identifying pair ID, or judgment. Only each participant receives their own prompt. Real answers vary within the candidate set in human games.
+- The imposter's known decoy is excluded from steal choices. A missing steal choice fails; late votes/choices are rejected.
+- Correct artist votes earn +100, or +150 on a catch streak. Escape earns +200; successful steal +150. Ties/no votes allow escape; abstention breaks a streak.
+- Only nonblank valid ratings participate in quality awards. Tied highest artist ratings share +50 each. A valid imposter rating at least the valid artists' median earns +100. Missing or failed ratings are visibly unscored and excluded.
+- Text clues are optional, participant-only, bounded and rendered as text. They survive reconnect within the round and reset on the next round.
 
-Keys live only on the server. The image edit requests 1024×1024 WebP at 80% compression. Images are saved to `MEDIA_DIR` and served by URL, so socket state does not repeatedly carry base64 artwork. The cost-focused default is `gpt-image-1-mini`; benchmark it with your own key before choosing the final model. Live latency and cost have not been measured in this checkout. Generation timing and output byte size are logged, and `/api/studio/generate` returns `elapsedMs`.
+## Limits, persistence and operations
 
-## Deploy
+Per-game image allowance is 24 and resets on a rematch. Independent daily request reservations and concurrency controls apply across all rooms; the budget ledger persists beside the media directory. The form defaults to 48 reservations per job type per UTC day. These are request limits, not exact dollar billing limits. Provider billing controls remain separate.
 
-The server owns timers and pushes state over WebSockets, so it needs a host that runs a long-lived Node process. Vercel serverless functions do not hold WebSocket connections; use Render, Railway or Fly.
+Room creation/join/event rates, connection counts, image bytes/dimensions and stroke/point counts are bounded. Studio/proof routes require STUDIO_KEY in every environment. Debug routes additionally require non-production and ENABLE_DEBUG=true; keep them disabled outside local testing. No keys, raw sketches, private prompts or upstream response bodies are logged. Operational metadata includes status, latency and image byte counts.
 
-**Render (fastest):**
+Rooms are intentionally in memory: a server restart ends a game. Graceful shutdown and missing-room reconnects explain the loss and allow a new room. No session durability is claimed. Media and the request ledger persist only when MEDIA_DIR and AI_BUDGET_FILE use an attached disk. Generated images expire after 30 days and total storage is capped at 500 MB; local saved galleries explain this. Download a result PNG to keep it permanently.
 
-1. Push this repo to GitHub.
-2. In Render, *New → Blueprint*, pick the repo. `render.yaml` defines the service.
-3. Set `OPENAI_API_KEY` and `STUDIO_KEY` in the environment. The blueprint attaches a 1 GB persistent media disk; use a single instance.
-4. Deploy. The health check is `/api/health`. Your game URL is the service URL.
+## Validate
 
-**Any Docker host (Railway, Fly, a VPS):**
-
-```bash
-docker build -t sketchy .
-docker run -p 3000:3000 -v sketchy-media:/app/server/data/media -e OPENAI_API_KEY=sk-... sketchy
+```sh
+npm run typecheck
+npm test
+npm run build
+npm run verify:browser
+node --import tsx scripts/demo-verify.ts
+npm run eval:prepare
+npm run ai:smoke
+npm run eval:run
 ```
 
-Rooms live in memory, so run one instance (or add sticky sessions and a shared store before scaling out).
+Browser scripts require Google Chrome. They start their own ephemeral local server. Browser verification covers 13 phases/entry states at four viewport sizes, drawing/undo, eight-player voting, all results, sharing, replay and reconnect. The solo script exercises both roles and replay. Automated browser/device emulation is not physical-device or human-playtest evidence.
 
-## Demo content
+Evaluation preparation makes 36 synthetic sketches across six pairs and empty human-label fields. Live evaluation refuses to invent labels. A representative subset is judged twice with cache bypass. Results include failures and side-by-side output for human fidelity review. See [PLAYTEST.md](docs/PLAYTEST.md).
 
-Two complete prepared sample pairs ship with the repo: Cats (2) and Frogs (9). Each includes three authored real-prompt sketches, one decoy sketch, compressed built-in ImageGen artwork, and **example scores**. They demonstrate the game without spending tokens for bots; the demo explicitly labels the scores as examples. Your own sketch uses live OpenAI only when the server is configured, otherwise the UI says Preview mode.
+## Deploy and submit
 
-These fixtures are not claimed to be recordings from the live image-edit/judge pipeline. Replace them with measured recordings through `/studio` before advertising a fully live showcase. `scripts/build-demo-content.mjs` regenerates the authored stroke fixtures. Artwork provenance is in `server/data/demo/ARTWORK.md`. The two bundled JSON files and all eight WebP images are committed, so deployments have artwork from the first run. Other studio recordings remain gitignored.
+[Render blueprint](render.yaml) and [deployment plan](docs/DEPLOYMENT.md) retain one long-lived Node/WebSocket service and a persistent disk. Paid service creation needs the owner's explicit budget approval. Docker is also supported. Do not horizontally scale this in-memory design.
 
-Production studio endpoints and `/api/proof` require `STUDIO_KEY` in the `x-studio-key` header; the studio is disabled in production without a key. Keep `MEDIA_DIR` on a persistent volume for gallery URLs to survive redeploys. Media has no automatic expiry; monitor disk usage and retain shared images for as long as you need them.
-
-See [the submission checklist](docs/SUBMISSION.md) for live-AI verification and recording steps.
-
-## Project layout
-
-```
-shared/        types, phase lengths, scoring constants, the 24 prompt pairs
-server/src/    room.ts (state machine, timers, privacy), ai.ts (glow-up + judge), scoring.ts, demo.ts (bots), index.ts
-client/src/
-  design/      tokens.css + tokens.ts + motion.ts, and the component library
-  shell/       MainShell, PhoneShell, PhaseStage (the one transition system), HowTo
-  moments/     one file per phase, each with main-screen and phone variants
-  screens/     Landing, Host, Play, Demo, Studio
-  sound/       WebAudio sfx + mute
-  progression/ XP, levels, gallery, personal bests (localStorage)
-  share/       result card PNG
-```
+[Submission materials](docs/SUBMISSION.md) contain the title, cover, draft description and official links. No contest entry is submitted by this repository or its scripts.

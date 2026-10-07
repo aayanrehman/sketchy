@@ -3,6 +3,7 @@ import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { Phase } from '@shared/types';
 import { childVariants, phaseVariants, popVariants } from '@/design/motion';
 import { useSfx } from '@/sound/useSfx';
+import { setMusicMood } from '@/sound/music';
 
 /**
  * THE phase transition system. Every screen is a child keyed by phase:
@@ -12,14 +13,18 @@ import { useSfx } from '@/sound/useSfx';
  */
 export function PhaseStage({ phase, children, narrow, banner }: { phase: Phase; children: ReactNode; narrow?: boolean; banner?: { text: string; tone?: 'magenta' | 'cyan' | 'gold' | 'red' } | null }) {
   const rm = !!useReducedMotion();
+  const region = useRef<HTMLElement>(null);
+  useEffect(() => {
+    const frame = requestAnimationFrame(() => { window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); region.current?.focus({ preventScroll: true }); });
+    return () => cancelAnimationFrame(frame);
+  }, [phase]);
+  useEffect(() => { setMusicMood(phase === 'DRAW' || phase === 'VOTE' || phase === 'STEAL' ? 'upbeat' : 'chill'); }, [phase]);
   return (
     <LayoutGroup>
-      <PhaseBanner phase={phase} banner={banner} />
-      <AnimatePresence mode="wait" initial={false}>
-        <motion.section key={phase} className={`phase ${narrow ? 'phase--narrow' : ''}`} variants={phaseVariants(rm)} initial="initial" animate="enter" exit="exit">
+      <PhaseBanner phase={phase} banner={phase === 'DRAW' ? null : banner} />
+        <motion.section ref={region} onAnimationComplete={definition => { if (definition === 'enter') region.current?.focus({ preventScroll: true }); }} tabIndex={-1} aria-label={`${phase.toLowerCase()} phase`} key={phase} className={`phase ${narrow ? 'phase--narrow' : ''}`} variants={phaseVariants(rm)} initial="initial" animate="enter" exit="exit">
           {children}
         </motion.section>
-      </AnimatePresence>
     </LayoutGroup>
   );
 }
@@ -31,9 +36,9 @@ export function Rise({ children, className = '', style }: { children: ReactNode;
 }
 
 const DEFAULT_BANNERS: Partial<Record<Phase, { text: string; tone?: 'magenta' | 'cyan' | 'gold' | 'red' }>> = {
-  PROMPT: { text: 'Secret prompt', tone: 'magenta' }, DRAW: { text: 'Draw!', tone: 'cyan' }, GALLERY: { text: 'Glow-up', tone: 'gold' },
+  PROMPT: { text: 'Secret prompt', tone: 'magenta' }, DRAW: { text: 'Draw!', tone: 'cyan' }, GALLERY: { text: 'Reveal!', tone: 'gold' },
   DISCUSS: { text: 'Discuss', tone: 'magenta' }, VOTE: { text: 'Vote!', tone: 'red' }, UNMASK: { text: 'Unmask', tone: 'red' },
-  STEAL: { text: 'The steal', tone: 'gold' }, VERDICT: { text: 'AI verdict', tone: 'cyan' }, SCORES: { text: 'Scores', tone: 'magenta' }, FINAL: { text: 'Final', tone: 'gold' },
+  STEAL: { text: 'The steal', tone: 'gold' }, VERDICT: { text: 'Results', tone: 'cyan' }, SCORES: { text: 'Scores', tone: 'magenta' }, FINAL: { text: 'Final', tone: 'gold' },
 };
 
 function PhaseBanner({ phase, banner }: { phase: Phase; banner?: { text: string; tone?: 'magenta' | 'cyan' | 'gold' | 'red' } | null }) {

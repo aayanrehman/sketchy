@@ -1,16 +1,21 @@
 import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import type { AwardReason } from '@shared/types';
+import type { Award, AwardReason } from '@shared/types';
 import { Avatar, DrawingTile, useScoreBurst } from '@/design/components';
 import { Rise } from '@/shell/PhaseStage';
 import { childVariants, stagger } from '@/design/motion';
 import { useSfx } from '@/sound/useSfx';
 import { phaseElapsed, type MomentProps } from './common';
+import './polish.css';
 
 export const REASON: Record<AwardReason, string> = {
-  caught_vote: 'Voted for the imposter', caught_vote_streak: 'Catch streak ×1.5', escape: 'Escaped the vote', steal: 'Stole the round',
-  perfect_disguise: 'Perfect Disguise', judges_favorite: "Judge's Favorite", imposter_fled: 'The imposter fled',
+  caught_vote: 'Correct vote', caught_vote_streak: 'Correct vote streak', escape: 'Escaped', steal: 'Guessed the prompt',
+  perfect_disguise: 'Disguise bonus', judges_favorite: 'Best drawing', imposter_fled: 'Imposter left',
 };
+const DETAIL: Partial<Record<AwardReason, string>> = {
+  perfect_disguise: 'imposter matched the prompt as well as artists', judges_favorite: 'highest AI match',
+};
+const awardText = (a: Award) => `${REASON[a.reason]} +${a.points}${DETAIL[a.reason] ? ` (${DETAIL[a.reason]})` : ''}`;
 
 /** SCORES: points fly from each drawing tile into the avatar, staggered; rows then settle in rank order. */
 export function ScoresMoment({ view, phone }: MomentProps & { phone?: boolean }) {
@@ -42,8 +47,12 @@ export function ScoresMoment({ view, phone }: MomentProps & { phone?: boolean })
   return (
     <div className="phase" style={{ justifyItems: 'center' }}>
       <Rise><h2 className="display-md phase__title">{r.fled ? 'The imposter fled!' : `Round ${r.index} scores`}</h2></Rise>
+      {me && r.participantIds.includes(me.playerId) && (() => {
+        const earned = r.awards.filter((a) => a.playerId === me.playerId).reduce((s, a) => s + a.points, 0);
+        return <Rise><p className={`score-summary ${earned > 0 ? 'score-summary--plus' : ''}`}>{earned > 0 ? `You earned +${earned} this round` : 'No points this round'}</p></Rise>;
+      })()}
       {!r.fled && (
-        <div className={`gallery ${phone ? 'gallery--phone' : 'gallery--4'}`} style={{ maxWidth: phone ? undefined : 720 }}>
+        <div className="gallery gallery--4" style={{ maxWidth: phone ? 420 : 520 }}>
           {r.drawings.map((d) => (
             <motion.div key={d.playerId} variants={childVariants(rm)}>
               <DrawingTile drawing={d} player={view.byId.get(d.playerId)} layoutId={`tile-${r.index}-${d.playerId}`} size={160} dim={d.playerId === r.imposterId ? false : undefined} />
@@ -59,8 +68,8 @@ export function ScoresMoment({ view, phone }: MomentProps & { phone?: boolean })
             <motion.div key={p.id} layout="position" className={`score-row ${me?.playerId === p.id ? 'score-row--me' : ''}`} data-scorerow={p.id}>
               <Avatar player={p} size="sm" layoutPrefix="score" />
               <div>
-                <div className="score-row__name">#{i + 1} {p.name} {p.id === r.imposterId && <span className="chip chip--red" style={{ fontSize: 10, padding: '2px 8px' }}>IMPOSTER</span>}</div>
-                <div className="score-row__reason">{mine.length ? mine.map((a) => REASON[a.reason]).join(' · ') : r.fled ? '' : 'No points this round'}</div>
+                <div className="score-row__name">#{1 + ranked.filter(x => (settled ? x.score : before.get(x.id) || 0) > (settled ? p.score : before.get(p.id) || 0)).length} {p.name} {p.id === r.imposterId && <span className="chip chip--red" style={{ fontSize: 10, padding: '2px 8px' }}>IMPOSTER</span>}</div>
+                <div className="score-row__reason">{mine.length ? mine.map(awardText).join(' · ') : r.fled ? '' : 'No points this round'}</div>
               </div>
               <div style={{ textAlign: 'right' }}>
                 <div className="score-row__total">{settled ? p.score : before.get(p.id)}</div>
@@ -70,7 +79,7 @@ export function ScoresMoment({ view, phone }: MomentProps & { phone?: boolean })
           );
         })}
       </motion.div>
-      {me && <Rise><p className="phase__sub">{(() => { const p = view.byId.get(me.playerId); if (!p) return ''; const rank = ranked.findIndex((x) => x.id === p.id) + 1; return `You: ${p.score} pts · rank #${rank || '-'}${p.streak >= 2 ? ` · ${p.streak} catch streak` : ''}`; })()}</p></Rise>}
+      {me && <Rise><p className="phase__sub">{(() => { const p = view.byId.get(me.playerId); if (!p) return ''; const rank = 1 + ranked.filter(x => x.score > p.score).length; return `You: ${p.score} pts · rank #${rank || '-'}${p.streak >= 2 ? ` · ${p.streak} catch streak` : ''}`; })()}</p></Rise>}
     </div>
   );
 }

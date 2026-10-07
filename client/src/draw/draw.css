@@ -9,3 +9,13 @@
 .draw__size { width: var(--tap); height: var(--tap); border-radius: var(--r-pill); border: 2px solid var(--c-ink); background: var(--c-surface); display: grid; place-items: center; cursor: pointer; }
 .draw__size span { display: block; border-radius: var(--r-pill); background: var(--c-ink); }
 .draw__size--on { background: var(--c-blue); }
+/* Desktop: canvas sized to the screen height, tools in a column beside it, so nothing scrolls. */
+@media (min-width: 1024px) {
+  .draw-phase { max-width: none !important; justify-items: center; }
+  .draw-phase > * { width: min(100%, calc(min(100dvh - 250px, 640px) + 176px)); }
+  .draw { grid-template-columns: minmax(0, min(100dvh - 250px, 640px)) 160px; align-items: start; }
+  .draw__tools { align-content: start; }
+  .draw__colors { display: grid; grid-template-columns: repeat(3, var(--tap)); justify-content: start; }
+  .draw__row { flex-direction: column; align-items: stretch; }
+  .draw__sizes { justify-content: start; }
+}

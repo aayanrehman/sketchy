@@ -10,7 +10,9 @@ interface Props {
   drawing: Drawing; player?: Player; layoutId?: string; selectable?: boolean; selected?: boolean; dim?: boolean; spot?: boolean;
   votes?: number; showVotes?: boolean; onSelect?: () => void; children?: ReactNode; submittedCheck?: boolean; size?: number; hideName?: boolean;
   /** Seconds to show the raw sketch before morphing, when the art is already there on mount. */
-  revealDelay?: number;
+  revealDelay?: number; rawOnly?: boolean;
+  /** Label shown on hover/focus when the tile is selectable, e.g. "Vote". */
+  actionLabel?: string;
 }
 
 /**
@@ -18,13 +20,15 @@ interface Props {
  * sketch + shimmer while pending -> crossfade/scale into AI art -> Golden frame with a shine sweep.
  * Fallback: raw sketch in a gold frame with "The AI was speechless."
  */
-export function DrawingTile({ drawing, player, layoutId, selectable, selected, dim, spot, votes, showVotes, onSelect, children, submittedCheck, size = 320, hideName, revealDelay = 0 }: Props) {
+export function DrawingTile({ drawing, player, layoutId, selectable, selected, dim, spot, votes, showVotes, onSelect, children, submittedCheck, size = 320, hideName, revealDelay = 0, rawOnly = false, actionLabel }: Props) {
   const rm = !!useReducedMotion();
   const sfx = useSfx();
   const [ready, setReady] = useState(revealDelay <= 0);
   useEffect(() => { if (revealDelay > 0) { const id = setTimeout(() => setReady(true), revealDelay * 1000); return () => clearTimeout(id); } }, [revealDelay]);
   const mockOnly = drawing.glowStatus === 'done' && !drawing.glowUrl && !!drawing.glowMock;
-  const glowed = ready && drawing.glowStatus === 'done' && (!!drawing.glowUrl || mockOnly);
+  const [peek, setPeek] = useState(false);
+  const glowed = !rawOnly && ready && drawing.glowStatus === 'done' && (!!drawing.glowUrl || mockOnly);
+  const pending = !rawOnly && !drawing.blank && drawing.glowStatus === 'pending';
   const [playedGold, setPlayedGold] = useState(false);
   useEffect(() => {
     if (drawing.golden && glowed && !playedGold) { setPlayedGold(true); sfx.play('golden'); }
@@ -32,7 +36,7 @@ export function DrawingTile({ drawing, player, layoutId, selectable, selected, d
   useEffect(() => { if (glowed) sfx.play('glow'); /* eslint-disable-next-line */ }, [glowed]);
 
   const cls = ['tile',
-    drawing.glowStatus === 'pending' ? 'tile--pending' : '',
+    !rawOnly && drawing.glowStatus === 'pending' ? 'tile--pending' : '',
     drawing.glowStatus === 'fallback' && !drawing.blank ? 'tile--fallback' : '',
     drawing.golden && glowed ? 'tile--golden' : '',
     selectable ? 'tile--selectable' : '', selected ? 'tile--selected' : '', dim ? 'tile--dim' : '', spot ? 'tile--spot' : '',
@@ -60,7 +64,7 @@ export function DrawingTile({ drawing, player, layoutId, selectable, selected, d
         <SketchCanvas strokes={drawing.strokes} size={size} className="tile__layer" />
       )}
       <AnimatePresence>
-        {glowed && (
+        {glowed && !peek && (
           <motion.div
             key="glow"
             className="tile__layer"
@@ -78,8 +82,15 @@ export function DrawingTile({ drawing, player, layoutId, selectable, selected, d
       {drawing.golden && glowed && <div className="tile__shine" aria-hidden />}
       <div className="tile__frame" aria-hidden />
       {drawing.golden && glowed && <span className="tile__golden-tag">GOLDEN</span>}
-      {glowed && drawing.glowMock && !drawing.golden && <span className="tile__golden-tag tile__mock-tag">AI PREVIEW</span>}
-      {drawing.glowStatus === 'fallback' && !drawing.blank && <span className="tile__fallback">The AI was speechless.</span>}
+      {pending && <PendingLabel />}
+      {drawing.glowStatus === 'fallback' && !drawing.blank && !rawOnly && <span className="tile__fallback">Sketch only</span>}
+      {glowed && !drawing.blank && (
+        <span className="tile__inset" onPointerEnter={() => setPeek(true)} onPointerLeave={() => setPeek(false)} title="Original sketch: hover to compare">
+          <SketchCanvas strokes={drawing.strokes} size={96} className="tile__layer" />
+          <small>{peek ? 'Original' : 'Sketch'}</small>
+        </span>
+      )}
+      {selectable && actionLabel && <span className="tile__action" aria-hidden>{actionLabel}</span>}
       {player && !hideName && (
         <span className="tile__name"><span className="tile__name-dot"><AvatarArt avatar={player.avatar} /></span><span className="tile__name-text">{player.name}</span></span>
       )}
@@ -94,4 +105,12 @@ export function DrawingTile({ drawing, player, layoutId, selectable, selected, d
       {children && <div className="tile__stamp-slot">{children}</div>}
     </motion.div>
   );
+}
+
+const STEPS = ['Reading the sketch', 'Inking outlines', 'Adding color', 'Final touches'];
+/** Shown on a tile while its sticker version is being drawn. */
+function PendingLabel() {
+  const [i, setI] = useState(0);
+  useEffect(() => { const id = setInterval(() => setI((n) => Math.min(n + 1, STEPS.length - 1)), 2600); return () => clearInterval(id); }, []);
+  return <span className="tile__pending" role="status"><i aria-hidden />{STEPS[i]}…</span>;
 }

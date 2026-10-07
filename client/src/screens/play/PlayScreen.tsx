@@ -2,7 +2,8 @@ import { useEffect, useState } from 'react';
 import { PhoneShell } from '@/shell/PhoneShell';
 import { PhaseStage } from '@/shell/PhaseStage';
 import { useRoom } from '@/state/useRoom';
-import { socket, saveToken, loadToken, saveName, loadName } from '@/net/socket';
+import { convex, setSession, saveToken, loadToken, saveName, loadName, loadHostToken } from '@/net/socket';
+import { api } from '../../../../convex/_generated/api';
 import { unlockAudio } from '@/sound/sfx';
 import { Button, Card, Mascot, Scenery } from '@/design/components';
 import { LobbyPhone } from '@/moments/Lobby';
@@ -28,26 +29,20 @@ export function PlayScreen() {
 
   const join = (c: string, n: string, token?: string) => {
     setJoining(true); setErr(null);
-    const s = socket();
-    const go = () => s.timeout(10000).emit('join', { code: c, name: n, token }, (timeout, r) => {
+    const hostToken = loadHostToken(c);
+    convex.mutation(api.game.join, { code: c, name: n, token, hostToken }).then((r) => {
       setJoining(false);
-      if (timeout) { setErr('Could not reach the room. Please try again.'); return; }
-      if (!r.ok) { setErr(r.error || 'Could not join the room'); if (token) { try { localStorage.removeItem('sketchy.tokens'); } catch { /* ignore */ } } return; }
-      saveToken(c, r.token); saveName(n); setJoined(true);
+      if (!r.ok) { setJoined(false); setErr(r.error); if (token) { try { localStorage.removeItem('sketchy.tokens'); } catch { /* ignore */ } } return; }
+      saveToken(c, r.token); saveName(n); setSession({ code: c, token: r.token, hostToken }); setJoined(true);
       history.replaceState(null, '', `/play?code=${c}`);
-    });
-    go();
+    }).catch(() => { setJoining(false); setErr('Could not reach the room. Please try again.'); });
   };
 
-  // Auto-rejoin on refresh / reconnect.
+  // Rejoin the same seat on refresh.
   useEffect(() => {
     const c = (params.get('code') || '').toUpperCase();
     const tok = c ? loadToken(c) : undefined;
     if (c && tok) join(c, loadName() || 'Player', tok);
-    const s = socket();
-    const re = () => { const cc = new URLSearchParams(location.search).get('code')?.toUpperCase(); const t = cc ? loadToken(cc) : undefined; if (cc && t) s.emit('join', { code: cc, name: loadName() || 'Player', token: t }, () => {}); };
-    s.on('connect', re);
-    return () => { s.off('connect', re); };
     // eslint-disable-next-line
   }, []);
 
@@ -77,7 +72,7 @@ export function PlayScreen() {
   return (
     <PhoneShell room={room} me={me} serverOffset={view.serverOffset}>
       {!view.connected && <div className="offline" role="status">Reconnecting…</div>}
-      {view.error && <div className="offline" role="alert">{view.error}</div>}
+      {view.error && <div className="offline" role="alert">{view.error} <a href="/">Return home</a></div>}
       <PhaseStage phase={phase} narrow banner={phase === 'LOBBY' || phase === 'HOW_TO' ? null : undefined}>
         {phase === 'LOBBY' && <LobbyPhone view={view} />}
         {phase === 'HOW_TO' && <HowToPhone view={view} />}

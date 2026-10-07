@@ -1,10 +1,14 @@
-# Render blueprint: one web service with WebSockets. Set OPENAI_API_KEY in the dashboard.
+# Prepare only. Creating this paid service/disk requires the owner's budget approval.
 services:
   - type: web
     name: sketchy
     runtime: node
+    repo: https://github.com/aayanrehman/sketchy
+    branch: codex/finish-sketchy-submission
     plan: starter
-    buildCommand: npm ci && npm run build
+    numInstances: 1
+    autoDeployTrigger: 'off'
+    buildCommand: npm ci && npm run typecheck && npm test && npm run build
     startCommand: npm start
     healthCheckPath: /api/health
     disk:
@@ -12,17 +16,25 @@ services:
       mountPath: /var/data/sketchy
       sizeGB: 1
     envVars:
+      - key: NODE_VERSION
+        value: 22.23.1
       - key: MEDIA_DIR
         value: /var/data/sketchy/media
+      - key: AI_BUDGET_FILE
+        value: /var/data/sketchy/ai-budget.json
+      - key: MEDIA_MAX_BYTES
+        value: 500000000
+      - key: AI_DAILY_JOB_LIMIT
+        value: 48
+      - key: AI_CONCURRENCY
+        value: 8
       - key: NODE_ENV
         value: production
-      - key: OPENAI_API_KEY
+      - key: AI_MODE
+        value: fal
+      - key: LIVE_AI_ENABLED
+        value: 'false'
+      - key: FAL_KEY
         sync: false
-      - key: OPENAI_IMAGE_MODEL
-        value: gpt-image-1-mini
-      - key: OPENAI_IMAGE_QUALITY
-        value: low
-      - key: OPENAI_JUDGE_MODEL
-        value: gpt-4.1-mini
       - key: STUDIO_KEY
-        sync: false
+        generateValue: true

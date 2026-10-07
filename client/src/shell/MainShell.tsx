@@ -1,16 +1,13 @@
-import { SoundIcon } from '@/design/components/Illustrations';
 import type { ReactNode } from 'react';
 import { motion } from 'framer-motion';
 import type { PublicRoom } from '@shared/types';
-import { Avatar, Button, Modal, Scenery } from '@/design/components';
-import { useMute } from '@/sound/useSfx';
+import { Avatar, Button, Modal, Scenery, SoundControl } from '@/design/components';
 import { HowTo } from './HowTo';
 import { useState } from 'react';
 import './shell.css';
 
 /** Persistent layout for the main screen: brand + code + round pips on top, the stage, and the cast rail below. */
 export function MainShell({ room, children, hideRail, railIds, meId }: { room: PublicRoom; children: ReactNode; hideRail?: boolean; railIds?: string[]; meId?: string | null }) {
-  const [muted, setMuted] = useMute();
   const [help, setHelp] = useState(false);
   const players = railIds ? room.players.filter((p) => railIds.includes(p.id)) : room.players;
   return (
@@ -28,7 +25,7 @@ export function MainShell({ room, children, hideRail, railIds, meId }: { room: P
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {!room.isDemo && <span className="main-shell__code"><small>ROOM</small>{room.code}</span>}
           <Button variant="ghost" icon aria-label="How to play" onClick={() => setHelp(true)}>?</Button>
-          <Button variant="ghost" icon aria-label={muted ? 'Unmute' : 'Mute'} aria-pressed={muted} onClick={() => setMuted(!muted)}><SoundIcon muted={muted} /></Button>
+          <SoundControl />
         </div>
       </header>
       <main className="main-shell__stage">{children}</main>

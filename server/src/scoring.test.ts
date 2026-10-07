@@ -64,3 +64,20 @@ test('imposter fled gives artists +50', () => {
   scoreRound(r, players);
   assert.equal(players.get('a')!.score, 50); assert.equal(players.get('imp')!.score, 0);
 });
+
+test('blanks, failures, nonfinite and out-of-range scores earn no quality bonuses', () => {
+  for (const kind of ['blank', 'fallback', 'missing', 'nan', 'range']) {
+    const players = new Map(['imp','a','b','c'].map(id => [id, player(id, 1)]));
+    const r = round({ caught: true, drawings: ['imp','a','b','c'].map(playerId => ({ playerId, strokes: [], glowStatus: 'fallback', golden: false,
+      judgeStatus: kind === 'fallback' ? 'fallback' : 'done', match: kind === 'missing' ? undefined : kind === 'nan' ? NaN : kind === 'range' ? 101 : 0, blank: kind === 'blank' })) });
+    const awards = scoreRound(r, players); assert.deepEqual(awards, [], kind);
+    assert.equal(players.get('a')!.streak, 0, 'abstention breaks streak');
+  }
+});
+test('valid tied favorites share awards; failed artists cannot rank against valid scores', () => {
+  const players = new Map(['imp','a','b','c'].map(id => [id, player(id)]));
+  const r = round({ caught: true, drawings: ['imp','a','b','c'].map(playerId => ({ playerId, strokes: [], glowStatus: 'fallback', golden: false, judgeStatus: playerId === 'c' ? 'fallback' : 'done', match: playerId === 'c' ? 100 : 70, blank: false })) });
+  const awards = scoreRound(r, players);
+  assert.equal(awards.filter(a => a.reason === 'judges_favorite').length, 2);
+  assert.equal(players.get('c')!.score, 0); assert.equal(players.get('imp')!.score, 100);
+});

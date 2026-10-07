@@ -1,0 +1,8 @@
+.env
+.env.*
+!.env.example
+server/data/
+artifacts/
+node_modules
+client/dist
+.claude/

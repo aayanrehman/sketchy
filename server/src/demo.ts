@@ -81,19 +81,20 @@ export function setupDemo(room: Room, humanId: string) {
   const later = (ms: number, fn: () => void) => { timers.push(setTimeout(fn, ms)); };
   const clear = () => { while (timers.length) clearTimeout(timers.pop()!); };
 
+  room.onDestroy = clear;
   room.onPhase = (phase) => {
     clear();
     const r = room.currentRound();
     switch (phase) {
       case 'HOW_TO': for (const id of botIds) later(300, () => room.howToReady(id)); break;
       case 'DRAW':
-        for (const id of botIds) later(5000 + Math.random() * 14000, () => room.submitDrawing(id, [{ color: '#111', size: 6, points: [] }], 'bot'));
+        for (const id of botIds) later(1500 + Math.random() * 2500, () => room.submitDrawing(id, [{ color: '#111', size: 6, points: [] }], 'bot'));
         break;
       case 'DISCUSS': {
         // Bots bicker, then the demo uses the host skip so a solo judge is not stuck for 30 s.
-        const lines = shuffle(BANTER).slice(0, 3);
+        const lines = shuffle(BANTER).slice(0, 1);
         lines.forEach((l, i) => later(1500 + i * 2200, () => room.toast('info', `${BOT_NAMES[i % 3]}: ${l}`, botIds[i % 3])));
-        later(10000, () => room.skip(null));
+        later(3500, () => room.skip(null));
         break;
       }
       case 'VOTE': {

@@ -31,8 +31,8 @@ export async function buildShareCard(args: { drawings: Drawing[]; players: Map<s
       ctx.restore();
       ctx.lineWidth = 8; ctx.strokeStyle = d.golden ? color.gold : isImp ? color.red : color.ink; ctx.beginPath(); ctx.roundRect(x, y, tile, tile, 28); ctx.stroke();
       ctx.fillStyle = color.surface; ctx.strokeStyle = color.ink; ctx.lineWidth = 4; ctx.beginPath(); ctx.roundRect(x + 14, y + tile - 56, Math.min(tile - 28, 60 + (p?.name.length || 4) * 18), 42, 21); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = color.ink; ctx.textAlign = 'left'; ctx.font = '900 26px Nunito, sans-serif'; ctx.fillText(`${p?.name || 'Artist'}`, x + 26, y + tile - 26);
-      if (typeof d.match === 'number' && d.match >= 0) { ctx.textAlign = 'right'; ctx.fillStyle = color.ink; ctx.font = '700 34px Fredoka, sans-serif'; ctx.fillText(`${d.match}%`, x + tile - 18, y + 48); }
+      ctx.fillStyle = color.ink; ctx.textAlign = 'left'; ctx.font = '900 26px Nunito, sans-serif'; ctx.fillText(`${p?.name || 'Artist'}`, x + 26, y + tile - 26, tile - 52);
+      if (typeof d.match === 'number' && d.match >= 0) { ctx.textAlign = 'right'; ctx.fillStyle = color.ink; ctx.font = '700 34px Fredoka, sans-serif'; ctx.fillText(`${d.match}/100`, x + tile - 18, y + 48); }
       if (isImp) {
         ctx.save(); ctx.translate(x + tile / 2, y + tile / 2); ctx.rotate(-0.2);
         ctx.font = `700 ${Math.min(56, tile * .13)}px Fredoka, sans-serif`; ctx.lineWidth = 8; ctx.strokeStyle = color.red; ctx.fillStyle = color.surface;
@@ -45,7 +45,7 @@ export async function buildShareCard(args: { drawings: Drawing[]; players: Map<s
     } else draw();
   });
   await Promise.all(loads);
-  await new Promise<void>((resolve) => { const img = new Image(); const timer = setTimeout(resolve, 3000); img.onload = () => { clearTimeout(timer); ctx.drawImage(img, W - 150, 22, 115, 115); resolve(); }; img.onerror = () => { clearTimeout(timer); resolve(); }; img.src = '/blotto.svg'; });
+  await new Promise<void>((resolve) => { const img = new Image(); const timer = setTimeout(resolve, 3000); img.onload = () => { clearTimeout(timer); ctx.drawImage(img, W - 150, 22, 115, 115); resolve(); }; img.onerror = () => { clearTimeout(timer); resolve(); }; img.src = '/mascot/happy.webp'; });
   ctx.fillStyle = color.ink; ctx.textAlign = 'center'; ctx.font = '700 44px Fredoka, sans-serif'; ctx.fillText('One of you is drawing something different.', W / 2, H - 120);
   ctx.fillStyle = color.textDim; ctx.font = '800 36px Nunito, sans-serif'; ctx.fillText(args.url, W / 2, H - 60);
   return c.toDataURL('image/png');

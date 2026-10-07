@@ -1,11 +1,40 @@
 import { StatusIcon } from '@/design/components/Illustrations';
 import { useEffect, useRef, useState } from 'react';
+import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { Avatar, Button, Card, Timer } from '@/design/components';
 import { Rise } from '@/shell/PhaseStage';
 import { DrawCanvas, type DrawHandle } from '@/draw/DrawCanvas';
 import { load, unlockedColors } from '@/progression/store';
 import { useSfx } from '@/sound/useSfx';
-import { send, type MomentProps } from './common';
+import { phaseElapsed, send, type MomentProps } from './common';
+import './polish.css';
+
+/** 3-2-1-Go! overlay shown once at the start of DRAW. Visual only: pointer-events none, canvas stays live. */
+function Countdown({ startedAgo }: { startedAgo: number }) {
+  const rm = !!useReducedMotion();
+  const sfx = useSfx();
+  const [step, setStep] = useState<number | null>(startedAgo < 1500 ? 0 : null);
+  useEffect(() => {
+    if (step === null) return;
+    const steps = ['3', '2', '1', 'Go!'];
+    const timers = steps.map((s, i) => window.setTimeout(() => { setStep(i); sfx.play(s === 'Go!' ? 'chime' : 'tick'); }, i * 550));
+    timers.push(window.setTimeout(() => setStep(null), 2200));
+    return () => timers.forEach(clearTimeout);
+    // eslint-disable-next-line
+  }, []);
+  const label = step === null ? null : ['3', '2', '1', 'Go!'][step];
+  return (
+    <div className="countdown" aria-live="assertive">
+      <AnimatePresence mode="popLayout">
+        {label && (
+          <motion.div key={label} className={`countdown__num ${label === 'Go!' ? 'countdown__num--go' : ''}`}
+            initial={{ opacity: 0, scale: rm ? 1 : 0.4, rotate: rm ? 0 : -8 }} animate={{ opacity: 1, scale: 1, rotate: 0 }}
+            exit={{ opacity: 0, scale: rm ? 1 : 1.4 }} transition={{ duration: rm ? 0.12 : 0.28, ease: [0.34, 1.56, 0.64, 1] }}>{label}</motion.div>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
 
 export function DrawMain({ view }: MomentProps) {
   const room = view.room!; const r = view.round!;
@@ -33,6 +62,7 @@ export function DrawPhone({ view }: MomentProps) {
   const submitted = sent || !!p?.hasSubmitted;
   const spectating = !r.participantIds.includes(me.playerId);
   const extra = unlockedColors(load().xp).map((u) => u.color);
+  const [startedAgo] = useState(() => phaseElapsed(view));
 
   const submit = () => {
     if (submitted || !ref.current) return;
@@ -52,9 +82,14 @@ export function DrawPhone({ view }: MomentProps) {
   if (spectating) return <Rise><Card padLg className="prompt-card"><p className="prompt-card__label">SPECTATING</p><p className="dim">Players are drawing "{r.theme}". You join next round.</p></Card></Rise>;
 
   return (
-    <div className="phase phase--narrow">
-      <Rise className="draw-head">
-        <div className={`draw-prompt ${me.isImposter ? 'draw-prompt--imposter' : ''}`}>{me.prompt}{me.isImposter && <span className="chip chip--red" style={{ marginLeft: 8, fontSize: 11 }}>Blend in</span>}</div>
+    <div className="phase phase--narrow draw-phase">
+      {!submitted && <Countdown startedAgo={startedAgo} />}
+      <Rise className="draw-head draw-head--big">
+        <div className="draw-head__row">
+          <span className="draw-head__label">{me.isImposter ? 'YOUR PROMPT' : 'DRAW'}</span>
+          {me.isImposter && <span className="chip chip--red draw-head__chip">You’re the imposter: blend in</span>}
+        </div>
+        <div className={`draw-prompt draw-prompt--big ${me.isImposter ? 'draw-prompt--imposter' : ''}`} title={me.prompt || undefined}>{me.prompt}</div>
       </Rise>
       <Rise>
         <div style={{ opacity: submitted ? 0.5 : 1, pointerEvents: submitted ? 'none' : 'auto' }}>
@@ -63,7 +98,7 @@ export function DrawPhone({ view }: MomentProps) {
       </Rise>
       <Rise>
         {submitted ? <Button variant="lime" size="lg" block disabled>Submitted <StatusIcon kind="check" /></Button>
-          : <Button variant="secondary" size="lg" block onClick={submit}>{strokes ? 'Submit drawing' : 'Submit (blank)'}</Button>}
+          : <Button variant="secondary" size="lg" block disabled={!strokes} onClick={submit}>{strokes ? 'Submit drawing' : 'Draw something first'}</Button>}
       </Rise>
     </div>
   );

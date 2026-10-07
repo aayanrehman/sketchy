@@ -1,0 +1,14 @@
+import 'dotenv/config';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { glowUp, judge, AI_MODE } from '../server/src/ai';
+import { MEDIA_DIR } from '../server/src/media';
+if(!['openai','fal'].includes(AI_MODE))throw Error('Use the private setup form to enable live AI first.');
+const dir=path.resolve('artifacts/ai-eval');
+const png=`data:image/png;base64,${(await fs.readFile(path.join(dir,'pair-2-real.png'))).toString('base64')}`;
+const [glow,rating]=await Promise.all([glowUp(png),judge(png,'A cat DJ',false,undefined,true)]);
+const result={testedAt:new Date().toISOString(),kind:'Live provider smoke test; not a human-labeled evaluation',provider:AI_MODE,imageModel:'gpt-image-1-mini',judgeModel:'gpt-4.1-mini',glow,rating};
+if(glow.glowUrl)await fs.copyFile(path.join(MEDIA_DIR,path.basename(glow.glowUrl)),path.join(dir,'smoke-edit.webp'));
+await fs.writeFile(path.join(dir,'smoke-result.json'),JSON.stringify(result,null,2));
+console.log(JSON.stringify({image:glow.status,imageReason:glow.reason,imageMs:glow.elapsedMs,judge:rating.status,judgeReason:rating.reason,judgeMs:rating.elapsedMs}));
+if(glow.status!=='done'||rating.status!=='done')process.exitCode=1;
