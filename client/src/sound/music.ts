@@ -1,7 +1,7 @@
 /**
  * Lofi background loop, synthesized live with WebAudio so there are no asset files.
- * Jazzy 7th/9th chords on a Rhodes-ish voice, soft bass, muffled swung drums and a vinyl bed,
- * driven by a lookahead scheduler. Shares the sfx AudioContext and mute toggle.
+ * Jazzy 7th/9th chords on a Rhodes-ish voice over a warm pad, soft bass and a gentle kick, with a
+ * slight tape wobble. No noise layers (no crackle, hats or snare). Driven by a lookahead scheduler. Shares the sfx AudioContext and mute toggle.
  * Nothing plays until startMusic() is called (after a user gesture).
  */
 import { ac, getVolume, isMuted, onMuteChange, onVolumeChange } from './sfx';
@@ -17,24 +17,18 @@ const PROGS: Prog[] = [
 ];
 const PENTA = [0, 2, 4, 7, 9];
 const MOOD = {
-  chill: { bpm: 78, swing: 0.58, vol: 0.17, kick: [0, 10], mel: 0.05, hats: [.6, 0, .3, 0, .5, 0, .3, 0, .6, 0, .3, 0, .5, 0, .4, 0] },
-  upbeat: { bpm: 96, swing: 0.56, vol: 0.17, kick: [0, 7, 10], mel: 0.08, hats: [.7, .25, .45, .25, .6, .25, .45, .3, .7, .25, .45, .25, .6, .3, .5, .35] },
+  chill: { bpm: 74, swing: 0.58, vol: 0.17, kick: [0, 10], mel: 0.06, walk: false },
+  upbeat: { bpm: 88, swing: 0.56, vol: 0.17, kick: [0, 8, 10], mel: 0.09, walk: true },
 };
 
 let c: AudioContext | null = null;
-let bus: GainNode, keys: BiquadFilterNode, out: GainNode, flutter: GainNode, lfo: OscillatorNode, crackle: AudioBufferSourceNode;
-let noiseBuf: AudioBuffer | null = null, crackleBuf: AudioBuffer | null = null;
+let bus: GainNode, keys: BiquadFilterNode, pad: BiquadFilterNode, out: GainNode, flutter: GainNode, lfo: OscillatorNode;
 let timer: ReturnType<typeof setInterval> | undefined, unsub: (() => unknown) | undefined;
 let mood: MusicMood = 'chill', pending: MusicMood | null = null, prog = PROGS[0], nextT = 0, step = 0;
 
 const hz = (m: number) => 440 * 2 ** ((m - 69) / 12);
 const pick = <T,>(a: T[]) => a[Math.floor(Math.random() * a.length)];
 
-function buf(secs: number, fill: () => number) {
-  const b = c!.createBuffer(1, c!.sampleRate * secs, c!.sampleRate); const d = b.getChannelData(0);
-  for (let i = 0; i < d.length; i++) d[i] = fill();
-  return b;
-}
 function env(p: AudioParam, t: number, a: number, peak: number, d: number) {
   p.setValueAtTime(0.0001, t); p.linearRampToValueAtTime(peak, t + a); p.exponentialRampToValueAtTime(0.0001, t + d);
 }
@@ -45,17 +39,17 @@ function osc(dest: AudioNode, type: OscillatorType, f: number, t: number, d: num
   env(g.gain, t, a, vol, d); o.connect(g).connect(dest); o.start(t); o.stop(t + d + 0.05);
   return o;
 }
-function hit(t: number, type: BiquadFilterType, f: number, d: number, vol: number) {
-  const s = c!.createBufferSource(); s.buffer = noiseBuf; const fl = c!.createBiquadFilter(); fl.type = type; fl.frequency.value = f;
-  const g = c!.createGain(); env(g.gain, t, 0.003, vol, d); s.connect(fl).connect(g).connect(bus); s.start(t, Math.random() * 0.5, d + 0.05);
-}
 function rhodes(m: number, t: number, d: number, vol: number) {
   const f = hz(m);
   osc(keys, 'sine', f, t, d, vol, 0.02, -4, true);
   osc(keys, 'triangle', f, t, d * 0.6, vol * 0.25, 0.02, 5, true);
   osc(keys, 'sine', f * 2, t, d * 0.25, vol * 0.1, 0.005); // tine
 }
-function kick(t: number) { osc(bus, 'sine', 120, t, 0.32, 0.9, 0.004).frequency.exponentialRampToValueAtTime(42, t + 0.12); }
+function kick(t: number) { osc(bus, 'sine', 85, t, 0.28, 0.45, 0.008).frequency.exponentialRampToValueAtTime(45, t + 0.14); }
+/** A slow-swelling, detuned pad under each chord: the warm, nostalgic glue. */
+function padChord(notes: number[], t: number, d: number) {
+  for (const n of notes) for (const det of [-7, 7]) osc(pad, 'sine', hz(n), t, d, 0.022, d * 0.35, det, true);
+}
 function bass(m: number, t: number, d: number) { osc(bus, 'sine', hz(m), t, d, 0.4, 0.02); osc(bus, 'triangle', hz(m), t, d * 0.5, 0.08, 0.02); }
 
 function schedule(i: number, bar: number, t: number) {
@@ -63,11 +57,11 @@ function schedule(i: number, bar: number, t: number) {
   if (i === 0) {
     chord.slice(1).forEach((n, k) => rhodes(n, t + k * 0.018, beat * 3.8, bar % 2 ? 0.07 : 0.1)); // soft strum
     bass(chord[0], t, beat * 1.5);
+    if (bar % 2 === 0) padChord(chord.slice(1, 4), t, beat * 8);
   }
   if (i === 10) bass(chord[0] + (bar % 2 ? 7 : 0), t, beat * 0.9);
+  if (m.walk && i === 6) bass(chord[0] + 12, t, beat * 0.5);
   if (m.kick.includes(i)) kick(t);
-  if (i === 4 || i === 12) { hit(t, 'bandpass', 1800, 0.2, 0.22); hit(t, 'highpass', 4000, 0.12, 0.05); } // brushed snare
-  if (m.hats[i]) hit(t, 'highpass', 7000, 0.035, m.hats[i] * 0.1 * (0.8 + Math.random() * 0.4));
   if (i % 2 === 0 && Math.random() < m.mel) rhodes(72 + prog.key + pick(PENTA), t, beat * 1.5, 0.05);
 }
 
@@ -99,17 +93,13 @@ export function startMusic() {
   try {
     if (c) return;
     const ctx = ac(); if (!ctx) return; c = ctx;
-    noiseBuf ??= buf(1, () => Math.random() * 2 - 1);
-    crackleBuf ??= buf(2, () => (Math.random() < 0.0004 ? 0.8 : 0.01) * (Math.random() * 2 - 1));
     out = c.createGain(); out.gain.value = 0;
-    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 4500;
+    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3200;
     const comp = c.createDynamicsCompressor(); comp.threshold.value = -18; comp.ratio.value = 3;
     bus = c.createGain(); bus.connect(lp).connect(comp).connect(out).connect(c.destination);
     keys = c.createBiquadFilter(); keys.type = 'lowpass'; keys.frequency.value = 1800; keys.connect(bus);
-    lfo = c.createOscillator(); lfo.frequency.value = 0.4; flutter = c.createGain(); flutter.gain.value = 7; lfo.connect(flutter); lfo.start();
-    crackle = c.createBufferSource(); crackle.buffer = crackleBuf; crackle.loop = true;
-    const hp = c.createBiquadFilter(); hp.type = 'highpass'; hp.frequency.value = 1000; const cg = c.createGain(); cg.gain.value = 0.3;
-    crackle.connect(hp).connect(cg).connect(bus); crackle.start();
+    pad = c.createBiquadFilter(); pad.type = 'lowpass'; pad.frequency.value = 900; pad.connect(bus);
+    lfo = c.createOscillator(); lfo.frequency.value = 0.4; flutter = c.createGain(); flutter.gain.value = 5; lfo.connect(flutter); lfo.start();
     step = 0; prog = PROGS[0];
     const offM = onMuteChange(level), offV = onVolumeChange(level); unsub = () => { offM(); offV(); }; document.addEventListener('visibilitychange', vis);
     level(); vis();
@@ -126,7 +116,7 @@ export function stopMusic() {
     if (!c) return;
     clearInterval(timer); timer = undefined; unsub?.(); document.removeEventListener('visibilitychange', vis);
     const t = c.currentTime + 0.6, o = out;
-    o.gain.setTargetAtTime(0, c.currentTime, 0.1); crackle.stop(t); lfo.stop(t);
+    o.gain.setTargetAtTime(0, c.currentTime, 0.1); lfo.stop(t);
     setTimeout(() => o.disconnect(), 700);
     c = null; pending = null;
   } catch { /* audio is never allowed to break the game */ }
