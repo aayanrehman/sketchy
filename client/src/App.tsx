@@ -6,15 +6,18 @@ import { Studio } from '@/screens/Studio';
 import { ToastProvider, ScoreBurstLayer } from '@/design/components';
 import { Cover } from '@/screens/Cover';
 import { ErrorBoundary } from '@/shell/ErrorBoundary';
+import { usePath } from '@/nav';
 
 /** One URL, five routes: / landing, /host main screen, /play phone, /demo solo, /studio hidden tool. */
 export default function App() {
-  const path = location.pathname.replace(/\/+$/, '') || '/';
+  const full = usePath();
+  const path = full.split('?')[0].replace(/\/+$/, '') || '/';
+  // Keyed by path so each screen mounts fresh on navigation; screens rewriting their own ?code= don't remount.
   const screen = path === '/host' ? <HostScreen /> : path === '/play' ? <PlayScreen /> : path === '/demo' ? <Demo /> : path === '/studio' ? <Studio /> : path === '/cover' ? <Cover /> : <Landing />;
   return (
     <ErrorBoundary>
       <ToastProvider>
-        <ScoreBurstLayer>{screen}</ScoreBurstLayer>
+        <ScoreBurstLayer><div key={path} style={{ display: 'contents' }}>{screen}</div></ScoreBurstLayer>
       </ToastProvider>
     </ErrorBoundary>
   );

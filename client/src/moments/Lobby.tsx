@@ -1,4 +1,5 @@
 import { motion, useReducedMotion } from 'framer-motion';
+import { go } from '@/nav';
 import { useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
 import { MIN_PLAYERS, MAX_PLAYERS } from '@shared/types';
@@ -57,7 +58,7 @@ export function LobbyPhone({ view }: MomentProps) {
           </>
         ) : <p className="phase__sub">Waiting for host… ({n}/{MAX_PLAYERS})</p>}
       </Rise>
-      <Rise><Button variant="ghost" size="sm" onClick={() => { send().emit('leave'); location.href = '/'; }}>Leave</Button></Rise>
+      <Rise><Button variant="ghost" size="sm" onClick={() => { send().emit('leave'); go('/'); }}>Leave</Button></Rise>
     </div>
   );
 }

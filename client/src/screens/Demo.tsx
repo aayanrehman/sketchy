@@ -1,3 +1,4 @@
+import { SoundControl } from '@/design/components';
 import { useEffect, useState } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
@@ -51,7 +52,7 @@ export function Demo() {
 
   if (!started || !view.room || !view.me) {
     return (
-      <div className="landing">
+      <div className="landing"><div className="corner-sound"><SoundControl /></div>
         <Scenery density={3} />
         <form className="landing__inner" onSubmit={(e) => { e.preventDefault(); start(); }}>
           <div className="landing__hero"><Mascot mood="sus" size={120} float /></div>

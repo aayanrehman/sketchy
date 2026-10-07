@@ -1,4 +1,6 @@
+import { SoundControl } from '@/design/components';
 import { useEffect, useRef, useState } from 'react';
+import { go } from '@/nav';
 import { MainShell } from '@/shell/MainShell';
 import { PhaseStage } from '@/shell/PhaseStage';
 import { useRoom } from '@/state/useRoom';
@@ -32,8 +34,8 @@ export function HostScreen() {
     }).catch(() => setErr('Could not create a room. Please try again.')).finally(() => { creating.current = false; });
   }, []);
 
-  if (err) return <div className="landing"><Card padLg><h2 className="display-md">Hmm</h2><p className="dim" style={{ margin: '8px 0 16px' }}>{err}</p><Button onClick={() => { location.href = '/'; }}>Back</Button></Card></div>;
-  if (!view.room) return <div className="landing"><div style={{ display: 'grid', justifyItems: 'center', gap: 12 }}><Mascot mood="think" size={120} float /><p className="display-md ink-text">Setting the stage…</p></div></div>;
+  if (err) return <div className="landing"><div className="corner-sound"><SoundControl /></div><Card padLg><h2 className="display-md">Hmm</h2><p className="dim" style={{ margin: '8px 0 16px' }}>{err}</p><Button onClick={() => { go('/'); }}>Back</Button></Card></div>;
+  if (!view.room) return <div className="landing"><div className="corner-sound"><SoundControl /></div><div style={{ display: 'grid', justifyItems: 'center', gap: 12 }}><Mascot mood="think" size={120} float /><p className="display-md ink-text">Setting the stage…</p></div></div>;
   const room = view.room;
   const phase = room.phase;
   return (

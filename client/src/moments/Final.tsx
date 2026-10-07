@@ -1,4 +1,5 @@
 import { AwardArt } from '@/design/components/Illustrations';
+import { go } from '@/nav';
 import { useEffect, useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Avatar, Button, Card, Confetti } from '@/design/components';
@@ -116,7 +117,7 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
         <Button variant="gold" size="lg" onClick={share}>Download share card</Button>
         {view.canHost && !room.isDemo && <Button variant="primary" size="lg" onClick={() => send().emit('host:playAgain')}>Play again</Button>}
         {room.isDemo && <Button variant="lime" onClick={() => { send().emit('host:playAgain'); send().emit('host:start'); }}>Try both roles again</Button>}
-        {room.isDemo && <Button variant="primary" size="lg" onClick={() => { location.href = '/'; }}>Host a real game</Button>}
+        {room.isDemo && <Button variant="primary" size="lg" onClick={() => { go('/'); }}>Host a real game</Button>}
         {phone && !me?.isHost && !room.isDemo && <p className="phase__sub">Waiting for the host to play again…</p>}
       </Rise>
     </div>

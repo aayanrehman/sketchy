@@ -316,3 +316,6 @@
 .phone-shell .howto { max-width: 760px; margin: 0 auto; }
 .side__hint { display: grid; grid-template-columns: 28px minmax(0, 1fr); gap: 8px; align-items: start; padding: 8px; border-radius: var(--r-sm); background: var(--c-gold-2); border: 2px solid var(--c-ink); }
 .side__hint b { display: block; border: 0; font-family: var(--f-display); }
+
+/* Sound button on the pre-game pages (home, join, name entry, host setup). */
+.corner-sound { position: absolute; top: calc(var(--s-3) + var(--safe-t)); right: var(--gutter); z-index: var(--z-modal); }

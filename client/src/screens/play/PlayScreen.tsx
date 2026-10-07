@@ -1,3 +1,4 @@
+import { SoundControl } from '@/design/components';
 import { useEffect, useState } from 'react';
 import { PhoneShell } from '@/shell/PhoneShell';
 import { PhaseStage } from '@/shell/PhaseStage';
@@ -48,7 +49,7 @@ export function PlayScreen() {
 
   if (!joined || !view.room || !view.me) {
     return (
-      <div className="landing">
+      <div className="landing"><div className="corner-sound"><SoundControl /></div>
         <Scenery density={3} />
         <form className="landing__inner" onSubmit={(e) => { e.preventDefault(); unlockAudio(); if (code.length === 4 && name.trim()) join(code, name.trim()); }}>
           <div className="landing__hero"><Mascot mood="happy" size={110} float /></div>

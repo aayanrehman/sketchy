@@ -1,4 +1,6 @@
+import { SoundControl } from '@/design/components';
 import { useState } from 'react';
+import { go } from '@/nav';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Button, Card, Modal, Mascot, Scenery } from '@/design/components';
 import { load, level, levelTitle, levelProgress } from '@/progression/store';
@@ -13,7 +15,7 @@ export function Landing() {
   const [gallery, setGallery] = useState(false);
   const [help, setHelp] = useState(false);
   return (
-    <div className="landing landing--home">
+    <div className="landing landing--home"><div className="corner-sound"><SoundControl /></div>
       <Scenery density={3} />
       <motion.div className="landing__inner landing__home-grid" variants={phaseVariants(rm)} initial="initial" animate="enter">
         <div className="landing__scene">
@@ -25,9 +27,9 @@ export function Landing() {
         </div>
         <div className="landing__menu">
         <p className="landing__menu-title">Who's looking sketchy?</p>
-        <motion.div variants={childVariants(rm)}><Button size="lg" block onClick={() => { unlockAudio(); location.href = '/host'; }}>Host a game</Button></motion.div>
-        <motion.div variants={childVariants(rm)}><Button variant="secondary" size="lg" block onClick={() => { unlockAudio(); location.href = '/play'; }}>Join a game</Button></motion.div>
-        <motion.div variants={childVariants(rm)}><Button variant="lime" size="lg" block onClick={() => { unlockAudio(); location.href = '/demo'; }}>Try it solo</Button></motion.div>
+        <motion.div variants={childVariants(rm)}><Button size="lg" block onClick={() => { unlockAudio(); go('/host'); }}>Host a game</Button></motion.div>
+        <motion.div variants={childVariants(rm)}><Button variant="secondary" size="lg" block onClick={() => { unlockAudio(); go('/play'); }}>Join a game</Button></motion.div>
+        <motion.div variants={childVariants(rm)}><Button variant="lime" size="lg" block onClick={() => { unlockAudio(); go('/demo'); }}>Try it solo</Button></motion.div>
         <motion.p className="dim" style={{ fontWeight: 800, fontSize: 'var(--t-body-sm)' }} variants={childVariants(rm)}>4 to 8 players · 3 rounds · play at your pace · no login · draw by touch or pointer</motion.p>
         <motion.div variants={childVariants(rm)} style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button type="button" className="level-chip" onClick={() => setGallery(true)} aria-label="Your progress and gallery">
