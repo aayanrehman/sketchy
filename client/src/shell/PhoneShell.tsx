@@ -4,6 +4,7 @@ import type { PublicRoom, MeView, Player } from '@shared/types';
 import { Button, Modal, SoundControl, Timer } from '@/design/components';
 import { send } from '@/moments/common';
 import { HowTo } from './HowTo';
+import { Coach } from './Coach';
 import './shell.css';
 
 const TIMER_LABEL: Partial<Record<PublicRoom['phase'], string>> = {
@@ -34,7 +35,7 @@ export function PhoneShell({ room, me, serverOffset, children, showTimer = true 
           <SoundControl />
         </div>
       </header>
-      <main className="phone-shell__body">{children}</main>
+      <main className="phone-shell__body"><Coach room={room} me={me} />{children}</main>
       {inGame && (
         <aside className={`side ${chatOpen ? 'side--chat' : ''}`} aria-label="Players and chat">
           <PlayerList room={room} meId={me?.playerId} />

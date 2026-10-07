@@ -333,3 +333,18 @@
 .loading__dots i { width: 10px; height: 10px; border-radius: 50%; background: var(--c-ink); opacity: .25; animation: sk-dot 1.2s ease-in-out infinite; }
 .loading__dots i:nth-child(2) { animation-delay: .15s; } .loading__dots i:nth-child(3) { animation-delay: .3s; }
 @keyframes sk-dot { 40% { opacity: 1; transform: translateY(-4px); } }
+
+/* Coach bar: the round's steps + one sentence telling you what to do now. */
+.coach { display: grid; gap: 8px; margin: 0 auto var(--s-3); max-width: 1000px; }
+.coach__steps { list-style: none; margin: 0; padding: 0; display: flex; gap: 4px; flex-wrap: wrap; }
+.coach__steps li { flex: 1 1 0; min-width: 52px; text-align: center; padding: 3px 6px; border-radius: var(--r-pill); font-size: 11px; font-weight: 900; letter-spacing: .02em; color: var(--c-text-mute); background: rgba(255,255,255,.55); border: 2px solid transparent; }
+.coach__steps li.is-done { color: var(--c-success-text); background: rgba(189,242,110,.45); }
+.coach__steps li.is-on { color: var(--c-ink); background: var(--c-yellow); border-color: var(--c-ink); }
+.coach__line { display: flex; align-items: center; gap: 10px; padding: 6px 14px 6px 6px; border-radius: var(--r-md); background: var(--c-surface); border: 2px solid var(--c-ink); box-shadow: 0 3px 0 rgba(43,37,64,.12); font-weight: 800; font-size: var(--t-body-md); color: var(--c-ink); animation: sk-coach-in .35s cubic-bezier(.2,0,0,1) both; }
+.coach__line img { flex: 0 0 auto; width: 36px; height: 36px; }
+.coach--imp .coach__line { background: #FFE3E3; }
+@keyframes sk-coach-in { from { opacity: 0; transform: translateY(-4px); } }
+@media (max-width: 560px) { .coach__steps li { font-size: 10px; min-width: 0; padding: 2px 4px; } .coach__line { font-size: var(--t-body-sm); } }
+.howto__solo { padding: 10px 14px; border-radius: var(--r-md); background: var(--c-gold-2); border: 2px solid var(--c-ink); font-weight: 800; color: var(--c-ink); }
+.howto__more summary { cursor: pointer; font-weight: 900; color: var(--c-ink); }
+.howto__more ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: var(--t-body-sm); font-weight: 700; color: var(--c-text-dim); }

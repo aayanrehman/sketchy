@@ -12,7 +12,7 @@ export const PHASE_ORDER: Phase[] = [
 /** Fixed phase lengths from the PRD (ms). VERDICT is computed per round. */
 export const PHASE_MS: Record<Exclude<Phase, 'LOBBY' | 'FINAL' | 'VERDICT'>, number> = {
   HOW_TO: 10_000,
-  PROMPT: 5_000,
+  PROMPT: 8_000,
   DRAW: 50_000,
   GALLERY: 20_000,
   DISCUSS: 30_000,

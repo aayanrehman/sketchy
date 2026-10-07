@@ -1,16 +1,17 @@
 import { Button } from '@/design/components';
 
 const STEPS = [
-  { title: 'Everyone draws the secret prompt', text: 'Except one imposter, who gets a slightly different prompt and has to blend in.' },
-  { title: 'Spot the odd one out', text: 'Each sketch is redrawn as a sticker (the original stays in the corner). Chat about the clues, then click the drawing you suspect. If the imposter is in a tie, there’s a quick revote; otherwise a tie lets them escape.' },
-  { title: 'Catch them, or steal the round', text: 'Catch the imposter: +100 each (+150 on a streak). Imposter escapes: +200. If caught, the imposter can still steal +150 by guessing the real prompt.' },
+  { title: 'Everyone draws the same secret prompt', text: 'Except one imposter, who secretly gets a slightly different one.' },
+  { title: 'Spot the odd drawing', text: 'Chat about the drawings, then vote for the one you think the imposter made.' },
+  { title: 'Catch them for points', text: 'Vote for the imposter: +100. If the imposter gets away, they get +200.' },
 ];
 
 /** 3 illustrated steps. Used in the HOW_TO phase and from the "?" button anytime. */
-export function HowTo({ onDone, cta = 'Got it', compact }: { onDone?: () => void; cta?: string; compact?: boolean }) {
+export function HowTo({ onDone, cta = 'Got it', compact, solo }: { onDone?: () => void; cta?: string; compact?: boolean; solo?: boolean }) {
   return (
     <div className="howto">
       {!compact && <h2 className="display-md" style={{ textAlign: 'center' }}>How to play</h2>}
+      {solo && <p className="howto__solo">Practice game: 2 quick rounds against 3 bots. In round 1 you’re an artist; in round 2 <b>you’re the imposter</b>. Sketchy will tell you what to do at each step.</p>}
       <ol className="howto__steps">
         {STEPS.map((s, i) => (
           <li key={i} className="howto__step">
@@ -19,7 +20,15 @@ export function HowTo({ onDone, cta = 'Got it', compact }: { onDone?: () => void
           </li>
         ))}
       </ol>
-      <p className="dim howto__note">Bonus points: an AI judge rates how well each sketch matches the real prompt. Best artist +50; an imposter who matches as well as the typical artist +100.</p>
+      <details className="howto__more">
+        <summary>How points work</summary>
+        <ul>
+          <li>Vote for the imposter: +100 (+150 if you catch them two rounds in a row).</li>
+          <li>Imposter escapes: +200. If the votes tie and the imposter is one of the tied players, there’s a quick revote.</li>
+          <li>Caught imposter: one guess at the real prompt; right = +150.</li>
+          <li>An AI judge scores each original sketch against the real prompt: best artist +50; an imposter who matches as well as the typical artist +100.</li>
+        </ul>
+      </details>
       {onDone && <Button variant="secondary" size="lg" block onClick={onDone}>{cta}</Button>}
     </div>
   );

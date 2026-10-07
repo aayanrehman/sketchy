@@ -21,7 +21,7 @@ export function HowToPhone({ view }: MomentProps) {
   const ready = done || !!p?.readyHowTo;
   return (
     <Rise><Card padLg>
-      <HowTo onDone={ready ? undefined : () => { setDone(true); markHowTo(); send().emit('howto:ready'); }} />
+      <HowTo solo={view.room?.isDemo} cta="Let’s play" onDone={ready ? undefined : () => { setDone(true); markHowTo(); send().emit('howto:ready'); }} />
       {ready && <p className="phase__sub" style={{ marginTop: 12 }}>Waiting for the others…</p>}
       {ready && <Button variant="ghost" size="sm" block disabled>Got it <StatusIcon kind="check" /></Button>}
     </Card></Rise>

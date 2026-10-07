@@ -29,7 +29,7 @@ export function Landing() {
         <p className="landing__menu-title">Who's looking sketchy?</p>
         <motion.div variants={childVariants(rm)}><Button size="lg" block onClick={() => { unlockAudio(); go('/host'); }}>Host a game</Button></motion.div>
         <motion.div variants={childVariants(rm)}><Button variant="secondary" size="lg" block onClick={() => { unlockAudio(); go('/play'); }}>Join a game</Button></motion.div>
-        <motion.div variants={childVariants(rm)}><Button variant="lime" size="lg" block onClick={() => { unlockAudio(); go('/demo'); }}>Try it solo</Button></motion.div>
+        <motion.div variants={childVariants(rm)}><Button variant="lime" size="lg" block onClick={() => { unlockAudio(); go('/demo'); }}>Play solo vs. bots</Button></motion.div>
         <motion.p className="dim" style={{ fontWeight: 800, fontSize: 'var(--t-body-sm)' }} variants={childVariants(rm)}>4 to 8 players · 3 rounds · play at your pace · no login · draw by touch or pointer</motion.p>
         <motion.div variants={childVariants(rm)} style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button type="button" className="level-chip" onClick={() => setGallery(true)} aria-label="Your progress and gallery">
