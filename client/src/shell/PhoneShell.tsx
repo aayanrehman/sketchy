@@ -5,6 +5,7 @@ import { Button, Modal, SoundControl, Timer } from '@/design/components';
 import { send } from '@/moments/common';
 import { HowTo } from './HowTo';
 import { Coach } from './Coach';
+import { HomeButton } from './HomeButton';
 import './shell.css';
 
 const TIMER_LABEL: Partial<Record<PublicRoom['phase'], string>> = {
@@ -25,12 +26,13 @@ export function PhoneShell({ room, me, serverOffset, children, showTimer = true 
     <div className={`phone-shell ${inGame ? 'phone-shell--side' : ''}`}>
       <header className="phone-shell__head">
         <div className="phone-shell__me">
-          <span className="phone-shell__logo gold-text">SKETCHY</span>
+          <span className="phone-shell__logo"><HomeButton logo inGame={inGame} /></span>
           {p && <span className="chip" data-avatar={p.id} style={{ ['--av-color' as any]: p.color }}><AvatarArt avatar={p.avatar} /><span className="chip__name">{p.name}</span>{room.round > 0 && <span className="avatar__score">{p.score}</span>}</span>}
           {room.round > 0 ? <span className="phone-shell__round">Round {room.round}/{room.totalRounds}</span> : !room.isDemo && <span className="phone-shell__round">{room.code}</span>}
         </div>
         {timerOn && <div className="phone-shell__time"><span>{TIMER_LABEL[room.phase]}</span><Timer endsAt={room.phaseEndsAt} serverOffset={serverOffset} compact /></div>}
         <div className="phone-shell__ctl">
+          <HomeButton inGame={inGame} />
           <Button variant="ghost" icon aria-label="How to play" onClick={() => setHelp(true)}>?</Button>
           <SoundControl />
         </div>

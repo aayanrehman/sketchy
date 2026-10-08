@@ -90,12 +90,15 @@ export function ShareDialog({ open, onClose, view }: { open: boolean; onClose: (
   const invite = `${location.origin}/`;
   const flash = (t: string) => { setNote(t); setTimeout(() => setNote(null), 2200); };
   return (
-    <Modal open={open} onClose={onClose} label="Share your result">
+    <Modal open={open} onClose={onClose} label="Share your result" wide>
       <div className="share">
         <h2 className="display-md">Share your result</h2>
+        <div className="share__body">
         <div className="share__preview">
           {url ? <img src={url} alt="Your Sketchy result card" /> : err ? <p className="err">{err}</p> : <div className="share__loading"><i /><span>Making your card…</span></div>}
         </div>
+        <div className="share__side">
+        <p className="dim" style={{ fontWeight: 800 }}>Your card shows the target next to your image, your prompt, score and awards.</p>
         <div className="share__actions">
           {canShare && <Button variant="gold" size="lg" block onClick={() => navigator.share({ files: [file!], title: 'My Sketchy result', text: 'Can you out-prompt me?', url: invite }).catch(() => {})}>Share…</Button>}
           {canCopy && <Button variant={canShare ? 'ghost' : 'gold'} block onClick={() => navigator.clipboard.write([new ClipboardItem({ 'image/png': blob! })]).then(() => flash('Image copied. Paste it anywhere.')).catch(() => flash('Copy isn’t allowed here. Use Download.'))}>Copy image</Button>}
@@ -103,7 +106,8 @@ export function ShareDialog({ open, onClose, view }: { open: boolean; onClose: (
           <Button variant="ghost" block onClick={() => navigator.clipboard?.writeText(invite).then(() => flash('Link copied. Send it to your friends.')).catch(() => flash(invite))}>Copy invite link</Button>
         </div>
         <p className="share__note" role="status">{note || ' '}</p>
-        <Button variant="primary" block onClick={onClose}>Done</Button>
+        </div>
+        </div>
       </div>
     </Modal>
   );

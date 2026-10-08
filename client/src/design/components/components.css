@@ -155,7 +155,7 @@
 .burst--big { background: var(--g-gold); }
 
 /* ---- Confetti ---- */
-.confetti { position: fixed; inset: 0; pointer-events: none; z-index: var(--z-fx); }
+.confetti { position: fixed; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: var(--z-fx); }
 
 /* ---- Chips: HUD pills like "balloon 4" ---- */
 .chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 12px; border-radius: var(--r-pill); background: var(--c-surface); border: 2px solid var(--c-ink); font-weight: 900; font-size: var(--t-body-sm); color: var(--c-ink); box-shadow: 0 3px 0 rgba(43,37,64,0.16); }
@@ -275,3 +275,5 @@
 .scene--still .softcloud, .scene--still .spark, .scene--still .sky__sun { animation: none; }
 .scene--still .spark { opacity: .7; }
 @media (max-width: 720px) { .softcloud--near { display: none; } .lhills { height: 150px; } }
+
+.modal--wide { width: min(100%, 860px); }

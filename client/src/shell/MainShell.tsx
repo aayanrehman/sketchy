@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import type { PublicRoom } from '@shared/types';
 import { Avatar, Button, Modal, Scenery, SoundControl } from '@/design/components';
 import { HowTo } from './HowTo';
+import { HomeButton } from './HomeButton';
 import { useState } from 'react';
 import './shell.css';
 
@@ -15,7 +16,7 @@ export function MainShell({ room, children, hideRail, railIds, meId }: { room: P
       <Scenery hills={hideRail} density={4} />
       <header className="main-shell__head">
         <div className="main-shell__brand">
-          <span className="display-md gold-text">SKETCHY</span>
+          <span className="display-md"><HomeButton logo screen inGame={room.phase !== 'LOBBY'} /></span>
           {room.round > 0 && (
             <span className="pips" aria-label={`Round ${room.round} of ${room.totalRounds}`}>
               {Array.from({ length: room.totalRounds }, (_, i) => <span key={i} className={`pip ${i + 1 < room.round ? 'pip--done' : i + 1 === room.round ? 'pip--on' : ''}`} />)}
@@ -24,6 +25,7 @@ export function MainShell({ room, children, hideRail, railIds, meId }: { room: P
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {!room.isDemo && <span className="main-shell__code"><small>ROOM</small>{room.code}</span>}
+          <HomeButton screen inGame={room.phase !== 'LOBBY'} />
           <Button variant="ghost" icon aria-label="How to play" onClick={() => setHelp(true)}>?</Button>
           <SoundControl />
         </div>
