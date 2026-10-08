@@ -197,7 +197,7 @@ export interface ServerToClient {
 }
 
 export const LEVEL_TITLES = [
-  'Doodler', 'Scribbler', 'Sketcher', 'Inker', 'Illustrator',
-  'Art Fiend', 'Gallery Regular', 'Master Faker', 'Imposter Hunter', 'Sketch Lord',
+  'Rookie Prompter', 'Word Wrangler', 'Detail Hunter', 'Style Whisperer', 'Scene Director',
+  'Pixel Poet', 'Prompt Smith', 'Master Faker', 'Imposter Hunter', 'Prompt Legend',
 ];
 export const XP_PER_LEVEL = 500;

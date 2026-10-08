@@ -17,7 +17,7 @@ export function HowTo({ onDone, cta = 'Got it', compact, solo, mode = 'prompt' }
   return (
     <div className="howto">
       {!compact && <h2 className="display-md" style={{ textAlign: 'center' }}>How to play</h2>}
-      {solo && <p className="howto__solo">Practice game: 2 quick rounds against 3 bots. In round 1 you’re an artist; in round 2 <b>you’re the imposter</b>. Sketchy will tell you what to do at each step.</p>}
+      {solo && <p className="howto__solo">Practice game: 2 quick rounds against 3 bots. In round 1 you’re a regular player; in round 2 <b>you’re the imposter</b>. Sketchy will tell you what to do at each step.</p>}
       <ol className="howto__steps">
         {steps.map((s, i) => (
           <li key={i} className="howto__step">

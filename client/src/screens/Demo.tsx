@@ -60,8 +60,8 @@ export function Demo() {
         <form className="landing__inner" onSubmit={(e) => { e.preventDefault(); start(); }}>
           <div className="landing__hero"><Mascot mood="sus" size={120} float /></div>
           <h1 className="landing__logo gold-text">TRY IT SOLO</h1>
-          <p className="landing__tag">Play 2 quick rounds against 3 bots: once as an artist, once as the imposter. Bots use pre-made art and example scores; your sketch is redrawn and scored live.</p>
-          <p className="demo-mode">{['openai', 'fal'].includes(aiMode) ? 'Your sketch is redrawn as a sticker and scored live' : aiMode === 'loading' ? 'Checking the judge…' : 'Preview mode · sample scoring, no live AI'}</p>
+          <p className="landing__tag">Play 2 quick rounds against 3 bots: once as a regular player, once as the imposter. Bots use pre-made prompts and example scores; your prompts are generated and scored live.</p>
+          <p className="demo-mode">{['openai', 'fal'].includes(aiMode) ? 'Live AI: your prompts become images and get scored' : aiMode === 'loading' ? 'Checking the judge…' : 'Preview mode · sample scoring, no live AI'}</p>
           {error && <p className="err" role="alert">{error}</p>}
           <Card padLg style={{ display: 'grid', gap: 12 }}>
             <label className="sr-only" htmlFor="name">Your name</label>

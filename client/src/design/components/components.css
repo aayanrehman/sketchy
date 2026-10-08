@@ -254,3 +254,24 @@
 .sound__panel { position: absolute; right: 0; top: calc(100% + 8px); width: 220px; display: grid; gap: var(--s-3); padding: var(--s-3); background: var(--c-surface); border: var(--ol); border-radius: var(--r-md); box-shadow: var(--sh-pop); z-index: var(--z-modal); }
 .sound__row { display: grid; gap: 4px; font-weight: 900; font-size: var(--t-body-sm); color: var(--c-ink); }
 .sound__row input { width: 100%; accent-color: var(--c-ink); }
+
+/* ---- Lively home scenery ---- */
+.scene--lively { --px: 0; --py: 0; mask-image: none !important; }
+.sky__sun { position: absolute; right: 8%; top: -12%; width: 46vmin; height: 46vmin; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,241,184,.9), rgba(255,216,77,.25) 55%, rgba(255,216,77,0)); animation: sk-sun 9s ease-in-out infinite alternate; transform: translate(calc(var(--px) * -10px), calc(var(--py) * -6px)); }
+@keyframes sk-sun { to { opacity: .75; scale: 1.06; } }
+.softcloud { position: absolute; left: 0; animation-name: sk-cloud-across; animation-timing-function: linear; animation-iteration-count: infinite; }
+.softcloud svg { width: 100%; display: block; fill: #fff; filter: drop-shadow(0 6px 0 rgba(43,37,64,.06)); }
+.softcloud--far { filter: blur(.6px); }
+.softcloud--near svg { filter: drop-shadow(0 8px 0 rgba(43,37,64,.08)); }
+@keyframes sk-cloud-across { from { transform: translateX(-30vw); } to { transform: translateX(110vw); } }
+.spark { position: absolute; color: #fff; text-shadow: 0 0 10px rgba(255,216,77,.9), 0 0 2px var(--c-gold); animation: sk-spark 4.2s ease-in-out infinite; }
+@keyframes sk-spark { 0%, 100% { opacity: 0; transform: translateY(6px) scale(.6) rotate(0); } 45%, 55% { opacity: .95; transform: translateY(-6px) scale(1) rotate(45deg); } }
+.lhills { position: absolute; left: -3%; right: -3%; bottom: 0; height: 240px; }
+.lhills svg { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; }
+.lhills__far { transform: translate(calc(var(--px) * -8px), 0); bottom: 40px !important; height: 85% !important; }
+.lhills__mid { transform: translate(calc(var(--px) * -16px), 0); bottom: 10px !important; }
+.lhills__near { transform: translate(calc(var(--px) * -28px), 0); }
+.lhills svg { transition: transform .4s cubic-bezier(.2,0,0,1); }
+.scene--still .softcloud, .scene--still .spark, .scene--still .sky__sun { animation: none; }
+.scene--still .spark { opacity: .7; }
+@media (max-width: 720px) { .softcloud--near { display: none; } .lhills { height: 150px; } }
