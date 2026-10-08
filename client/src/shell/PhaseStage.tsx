@@ -35,6 +35,9 @@ export function Rise({ children, className = '', style }: { children: ReactNode;
   return <motion.div className={className} style={style} variants={childVariants(rm)}>{children}</motion.div>;
 }
 
+/** Prompt mode has no secret prompt: the PROMPT phase is studying the target. */
+export const STUDY_BANNER = { text: 'Study the target', tone: 'magenta' as const };
+
 const DEFAULT_BANNERS: Partial<Record<Phase, { text: string; tone?: 'magenta' | 'cyan' | 'gold' | 'red' }>> = {
   PROMPT: { text: 'Secret prompt', tone: 'magenta' }, DRAW: { text: 'Draw!', tone: 'cyan' }, GALLERY: { text: 'Reveal!', tone: 'gold' },
   DRAFT: { text: 'Quick draft', tone: 'cyan' }, REFINE: { text: 'Refine it', tone: 'gold' },

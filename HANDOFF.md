@@ -1,6 +1,6 @@
 # Sketchy: current handoff
 
-Last updated October 8, 2026 (Claude session: Draft→Refine clarity, engine edge cases, icons/manifest, docs). Previous: October 7 (Convex + Vercel move, Prompt mode). Older handoffs (`CODEX_FINISH_HANDOFF.md`, earlier versions of this file in git history) describe the previous Socket.IO/drawing-only build and are superseded.
+Last updated October 8, 2026, evening (Claude session: deployed the Oct 8 work to prod and verified it in a real browser; see §5). Earlier that day: Draft→Refine clarity, engine edge cases, icons/manifest, docs. Previous: October 7 (Convex + Vercel move, Prompt mode). Older handoffs (`CODEX_FINISH_HANDOFF.md`, earlier versions of this file in git history) describe the previous Socket.IO/drawing-only build and are superseded.
 
 ## 1. Where things live
 
@@ -53,14 +53,14 @@ Content: 12 Prompt-mode targets + masked versions in `client/public/targets/` an
 
 Fit-to-viewport layouts at 100% zoom; player screen with right-hand players + chat panel; coach bar (round step tracker + one instruction per phase, mode-aware); staggered "redrawing" reveal for every tile; mascot "Sketchy" (detective artist, 7 poses in `client/public/mascot/`); procedural lofi music on every page with Music/Effects sliders; instant HTML splash + shared loading screen + route fade; in-app navigation (no reloads); Home button + leave confirmation in every game header; home page with live prompt-mode explainer, lively sky (soft clouds, sun, sparkles, outline-free parallax hills); join/solo/host pages share that look; results screens; coverflow highlight reel; share dialog (native share on phones, copy image, download PNG, copy invite link; Convex images load with crossOrigin so the canvas exports); modals portaled to `<body>`; confetti sized to the window (it used to widen the page).
 
-## 4b. Shipped October 8 (Claude session, NOT yet deployed: run `npm run deploy`)
+## 4b. Shipped October 8 (deployed and browser-verified Oct 8, see §5)
 
 - Prompt mode Draft→Final hand-off: persistent two-step strip on the writer, draft recap + pre-fill in Refine, "+N since your draft" counter, step-named buttons, title cards for Draft and Refine, "Step 1 of 2 / 2 of 2" coach lines, how-to copy.
 - Engine: missing the draft no longer forfeits the final prompt; results wait for a late final-image score (25 s `verdictSettle` timer) before "See scores" can end the phase; character limit 320. `convex/engine.test.ts` (4 tests) now runs under `npm test` (35 total).
 - Icons: favicon.ico / favicon-64.png (head-and-beret crop), apple-touch-icon, icon-192/512 + maskable, `manifest.webmanifest` (installable), `og.png` + Open Graph / Twitter tags for link previews. "Add to home screen" nudge on the landing page after the first game (`shell/useInstall.ts`).
 - README and docs/SUBMISSION.md rewritten for Prompt mode + Convex/Vercel.
 
-## 4c. Shipped October 8, second pass (NOT yet deployed: run `npm run deploy`)
+## 4c. Shipped October 8, second pass (deployed and browser-verified Oct 8, see §5)
 
 - **Pace + difficulty** (lobby, host-only): Quick = 2 rounds, Study 8 s / Draft 25 / Refine 30 / Discuss 15 / Vote 15 / Scores 7 (default for new rooms and solo); Classic = PRD timings, 3 rounds. Difficulty: Easy 10+40 words, no rules; Normal 8+30, rules rotate; Hard 6+18, a rule every round. `shared/types.ts` (`QUICK_MS`, `WORD_LIMITS`), `Engine.setSettings/ms()`, action `setSettings`, `SettingsPicker` in `Lobby.tsx`. All word-limit copy is dynamic.
 - **Placeholder bots on every target** (`placeholderBots` in `convex/targets.ts`): artists "produce" the target, the bot imposter produces the masked image, with preset breakdowns. Solo play now picks random targets from the whole library (recorded content preferred for round 1). Record real content to replace them over time.
@@ -70,12 +70,22 @@ Fit-to-viewport layouts at 100% zoom; player screen with right-hand players + ch
 
 ## 5. Verified vs not verified
 
-Verified: typecheck; 31 old unit tests; `smoke:mp` full 4-player games in Sketch mode (with a forced revote) and Prompt mode (3 rounds, exactly one masked target, no leaks before reveal); live prod draft scored 75/100; solo flows driven in the browser.
-**Not verified:** a real group of humans playing Prompt mode on phones; the phone share sheet; audio by ear (music balance, no crackle); every screen on a real small phone; judge score consistency at scale.
+**Verified October 8, 2026 on prod (commit deployed = `git rev-parse HEAD`, typecheck clean, 38 tests)** with `scripts/live-verify.ts` (Playwright on the live site, extra seats scripted through the Convex client; screenshots in `artifacts/live/`, gitignored). Run: `VITE_CONVEX_URL=https://curious-chickadee-740.convex.cloud node --import tsx scripts/live-verify.ts [landing|daily|demo|mp|all]` (each run costs real AI jobs: daily ≈ 4, demo ≈ 8, mp ≈ 31).
+- Landing (390×844 and 1366×820): favicon.ico linked and served; "Today's target" card blurred with no streak before playing.
+- `/daily`: full quick round vs 3 bots to the result on phone and laptop; first play records the streak toast ("Day 1 of your streak…"), landing card unblurs and shows "You scored N/100" with 🔥 1; a second play the same day says "You scored N today. Play again for practice.", shows no streak toast and leaves the stored score and streak unchanged; "Copy challenge" copies `I scored N/100 on today's Sketchy target. Beat me: https://sketchy-blue.vercel.app/daily`.
+- `/demo`: two rounds; round 2 the human is the imposter and sees the pulsing ERASED stamp, dashed red frame and "erased" copy; a placeholder-bot target (robot-dog) resolved to scores with the target/masked images as bot art.
+- Lobby (host TV + 2 phones + 2 scripted seats): TV switches Classic (3 rounds) ↔ Quick (2 rounds) and Easy; the phone host (first player to join) switches Hard; the other phone sees the choice with disabled radios. In game: Quick Draft = 25 s, Refine = 30 s; Hard = 6/18 words with taboo then style rules.
+- Prompt mode on the phone: two-step strip, draft recap + pre-fill in Refine, "+3 since your draft", imposter ERASED copy. Missing the draft on purpose (timer ran out) still allowed a final prompt, which was generated and scored.
+- Results: every final image was judged; the game total equalled the sum of all awards (no score dropped). The "Waiting for the judge's last score…" state could NOT be reached live: even with finals locked 9 s before the buzzer, every score had landed before anyone could tap "See scores". It is covered by `convex/engine.test.ts` only.
+
+**Not verified:** a real group of humans on phones; "Add to home screen" on a real iPhone/Android (this Mac has no full Xcode, so no simulator; manifest is `display: standalone` with 192/512/maskable icons); the phone share sheet; audio by ear; judge score consistency at scale; the fal dashboard spend (Claude in Chrome wasn't connected; see §6 for the job-count-based estimate).
+
+**Fixed this session:** the Prompt-mode study phase showed the Sketch-mode "Secret prompt" title card; it now says "Study the target" (`STUDY_BANNER` in `shell/PhaseStage.tsx`, used by Play, Host and Demo screens). Also deployed the focus-outline fix from §10.
 
 ## 6. Costs
 
-~1¢ per image request (fal rounds up) + ~0.1–0.3¢ per judge call. Solo demo ≈ 5¢. 4-player 3-round Prompt game ≈ 30¢. Daily cap 200 images + 200 judges → worst case ≈ $2.50/day. Raise for judging week: `npx convex env set --prod AI_DAILY_JOB_LIMIT 400`. Set a spending alert in the fal dashboard.
+Measured Oct 8 from the `aiBudget` counters: one daily play = 2 images + 2 judge calls (draft + final each; bots are free). One 4-player Quick game (2 rounds) = 16 images + 16 judge calls (15 + 15 when someone misses a draft). Classic (3 rounds) = 24 + 24. The Discuss-phase hint (openrouter text call, one per round) is NOT counted against the budget.
+At ~1¢ per image + ~0.1–0.3¢ per judge call: daily play ≈ 2.5¢, solo demo ≈ 5¢, 4-player Quick game ≈ 20¢, Classic ≈ 30¢. Daily cap 200 images + 200 judges → worst case ≈ $2.50/day; raise for judging week with `npx convex env set --prod AI_DAILY_JOB_LIMIT 400`. Check actual spend in the fal dashboard and set a spending alert there.
 
 ## 7. Contest status (Handshake × OpenAI "AI Skills Studio": create a multiplayer game)
 
@@ -102,6 +112,7 @@ My estimate (not a prediction): Execution 4, Creativity 4–5, Usefulness 4, Pol
 - Every change so far was deployed with `npm run deploy`, then committed and pushed to `codex/finish-sketchy-submission`.
 - The Convex guidelines are in `convex/_generated/ai/guidelines.md`; read them before editing `convex/`.
 - Don't print `.env` / `.env.local` values. Load keys with `set -a; source .env; set +a` inside a command when needed.
+- `VITE_CONVEX_URL` in `.env.local` points at the DEV deployment. Scripts that should hit prod (`smoke:mp`, `live-verify`) need `VITE_CONVEX_URL=https://curious-chickadee-740.convex.cloud` on the command line.
 
 ## 10. Launch video + cover (October 7, 2026)
 
@@ -110,5 +121,5 @@ All in `video/`:
 - Footage is real, captured from the live site by `video/capture.ts` (`node --import tsx video/capture.ts demo desktop|phone`, `join`, `home`, `music`). The music bed is the game's own procedural lofi, recorded from the site. `video/raw/` (gitignored) holds the captures.
 - HyperFrames projects: `video/sketchy-launch/` (landscape; `node gen.mjs` writes index.html, `./build-assets.sh` re-cuts clips from `video/raw`) and `video/sketchy-vertical/` (written by `sketchy-launch/gen-vertical.mjs`, shares `assets/` via symlink). Render: `npx hyperframes render --quality high --output renders/video.mp4` in each folder. If a render stalls or crashes partway (happened on the vertical), use `HF_SEGMENTED_CAPTURE=true npx hyperframes render --quality high --low-memory-mode --resume --output renders/video.mp4` (about 4 min). If frame extraction times out, clear the leftover `.partial` folders in `$TMPDIR/hyperframes-extract-cache-501`. Cover: `video/sketchy-launch/cover.html`.
 - Plan: `video/sketchy-launch/STORYBOARD.md`. To swap in a custom domain, change `URL` in both gen scripts and the cover, then re-render.
-- Known: the live footage shows a blue focus box around the phase area (fixed locally in `client/src/design/tokens.css`, not deployed yet). After deploying, re-capture and re-render to get clean footage.
+- Known: the footage in the current renders shows a blue focus box around the phase area. The fix (`client/src/design/tokens.css`) is deployed as of Oct 8; re-capture and re-render to get clean footage.
 

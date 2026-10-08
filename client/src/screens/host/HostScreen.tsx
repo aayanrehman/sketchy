@@ -3,7 +3,7 @@ import { SoundControl } from '@/design/components';
 import { useEffect, useRef, useState } from 'react';
 import { go } from '@/nav';
 import { MainShell } from '@/shell/MainShell';
-import { PhaseStage } from '@/shell/PhaseStage';
+import { PhaseStage, STUDY_BANNER } from '@/shell/PhaseStage';
 import { useRoom } from '@/state/useRoom';
 import { convex, setSession, saveHostToken, loadHostToken } from '@/net/socket';
 import { api } from '../../../../convex/_generated/api';
@@ -44,7 +44,7 @@ export function HostScreen() {
     <MainShell room={room} hideRail={phase === 'LOBBY' || phase === 'FINAL'}>
       {view.error && <div className="offline" role="alert">{view.error} <a href="/">Return home</a></div>}
       {!view.connected && <div className="offline" role="status">Reconnecting…</div>}
-      <PhaseStage phase={phase} banner={phase === 'LOBBY' || phase === 'HOW_TO' ? null : undefined}>
+      <PhaseStage phase={phase} banner={phase === 'LOBBY' || phase === 'HOW_TO' ? null : phase === 'PROMPT' && view.round?.mode === 'prompt' ? STUDY_BANNER : undefined}>
         {phase === 'LOBBY' && <LobbyMain view={view} />}
         {phase === 'HOW_TO' && <HowToMain view={view} />}
         {phase === 'PROMPT' && <PromptMain view={view} />}

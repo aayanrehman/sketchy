@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from 'convex/react';
 import { api } from '../../../convex/_generated/api';
 import { PhoneShell } from '@/shell/PhoneShell';
-import { PhaseStage } from '@/shell/PhaseStage';
+import { PhaseStage, STUDY_BANNER } from '@/shell/PhaseStage';
 import { useRoom } from '@/state/useRoom';
 import { convex, setSession, loadName, saveName } from '@/net/socket';
 import { unlockAudio } from '@/sound/sfx';
@@ -79,7 +79,7 @@ export function Demo({ daily = false }: { daily?: boolean }) {
   return (
     <PhoneShell room={room} me={view.me} serverOffset={view.serverOffset}>
       {!view.connected && <div className="offline" role="status">Reconnecting…</div>}
-      <PhaseStage phase={phase} narrow banner={phase === 'HOW_TO' || phase === 'LOBBY' ? null : undefined}>
+      <PhaseStage phase={phase} narrow banner={phase === 'LOBBY' || phase === 'HOW_TO' ? null : phase === 'PROMPT' && view.round?.mode === 'prompt' ? STUDY_BANNER : undefined}>
         {phase === 'LOBBY' && <p className="phase__sub">Bots are warming up…</p>}
         {phase === 'HOW_TO' && <HowToPhone view={view} />}
         {phase === 'PROMPT' && (view.round?.mode === 'prompt' ? <StudyPhone view={view} /> : <PromptPhone view={view} />)}

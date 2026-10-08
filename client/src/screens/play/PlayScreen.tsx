@@ -3,7 +3,7 @@ import { Loading } from '@/shell/Loading';
 import { SoundControl } from '@/design/components';
 import { useEffect, useState } from 'react';
 import { PhoneShell } from '@/shell/PhoneShell';
-import { PhaseStage } from '@/shell/PhaseStage';
+import { PhaseStage, STUDY_BANNER } from '@/shell/PhaseStage';
 import { useRoom } from '@/state/useRoom';
 import { convex, setSession, saveToken, loadToken, saveName, loadName, loadHostToken } from '@/net/socket';
 import { api } from '../../../../convex/_generated/api';
@@ -70,7 +70,7 @@ export function PlayScreen() {
     <PhoneShell room={room} me={me} serverOffset={view.serverOffset}>
       {!view.connected && <div className="offline" role="status">Reconnecting…</div>}
       {view.error && <div className="offline" role="alert">{view.error} <a href="/">Return home</a></div>}
-      <PhaseStage phase={phase} narrow banner={phase === 'LOBBY' || phase === 'HOW_TO' ? null : undefined}>
+      <PhaseStage phase={phase} narrow banner={phase === 'LOBBY' || phase === 'HOW_TO' ? null : phase === 'PROMPT' && view.round?.mode === 'prompt' ? STUDY_BANNER : undefined}>
         {phase === 'LOBBY' && <LobbyPhone view={view} />}
         {phase === 'HOW_TO' && <HowToPhone view={view} />}
         {phase === 'PROMPT' && (view.round?.mode === 'prompt' ? <StudyPhone view={view} /> : <PromptPhone view={view} />)}
