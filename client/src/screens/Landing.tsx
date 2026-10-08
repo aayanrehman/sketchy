@@ -8,6 +8,7 @@ import { childVariants, phaseVariants } from '@/design/motion';
 import { unlockAudio } from '@/sound/sfx';
 import { HowTo } from '@/shell/HowTo';
 import { LiveDemo } from './LiveDemo';
+import { useInstall } from '@/shell/useInstall';
 
 /** / landing: Host a game, Join a game, Try it solo. Shows your level and gallery. */
 export function Landing() {
@@ -15,6 +16,8 @@ export function Landing() {
   const prog = load();
   const [gallery, setGallery] = useState(false);
   const [help, setHelp] = useState(false);
+  const inst = useInstall();
+  const played = prog.games > 0;
   return (
     <div className="landing landing--home"><div className="corner-sound"><SoundControl /></div>
       <Scenery density={3} lively />
@@ -35,6 +38,13 @@ export function Landing() {
           </button>
           <Button variant="ghost" size="sm" onClick={() => setHelp(true)}>How to play</Button>
         </motion.div>
+        {played && (inst.canInstall || inst.iosHint) && (
+          <motion.div className="install" variants={childVariants(rm)} role="note">
+            <span>{inst.canInstall ? 'Keep Sketchy on your home screen for the next game.' : 'On iPhone: tap Share, then “Add to Home Screen” to keep Sketchy handy.'}</span>
+            {inst.canInstall && <Button variant="secondary" size="sm" onClick={inst.install}>Add to home screen</Button>}
+            <button type="button" className="install__x" aria-label="Dismiss" onClick={inst.dismiss}>×</button>
+          </motion.div>
+        )}
         </div>
         </div>
         <motion.div className="landing__right" variants={childVariants(rm)}><LiveDemo /></motion.div>

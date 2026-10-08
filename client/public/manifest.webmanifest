@@ -1,0 +1,16 @@
+{
+  "name": "Sketchy",
+  "short_name": "Sketchy",
+  "description": "A party game where you recreate pictures with AI prompts. One player can’t see the whole picture. Find them.",
+  "start_url": "/?source=pwa",
+  "scope": "/",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#BDE4FF",
+  "theme_color": "#BDE4FF",
+  "icons": [
+    { "src": "/icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "/icon-512-maskable.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

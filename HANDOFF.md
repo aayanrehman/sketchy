@@ -1,13 +1,13 @@
 # Sketchy: current handoff
 
-Last updated October 7, 2026 (end of the Claude Code session that moved Sketchy to Convex + Vercel and built Prompt mode). Older handoffs (`CODEX_FINISH_HANDOFF.md`, earlier versions of this file in git history) describe the previous Socket.IO/drawing-only build and are superseded.
+Last updated October 8, 2026 (Claude session: Draft→Refine clarity, engine edge cases, icons/manifest, docs). Previous: October 7 (Convex + Vercel move, Prompt mode). Older handoffs (`CODEX_FINISH_HANDOFF.md`, earlier versions of this file in git history) describe the previous Socket.IO/drawing-only build and are superseded.
 
 ## 1. Where things live
 
 | What | Where |
 |---|---|
 | Live game | https://sketchy-blue.vercel.app (Vercel project `sketchy`, account `aayanrehmann-6534`) |
-| Code | `~/Documents/ChatGPT/sketchy`, GitHub `aayanrehman/sketchy` (public), **branch `codex/finish-sketchy-submission`**. `main` is stale (old Socket.IO build). Vercel is NOT linked to git: deploy with `npm run deploy`. |
+| Code | `~/Documents/ChatGPT/sketchy`, GitHub `aayanrehman/sketchy` (public). **`main` and `codex/finish-sketchy-submission` are the same commit as of Oct 8**; keep pushing to both or just `main`. Vercel is NOT linked to git: deploy with `npm run deploy`. |
 | Backend | Convex team `aayan-ur-rehman`, project `sketchy`. **Prod:** `curious-chickadee-740` (https://curious-chickadee-740.convex.cloud). **Dev:** `admired-perch-128`. |
 | AI provider | fal.ai (key `FAL_KEY` in local `.env` and in Convex env vars; never in the browser). Models: `fal-ai/gpt-image-1-mini` (text-to-image), `fal-ai/gpt-image-1-mini/edit` (sketch redraw, content generation), `openrouter/router/vision` + `openai/gpt-4.1-mini` (judge), `openrouter/router` (hint). fal allows ~10 concurrent requests; code retries 429s with backoff. |
 | Convex env (prod) | `FAL_KEY`, `AI_MODE=fal`, `LIVE_AI_ENABLED=true`, `AI_DAILY_JOB_LIMIT=200` (images and judge calls each). `SITE_URL` defaults to the Vercel URL (the judge fetches target images from it). Dev additionally has `SITE_URL` = raw GitHub URL of `client/public`. |
@@ -53,6 +53,13 @@ Content: 12 Prompt-mode targets + masked versions in `client/public/targets/` an
 
 Fit-to-viewport layouts at 100% zoom; player screen with right-hand players + chat panel; coach bar (round step tracker + one instruction per phase, mode-aware); staggered "redrawing" reveal for every tile; mascot "Sketchy" (detective artist, 7 poses in `client/public/mascot/`); procedural lofi music on every page with Music/Effects sliders; instant HTML splash + shared loading screen + route fade; in-app navigation (no reloads); Home button + leave confirmation in every game header; home page with live prompt-mode explainer, lively sky (soft clouds, sun, sparkles, outline-free parallax hills); join/solo/host pages share that look; results screens; coverflow highlight reel; share dialog (native share on phones, copy image, download PNG, copy invite link; Convex images load with crossOrigin so the canvas exports); modals portaled to `<body>`; confetti sized to the window (it used to widen the page).
 
+## 4b. Shipped October 8 (Claude session, NOT yet deployed: run `npm run deploy`)
+
+- Prompt mode Draft→Final hand-off: persistent two-step strip on the writer, draft recap + pre-fill in Refine, "+N since your draft" counter, step-named buttons, title cards for Draft and Refine, "Step 1 of 2 / 2 of 2" coach lines, how-to copy.
+- Engine: missing the draft no longer forfeits the final prompt; results wait for a late final-image score (25 s `verdictSettle` timer) before "See scores" can end the phase; character limit 320. `convex/engine.test.ts` (4 tests) now runs under `npm test` (35 total).
+- Icons: favicon.ico / favicon-64.png (head-and-beret crop), apple-touch-icon, icon-192/512 + maskable, `manifest.webmanifest` (installable), `og.png` + Open Graph / Twitter tags for link previews. "Add to home screen" nudge on the landing page after the first game (`shell/useInstall.ts`).
+- README and docs/SUBMISSION.md rewritten for Prompt mode + Convex/Vercel.
+
 ## 5. Verified vs not verified
 
 Verified: typecheck; 31 old unit tests; `smoke:mp` full 4-player games in Sketch mode (with a forced revote) and Prompt mode (3 rounds, exactly one masked target, no leaks before reveal); live prod draft scored 75/100; solo flows driven in the browser.
@@ -71,14 +78,15 @@ My estimate (not a prediction): Execution 4, Creativity 4–5, Usefulness 4, Pol
 ## 8. What's left (highest impact first)
 
 1. Real playtest: 4+ people, phones, Prompt mode. Note confusion and bugs.
-2. Submission assets: `docs/SUBMISSION.md` (title/description) and `docs/sketchy-cover.png` still pitch the drawing game; README still describes Socket.IO/Render. Update to Prompt mode + Convex/Vercel.
+2. Cover image still shows Sketch-mode art: regenerate `docs/sketchy-cover.png` and `client/public/og.png` from Prompt-mode screens (SUBMISSION.md and README are updated).
 3. Domain (planned playsketchy.com or trysketchy.com): buy, add to the Vercel project, update the share-card site text (it uses `location.host`, so it updates automatically).
 4. Phone pass of Prompt-mode screens (study, writer, refine, results) on a real small phone.
 5. More solo-demo content (pre-made bot rounds for more targets) so replays vary.
 6. Judge consistency check (same image scored repeatedly; tune `COMPARE_SYSTEM` in `convex/ai.ts` if it swings).
 7. Decide whether to keep Sketch mode visible or hide it to keep the pitch focused.
 8. Optional launch/demo video (not listed in the official requirements I read; check the mission page).
-9. Clean-ups: delete or archive `server/` + `/studio` once no longer needed; merge the branch to `main`.
+9. Clean-ups: delete or archive `server/` + `/studio` once no longer needed.
+10. Retention ideas not built yet (see the Oct 8 chat): daily target with a shareable score, class/friend leaderboards per room code, "beat my score" deep links.
 
 ## 9. Working notes for the next session
 
