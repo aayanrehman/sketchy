@@ -1,3 +1,7 @@
+# Sketchy
+
+**Start every session by reading `HANDOFF.md`** (current state, deployments, commands, what's left). Keep it updated when you ship something significant.
+
 <!-- convex-ai-start -->
 
 This project uses [Convex](https://convex.dev) as its backend.

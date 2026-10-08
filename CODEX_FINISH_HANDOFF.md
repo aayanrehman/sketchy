@@ -1,3 +1,5 @@
+> **Superseded:** this brief describes the earlier Socket.IO build. For the current state read `HANDOFF.md`.
+
 # Sketchy: finish and validate the public game
 
 Prepared October 7, 2026 for Aayan Ur Rehman. This is an execution brief, not a promise of a contest score. The official rubric uses four equally weighted 1–5 categories; the goal is evidence supporting the highest descriptors, not a fabricated 10/10 rating.
