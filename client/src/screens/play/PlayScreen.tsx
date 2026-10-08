@@ -1,3 +1,4 @@
+import { EntryLayout } from '@/shell/EntryLayout';
 import { Loading } from '@/shell/Loading';
 import { SoundControl } from '@/design/components';
 import { useEffect, useState } from 'react';
@@ -52,22 +53,14 @@ export function PlayScreen() {
   if ((joined || joining) && !err && (!view.room || !view.me)) return <Loading label="Joining the room" />;
   if (!joined || !view.room || !view.me) {
     return (
-      <div className="landing"><div className="corner-sound"><SoundControl /></div>
-        <Scenery density={3} />
-        <form className="landing__inner" onSubmit={(e) => { e.preventDefault(); unlockAudio(); if (code.length === 4 && name.trim()) join(code, name.trim()); }}>
-          <div className="landing__hero"><Mascot mood="happy" size={110} float /></div>
-          <h1 className="landing__logo gold-text">SKETCHY</h1>
-          <Card padLg style={{ display: 'grid', gap: 12 }}>
-            <label className="sr-only" htmlFor="code">Room code</label>
-            <input id="code" className="field field--code" placeholder="ROOM CODE" value={code} maxLength={4} autoCapitalize="characters" autoComplete="off" onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z2-9]/g, ''))} />
-            <label className="sr-only" htmlFor="name">Your name</label>
-            <input id="name" className="field" placeholder="Your name" value={name} maxLength={12} autoComplete="off" onChange={(e) => setName(e.target.value)} />
-            <p className="err" role="alert">{err}</p>
-            <Button type="submit" size="lg" block disabled={joining || code.length !== 4 || !name.trim()}>{joining ? 'Joining…' : 'Join game'}</Button>
-          </Card>
-          <a href="/" className="mute" style={{ fontWeight: 900 }}>Back</a>
-        </form>
-      </div>
+      <EntryLayout title="Join a game" subtitle="Enter the 4-letter code shown on the host’s screen." onSubmit={() => { unlockAudio(); if (code.length === 4 && name.trim()) join(code, name.trim()); }}>
+        <label className="entry__label" htmlFor="code">Room code</label>
+        <input id="code" className="field field--code" placeholder="ABCD" value={code} maxLength={4} autoCapitalize="characters" autoComplete="off" spellCheck={false} onChange={(e) => setCode(e.target.value.toUpperCase().replace(/[^A-Z2-9]/g, ''))} />
+        <label className="entry__label" htmlFor="name">Your name</label>
+        <input id="name" className="field field--center" placeholder="What should we call you?" value={name} maxLength={12} autoComplete="off" onChange={(e) => setName(e.target.value)} />
+        {err && <p className="err" role="alert">{err}</p>}
+        <Button type="submit" size="lg" block disabled={joining || code.length !== 4 || !name.trim()}>{joining ? 'Joining…' : 'Join game'}</Button>
+      </EntryLayout>
     );
   }
 

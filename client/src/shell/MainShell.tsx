@@ -13,7 +13,7 @@ export function MainShell({ room, children, hideRail, railIds, meId }: { room: P
   const players = railIds ? room.players.filter((p) => railIds.includes(p.id)) : room.players;
   return (
     <div className="main-shell">
-      <Scenery hills={hideRail} density={4} />
+      {room.phase === 'LOBBY' ? <Scenery lively /> : <Scenery hills={hideRail} density={4} />}
       <header className="main-shell__head">
         <div className="main-shell__brand">
           <span className="display-md"><HomeButton logo screen inGame={room.phase !== 'LOBBY'} /></span>

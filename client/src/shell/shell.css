@@ -405,3 +405,37 @@
 .leave .dim { font-weight: 700; max-width: 36ch; }
 .leave__actions { display: grid; grid-template-columns: 1fr 1fr; gap: var(--s-3); width: 100%; margin-top: var(--s-2); }
 @media (max-width: 520px) { .home-btn { padding: 0 10px; } }
+
+/* Pre-game pages (join, solo setup): same sky and brand as home, one clear card. */
+.entry { place-items: center; }
+.entry__inner { width: min(100%, 460px); display: grid; gap: var(--s-4); justify-items: center; position: relative; z-index: var(--z-tile); }
+.entry .landing__brand .mascot { width: 96px; height: 96px; }
+.entry .landing__logo { font-size: clamp(44px, 9vw, 72px); }
+.entry__card { width: 100%; display: grid; gap: 10px; padding: var(--s-5); border-radius: var(--r-xl); background: var(--c-surface); border: var(--ol); box-shadow: var(--sh-pop); text-align: center; }
+.entry__title { font-family: var(--f-display); font-weight: 700; font-size: var(--t-display-md); color: var(--c-ink); }
+.entry__sub { font-weight: 800; font-size: var(--t-body-sm); color: var(--c-text-dim); margin-bottom: 4px; }
+.entry__label { justify-self: center; font-size: var(--t-body-xs); font-weight: 900; letter-spacing: .06em; text-transform: uppercase; color: var(--c-text-mute); margin-top: 4px; }
+.entry__badge { justify-self: center; padding: 3px 12px; border-radius: var(--r-pill); background: var(--c-gold-2); border: 2px solid var(--c-ink); font-size: var(--t-body-xs); font-weight: 900; color: var(--c-ink); }
+.entry__back { font-weight: 900; color: var(--c-ink); text-decoration: none; padding: 6px 14px; border-radius: var(--r-pill); background: rgba(255,255,255,.7); border: 2px solid var(--c-ink); }
+.entry__back:hover { background: var(--c-surface); }
+.entry .err { min-height: 0; }
+/* Room code: spacing is added after every letter, so indent by the same amount to keep it truly centred (placeholder too). */
+.field--code { letter-spacing: .3em; text-indent: .3em; }
+.field--code::placeholder { letter-spacing: .3em; font-family: var(--f-display); font-size: var(--t-display-md); color: #C9C3DD; }
+.field--center { text-align: center; }
+
+/* Host lobby: the home page's sky with the room card front and centre. */
+.lobby--host { width: min(100%, 820px); margin: 0 auto; padding: var(--s-5); border-radius: var(--r-xl); background: rgba(255,255,255,.82); border: var(--ol); box-shadow: var(--sh-pop); backdrop-filter: blur(6px); gap: var(--s-4); }
+.lobby__title { margin-bottom: 2px; }
+.lobby--host .lobby__join { box-shadow: none; background: var(--c-surface-2); }
+.loading { position: relative; overflow: hidden; }
+.loading__in { position: relative; z-index: var(--z-tile); }
+/* Header controls never squash; on narrow screens Home shows just its icon. */
+.btn--icon, .home-btn, .sound { flex-shrink: 0; }
+.main-shell__brand { min-width: 0; overflow: hidden; }
+@media (max-width: 760px) {
+  .home-btn__text { display: none; }
+  .home-btn { width: var(--tap); padding: 0; justify-content: center; }
+  .main-shell__code small { display: none; }
+  .main-shell__code { font-size: var(--t-display-sm); padding: 2px 10px; }
+}

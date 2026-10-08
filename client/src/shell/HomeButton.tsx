@@ -18,7 +18,7 @@ export function HomeButton({ screen, inGame, logo }: { screen?: boolean; inGame:
     <>
       {logo
         ? <button type="button" className="home-logo gold-text" onClick={() => setOpen(true)} aria-label="Sketchy home">SKETCHY</button>
-        : <Button variant="ghost" size="sm" className="home-btn" onClick={() => setOpen(true)} aria-label="Back to home"><span aria-hidden>⌂</span> Home</Button>}
+        : <Button variant="ghost" size="sm" className="home-btn" onClick={() => setOpen(true)} aria-label="Back to home"><span aria-hidden>⌂</span><span className="home-btn__text">Home</span></Button>}
       <Modal open={open} onClose={() => setOpen(false)} label="Leave the game?">
         <div className="leave">
           <img src="/mascot/sus.webp" alt="" width={96} height={96} />

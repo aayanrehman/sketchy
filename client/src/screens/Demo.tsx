@@ -1,3 +1,4 @@
+import { EntryLayout } from '@/shell/EntryLayout';
 import { Loading } from '@/shell/Loading';
 import { SoundControl } from '@/design/components';
 import { useEffect, useState } from 'react';
@@ -55,22 +56,14 @@ export function Demo() {
   if (started && !error && (!view.room || !view.me)) return <Loading label="Setting up your game" />;
   if (!started || !view.room || !view.me) {
     return (
-      <div className="landing"><div className="corner-sound"><SoundControl /></div>
-        <Scenery density={3} />
-        <form className="landing__inner" onSubmit={(e) => { e.preventDefault(); start(); }}>
-          <div className="landing__hero"><Mascot mood="sus" size={120} float /></div>
-          <h1 className="landing__logo gold-text">TRY IT SOLO</h1>
-          <p className="landing__tag">Play 2 quick rounds against 3 bots: once as a regular player, once as the imposter. Bots use pre-made prompts and example scores; your prompts are generated and scored live.</p>
-          <p className="demo-mode">{['openai', 'fal'].includes(aiMode) ? 'Live AI: your prompts become images and get scored' : aiMode === 'loading' ? 'Checking the judge…' : 'Preview mode · sample scoring, no live AI'}</p>
-          {error && <p className="err" role="alert">{error}</p>}
-          <Card padLg style={{ display: 'grid', gap: 12 }}>
-            <label className="sr-only" htmlFor="name">Your name</label>
-            <input id="name" className="field" placeholder="Your name" value={name} maxLength={12} onChange={(e) => setName(e.target.value)} />
-            <Button type="submit" size="lg" block variant="lime" disabled={started}>{started ? 'Setting up…' : 'Start demo'}</Button>
-          </Card>
-          <a href="/" className="mute" style={{ fontWeight: 900 }}>Back</a>
-        </form>
-      </div>
+      <EntryLayout title="Play solo vs. bots" mood="sus" onSubmit={start}
+        subtitle="2 quick rounds against 3 bots: once as a regular player, once as the imposter. Bots use pre-made prompts and example scores; yours are live.">
+        <p className="entry__badge">{['openai', 'fal'].includes(aiMode) ? 'Live AI: your prompts become images and get scored' : aiMode === 'loading' ? 'Checking the AI…' : 'Preview mode · sample scoring, no live AI'}</p>
+        <label className="entry__label" htmlFor="name">Your name</label>
+        <input id="name" className="field field--center" placeholder="What should we call you?" value={name} maxLength={12} onChange={(e) => setName(e.target.value)} />
+        {error && <p className="err" role="alert">{error}</p>}
+        <Button type="submit" size="lg" block variant="lime" disabled={started}>{started ? 'Setting up…' : 'Start'}</Button>
+      </EntryLayout>
     );
   }
 

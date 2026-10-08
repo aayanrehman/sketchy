@@ -20,7 +20,8 @@ export function LobbyMain({ view }: MomentProps) {
   const n = room.players.filter((p) => !p.spectator).length;
   const url = `${location.origin}/play`;
   return (
-    <div className="lobby">
+    <div className="lobby lobby--host">
+      <Rise><h1 className="entry__title lobby__title">Your room is ready</h1><p className="entry__sub">Everyone joins on their own phone or laptop. You need at least {MIN_PLAYERS} players.</p></Rise>
       <Rise><Card className="lobby__join">
         <JoinQr url={`${url}?code=${room.code}`} />
         <div>
