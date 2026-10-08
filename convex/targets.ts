@@ -25,7 +25,7 @@ export function matchOf(b: Breakdown, styleRound = false) {
 export function promptProblem(text: string, pass: 'draft' | 'final', taboo: string[] | null): string | null {
   const t = text.trim();
   if (!t) return 'Write a prompt first.';
-  if (t.length > 220) return 'Keep it under 220 characters.';
+  if (t.length > 320) return 'Keep it under 320 characters.';
   const words = t.split(/\s+/).length;
   const max = pass === 'draft' ? 8 : 30;
   if (words > max) return `Your ${pass} can be at most ${max} words (you have ${words}).`;

@@ -86,6 +86,8 @@ export function WritePhone({ view }: MomentProps) {
     // eslint-disable-next-line
   }, [room.phaseEndsAt, locked, pass]);
   const others = r.drawings.filter((d) => d.playerId !== me.playerId);
+  const draftWords = mine?.draftPrompt ? mine.draftPrompt.trim().split(/\s+/).length : 0;
+  const chars = text.trim().length;
   return (
     <div className="phase write">
       <div className="write__grid">
@@ -94,21 +96,32 @@ export function WritePhone({ view }: MomentProps) {
           <ModifierBadge modifier={r.modifier} taboo={me.taboo} />
         </div>
         <div className="write__main">
+          <PassSteps pass={pass} />
           {pass === 'final' && mine && <DraftFeedback d={mine} />}
-          <form className="writer" onSubmit={(e) => { e.preventDefault(); submit(); }}>
-            <label htmlFor="prompt" className="writer__label">{pass === 'draft' ? 'Quick draft' : 'Final prompt'} <small>{pass === 'draft' ? 'up to 8 words · a first try; you’ll improve it next' : 'up to 30 words · only your final image is scored'}</small></label>
+          <motion.form key={pass} className="writer" onSubmit={(e) => { e.preventDefault(); submit(); }}
+            initial={{ opacity: 0, y: rm ? 0 : 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: rm ? 0.16 : 0.32 }}>
+            <label htmlFor="prompt" className="writer__label">
+              {pass === 'draft' ? 'Quick draft' : mine?.draftPrompt ? 'Expand your draft into the final prompt' : 'Final prompt'}
+              <small>{pass === 'draft' ? 'up to 8 words · a first try; next you get up to 30' : 'up to 30 words · only your final image is scored'}</small>
+            </label>
+            {pass === 'final' && mine?.draftPrompt && (
+              <p className="writer__from"><span>Your draft ({draftWords} word{draftWords === 1 ? '' : 's'})</span>“{mine.draftPrompt}” <em>· it’s pre-filled below, add up to {Math.max(0, 30 - draftWords)} more words</em></p>
+            )}
             <textarea id="prompt" className="field writer__input" rows={pass === 'draft' ? 2 : 3} value={text} disabled={locked}
               placeholder={pass === 'draft' ? 'e.g. frog drumming on a lily pad, watercolor' : 'Add the details, style, colors and lighting your draft missed'}
               onChange={(e) => { setText(capWords(e.target.value, max)); setErr(null); }}
               onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); submit(); } }} />
             <div className="writer__meta">
-              <span className={words >= max ? 'is-bad' : ''}>{words}/{max} words{words >= max ? ' · limit reached' : ''}</span>
+              <span className={words >= max ? 'is-bad' : ''}>
+                {words}/{max} words{words >= max ? ' · limit reached' : pass === 'final' && draftWords ? ` · ${words - draftWords >= 0 ? '+' : ''}${words - draftWords} since your draft` : ''}
+                {chars > 260 && <> · {chars}/320 characters</>}
+              </span>
               {(err || problem) && <span className="writer__err" role="alert">{err || problem}</span>}
             </div>
             {locked
-              ? <Button variant="lime" size="lg" block disabled>Locked in ✓ waiting for the others</Button>
-              : <Button type="submit" variant="secondary" size="lg" block disabled={!text.trim() || !!problem || busy}>{busy ? 'Sending…' : pass === 'draft' ? 'Lock in draft' : 'Lock in final prompt'}</Button>}
-          </form>
+              ? <Button variant="lime" size="lg" block disabled>{pass === 'draft' ? 'Draft locked ✓ next: expand it to 30 words' : 'Final locked ✓ waiting for the others'}</Button>
+              : <Button type="submit" variant="secondary" size="lg" block disabled={!text.trim() || !!problem || busy}>{busy ? 'Sending…' : pass === 'draft' ? 'Lock in draft (step 1 of 2)' : 'Lock in final prompt (step 2 of 2)'}</Button>}
+          </motion.form>
           {pass === 'final' && others.length > 0 && (
             <section className="drafts">
               <h3>Everyone’s drafts <small>(prompts stay secret until the end)</small></h3>
@@ -128,6 +141,17 @@ export function WritePhone({ view }: MomentProps) {
   );
 }
 
+/** The two writing passes, always visible so the 8-word draft and the 30-word final never blur together. */
+function PassSteps({ pass }: { pass: 'draft' | 'final' }) {
+  return (
+    <ol className="pass" aria-label="Writing steps">
+      <li className={pass === 'draft' ? 'is-on' : 'is-done'}><b>1</b><span>Quick draft</span><small>8 words · 35 s</small></li>
+      <li className="pass__arrow" aria-hidden>→</li>
+      <li className={pass === 'final' ? 'is-on' : ''}><b>2</b><span>Final prompt</span><small>30 words · 40 s · scored</small></li>
+    </ol>
+  );
+}
+
 function DraftImage({ d }: { d: Drawing }) {
   if (d.draftStatus === 'done' && d.draftUrl) return <img src={d.draftUrl} alt="" className="drafts__img" />;
   if (d.draftStatus === 'pending' || !d.draftStatus) return <div className="drafts__img drafts__img--pending"><i /></div>;
@@ -142,9 +166,9 @@ function DraftFeedback({ d }: { d: Drawing }) {
       <DraftImage d={d} />
       <div className="feedback__body">
         <h3>Your draft {scored && <b className="feedback__score">{d.draftMatch}/100</b>}</h3>
-        <p className="feedback__why">This was practice. Fix what it missed below; your final image is the one that’s scored (and improving earns a bonus).</p>
+        <p className="feedback__why">Practice only. Fix what it missed in your final prompt below; improving earns a bonus.</p>
         {d.draftStatus === 'pending' ? <p>Generating your draft image…</p>
-          : !scored ? <p>{d.draftStatus === 'done' ? 'Scoring it against the target…' : 'No draft image this time. Your final prompt still counts.'}</p>
+          : !scored ? <p>{d.draftStatus === 'done' ? 'Scoring it against the target…' : 'You missed the draft. No problem: your final prompt still counts in full.'}</p>
           : <>
               {d.draftMissed && <p><b>Missed:</b> {d.draftMissed}</p>}
               {d.draftTip && <p><b>Tip:</b> {d.draftTip}</p>}

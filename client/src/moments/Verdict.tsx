@@ -55,7 +55,7 @@ export function VerdictMoment({ view }: MomentProps) {
       <footer className="verdict__foot">
         <p className="dim">The AI judge scores each <b>original sketch</b> (not the redraw) against the real prompt. Best artist match: +50. An imposter who matches as well as the typical artist: +100.{view.room?.players.some((p) => p.isBot) ? ' Bot drawings and scores are pre-made examples; yours were redrawn and scored live.' : ''}</p>
         {me && r.participantIds.includes(me.playerId)
-          ? <Button size="lg" variant={ready ? 'ghost' : 'primary'} disabled={ready} onClick={() => send().emit('verdict:ready')}>{ready ? (waiting ? `Waiting for ${waiting} player${waiting === 1 ? '' : 's'}…` : 'Starting…') : 'See scores →'}</Button>
+          ? <Button size="lg" variant={ready ? 'ghost' : 'primary'} disabled={ready} onClick={() => send().emit('verdict:ready')}>{ready ? (waiting ? `Waiting for ${waiting} player${waiting === 1 ? '' : 's'}…` : r.drawings.some((d) => d.judgeStatus === 'pending') ? 'Waiting for the judge’s last score…' : 'Starting…') : 'See scores →'}</Button>
           : <p className="phase__sub">Players continue when they’re ready.</p>}
       </footer>
     </div>
@@ -104,7 +104,7 @@ function PromptVerdict({ view, ready, waiting, caughtLine }: MomentProps & { rea
       <footer className="verdict__foot">
         <p className="dim">An AI judge compares each final image with the target in five areas (0–20 each). Everyone earns half their match score, plus half of their draft-to-final improvement (up to +25); the closest artist gets +50.{view.room?.players.some((p) => p.isBot) ? ' Bot prompts and scores are pre-made examples; yours are live.' : ''}</p>
         {me && r.participantIds.includes(me.playerId)
-          ? <Button size="lg" variant={ready ? 'ghost' : 'primary'} disabled={ready} onClick={() => send().emit('verdict:ready')}>{ready ? (waiting ? `Waiting for ${waiting} player${waiting === 1 ? '' : 's'}…` : 'Starting…') : 'See scores →'}</Button>
+          ? <Button size="lg" variant={ready ? 'ghost' : 'primary'} disabled={ready} onClick={() => send().emit('verdict:ready')}>{ready ? (waiting ? `Waiting for ${waiting} player${waiting === 1 ? '' : 's'}…` : r.drawings.some((d) => d.judgeStatus === 'pending') ? 'Waiting for the judge’s last score…' : 'Starting…') : 'See scores →'}</Button>
           : <p className="phase__sub">Players continue when they’re ready.</p>}
       </footer>
     </div>

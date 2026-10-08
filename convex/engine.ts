@@ -28,6 +28,8 @@ const MODIFIERS: Modifier[] = ['none', 'taboo', 'style'];
 /** The reveal stays up until every tile's staggered paint-in has played (client: revealAt in Gallery.tsx), even if the AI was fast. */
 const galleryMinMs = (n: number) => 1_600 + Math.max(0, n - 1) * 900 + 1_800;
 const REVOTE_MS = 12_000;
+/** Prompt mode: how long the results screen waits for a late final-image score before "See scores" can end the phase. */
+const VERDICT_SETTLE_MS = 25_000;
 const BOT_GLOW_DELAY_MS = [1_500, 6_000];
 export const ROOM_IDLE_MS = 2 * 60 * 60 * 1000;
 export const JUDGE_FOG = 'My glasses fogged up.';
@@ -73,7 +75,8 @@ export type TimerAction =
   | { t: 'lobbyDrop'; id: string }
   | { t: 'botGlow'; round: number; id: string; gameId: string }
   | { t: 'bot'; op: 'howto' | 'draw' | 'vote' | 'steal' | 'skip' | 'chat' | 'draft' | 'final'; id: string; text?: string }
-  | { t: 'botDraft'; round: number; id: string; gameId: string };
+  | { t: 'botDraft'; round: number; id: string; gameId: string }
+  | { t: 'verdictSettle' };
 
 export interface EngineState {
   code: string; isDemo: boolean; hostId: string | null; hostToken: string; gameId: string;
@@ -144,6 +147,7 @@ export class Engine {
       case 'botGlow': this.botGlowArrives(a.round, a.id, a.gameId); break;
       case 'botDraft': this.botDraftArrives(a.round, a.id, a.gameId); break;
       case 'bot': this.botAct(a.op, a.id, a.text); break;
+      case 'verdictSettle': this.settleVerdict(); break;
     }
     return true;
   }
@@ -360,7 +364,11 @@ export class Engine {
     if (phase === 'VERDICT') {
       this.s.verdictReady = [];
       // Prompt mode scores the final image late (after it's generated): let it land on the results screen.
-      if (r?.mode !== 'prompt') for (const d of r?.drawings || []) if (d.judgeStatus === 'pending') { d.judgeStatus = 'fallback'; d.match = undefined; d.roast = JUDGE_FOG; }
+      if (r?.mode !== 'prompt') {
+        for (const d of r?.drawings || []) if (d.judgeStatus === 'pending') { d.judgeStatus = 'fallback'; d.match = undefined; d.roast = JUDGE_FOG; }
+      } else if (r.drawings.some((d) => d.judgeStatus === 'pending')) {
+        this.schedule('verdictSettle', VERDICT_SETTLE_MS, { t: 'verdictSettle' });
+      }
     }
     this.s.phase = phase;
     this.s.phaseStartedAt = this.now;
@@ -497,7 +505,7 @@ export class Engine {
       case 'REFINE': if (r && participants.every((p) => r.drawings.find((d) => d.playerId === p.id)?.finalPrompt !== undefined)) this.advance(); break;
       case 'GALLERY': if (r && r.drawings.every((d) => d.glowStatus !== 'pending')) this.shorten(Math.max(0, galleryMinMs(r.drawings.length) - (this.now - this.s.phaseStartedAt))); break;
       case 'VOTE': if (r && participants.every((p) => p.hasVoted)) this.advance(); break;
-      case 'VERDICT': { const humans = participants.filter((p) => !p.isBot); if (humans.length && humans.every((p) => this.s.verdictReady.includes(p.id))) this.advance(); break; }
+      case 'VERDICT': { const humans = participants.filter((p) => !p.isBot); if (humans.length && humans.every((p) => this.s.verdictReady.includes(p.id)) && !this.scoringPending()) this.advance(); break; }
       case 'STEAL': if (r && r.stealPick !== null) this.shorten(STEAL_REVEAL_MS); break;
     }
   }
@@ -509,9 +517,10 @@ export class Engine {
       case 'PROMPT': return this.mode === 'prompt' ? this.setPhase('DRAFT', PHASE_MS.DRAFT) : this.setPhase('DRAW', PHASE_MS.DRAW);
       case 'DRAFT': {
         if (!r) return;
+        // No draft in time: no draft image, but the player can still write a final prompt in REFINE (never lose a turn).
         for (const id of r.participantIds) {
           const p = this.seat(id)?.player;
-          if (p && !p.hasSubmitted) { p.hasSubmitted = true; r.drawings.push({ playerId: id, strokes: [], glowStatus: 'fallback', golden: false, judgeStatus: 'fallback', blank: true, draftStatus: 'fallback', finalPrompt: '' }); }
+          if (p && !p.hasSubmitted) { p.hasSubmitted = true; r.drawings.push({ playerId: id, strokes: [], glowStatus: 'fallback', golden: false, judgeStatus: 'fallback', blank: true, draftStatus: 'fallback' }); }
         }
         return this.setPhase('REFINE', PHASE_MS.REFINE);
       }
@@ -650,7 +659,7 @@ export class Engine {
     } else {
       const d = r.drawings.find((x) => x.playerId === playerId);
       if (!d || d.finalPrompt !== undefined) return null;
-      d.finalPrompt = clean; d.glowStatus = 'pending'; d.blank = false;
+      d.finalPrompt = clean; d.glowStatus = 'pending'; d.judgeStatus = 'pending'; d.blank = false;
     }
     this.touch();
     if (this.s.aiImageCount >= GLOWUP_ROOM_CAP * 2 || this.aiMode === 'off') this.applyGen(r.index, playerId, this.s.gameId, pass, { status: 'fallback' });
@@ -703,6 +712,8 @@ export class Engine {
       if (match === undefined) { d.judgeStatus = 'fallback'; d.match = -1; d.roast = JUDGE_FOG; }
       else { d.judgeStatus = 'done'; d.match = match; d.breakdown = res.breakdown; d.sees = res.missed; d.roast = res.tip; }
     }
+    // A late score landing on the results screen may be the last thing the ready players were waiting for.
+    this.checkEarlyEnd();
   }
 
   vote(voterId: string, targetId: string) {
@@ -743,7 +754,20 @@ export class Engine {
     if (this.s.phase !== 'VERDICT' || !this.currentRound()?.participantIds.includes(playerId)) return;
     if (!this.s.verdictReady.includes(playerId)) this.s.verdictReady.push(playerId);
     const humans = this.activePlayers.filter((p) => p.connected && !p.isBot);
-    if (humans.length && humans.every((p) => this.s.verdictReady.includes(p.id))) this.advance();
+    if (humans.length && humans.every((p) => this.s.verdictReady.includes(p.id)) && !this.scoringPending()) this.advance();
+  }
+
+  /** Prompt mode: a final image is still with the judge, so points can't be totalled yet. */
+  private scoringPending() {
+    const r = this.currentRound();
+    return this.s.phase === 'VERDICT' && r?.mode === 'prompt' && !!this.s.timers['verdictSettle'] && r.drawings.some((d) => d.judgeStatus === 'pending');
+  }
+
+  /** The judge took too long: score what we have and let the ready players move on. */
+  private settleVerdict() {
+    const r = this.currentRound(); if (this.s.phase !== 'VERDICT' || !r) return;
+    for (const d of r.drawings) if (d.judgeStatus === 'pending') { d.judgeStatus = 'fallback'; d.match = -1; d.roast = 'The judge ran out of time.'; }
+    this.checkEarlyEnd();
   }
 
   // ---------- output ----------
