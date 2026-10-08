@@ -1,56 +1,119 @@
-import type { Drawing, Player } from '@shared/types';
+import type { Drawing, Player, PublicRoom } from '@shared/types';
 import { paintStrokes } from '@/design/components/SketchCanvas';
 import { color } from '@/design/tokens';
 
-/** Shareable result card PNG: the round's gallery, who the imposter was, the game URL. */
-export async function buildShareCard(args: { drawings: Drawing[]; players: Map<string, Player>; imposterId: string; prompt: string; url: string; mode?: 'demo' | 'preview' }): Promise<string> {
+const W = 1080, H = 1350;
+const DISPLAY = '700 {s}px Fredoka, "Arial Rounded MT Bold", sans-serif';
+const BODY = '{w} {s}px Nunito, sans-serif';
+const font = (tpl: string, s: number, w = 800) => tpl.replace('{s}', String(s)).replace('{w}', String(w));
+
+/** Loads an image for canvas drawing. crossOrigin keeps the canvas exportable for AI images served from Convex storage. */
+function load(src?: string): Promise<HTMLImageElement | null> {
+  if (!src) return Promise.resolve(null);
+  return new Promise((res) => {
+    const img = new Image(); img.crossOrigin = 'anonymous';
+    const t = setTimeout(() => res(null), 6000);
+    img.onload = () => { clearTimeout(t); res(img); }; img.onerror = () => { clearTimeout(t); res(null); };
+    img.src = src;
+  });
+}
+
+function wrap(ctx: CanvasRenderingContext2D, text: string, maxW: number, maxLines: number) {
+  const words = text.split(/\s+/); const lines: string[] = []; let line = '';
+  for (const w of words) {
+    const next = line ? `${line} ${w}` : w;
+    if (ctx.measureText(next).width > maxW && line) { lines.push(line); line = w; if (lines.length === maxLines) break; } else line = next;
+  }
+  if (lines.length < maxLines && line) lines.push(line);
+  else if (line && lines.length === maxLines) lines[maxLines - 1] = lines[maxLines - 1].replace(/\s*\S*$/, '…');
+  return lines;
+}
+
+function tileImage(ctx: CanvasRenderingContext2D, img: HTMLImageElement | null, d: Drawing | null, x: number, y: number, s: number, border: string, label?: string) {
+  ctx.save(); ctx.beginPath(); ctx.roundRect(x, y, s, s, 32); ctx.fillStyle = color.paper; ctx.fill(); ctx.clip();
+  if (img) ctx.drawImage(img, x, y, s, s);
+  else if (d?.strokes?.length) { const t = document.createElement('canvas'); t.width = t.height = s; paintStrokes(t.getContext('2d')!, d.strokes, s); ctx.drawImage(t, x, y); }
+  ctx.restore();
+  ctx.lineWidth = 8; ctx.strokeStyle = border; ctx.beginPath(); ctx.roundRect(x, y, s, s, 32); ctx.stroke();
+  if (label) {
+    ctx.font = font(BODY, 26, 900); const w = ctx.measureText(label).width + 36;
+    ctx.fillStyle = color.surface; ctx.strokeStyle = color.ink; ctx.lineWidth = 4; ctx.beginPath(); ctx.roundRect(x + 16, y + 16, w, 46, 23); ctx.fill(); ctx.stroke();
+    ctx.fillStyle = color.ink; ctx.textAlign = 'left'; ctx.fillText(label, x + 34, y + 48);
+  }
+}
+
+/**
+ * A personal result card (1080×1350, portrait for socials): your best moment of the game,
+ * next to the target in prompt mode, with your prompt, score, rank and awards, plus an invite to play.
+ */
+export async function buildResultCard(room: PublicRoom, players: Map<string, Player>, meId: string | null, site: string): Promise<Blob> {
   await document.fonts.ready;
-  const W = 1080, H = 1350;
+  const ranked = [...room.players].sort((a, b) => b.score - a.score);
+  const hero = (meId && players.get(meId)) || ranked[0];
+  const rank = 1 + ranked.filter((p) => p.score > (hero?.score ?? 0)).length;
+  // Your best scored image across the game (falls back to any image you made).
+  const mine = room.rounds.flatMap((r) => r.drawings.filter((d) => d.playerId === hero?.id && !d.blank).map((d) => ({ d, r })));
+  mine.sort((a, b) => (b.d.match ?? -1) - (a.d.match ?? -1));
+  const best = mine[0];
+  const prompt = best?.r.mode === 'prompt';
+  const [heroImg, targetImg, mascot] = await Promise.all([
+    load(best?.d.glowStatus === 'done' ? best.d.glowUrl : undefined), load(prompt ? best?.r.targetUrl : undefined), load('/mascot/happy.webp'),
+  ]);
+
   const c = document.createElement('canvas'); c.width = W; c.height = H;
   const ctx = c.getContext('2d')!;
   const g = ctx.createLinearGradient(0, 0, 0, H); g.addColorStop(0, color.sky); g.addColorStop(1, color.sky2);
   ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
-  ctx.fillStyle = color.grass; ctx.strokeStyle = color.ink; ctx.lineWidth = 4;
-  ctx.beginPath(); ctx.moveTo(0, H - 180); ctx.bezierCurveTo(280, H - 260, 750, H - 130, W, H - 230); ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath(); ctx.fill(); ctx.stroke();
-  ctx.textAlign = 'center';
-  ctx.font = '700 100px Fredoka, "Arial Rounded MT Bold", sans-serif'; ctx.lineWidth = 10; ctx.strokeStyle = color.ink; ctx.lineJoin = 'round'; ctx.strokeText('SKETCHY', W / 2, 130); ctx.fillStyle = color.yellow; ctx.fillText('SKETCHY', W / 2, 130);
-  ctx.font = '800 40px Nunito, sans-serif'; ctx.fillStyle = color.ink; while (ctx.measureText(`"${args.prompt}"`).width > W - 120) { const n = Number(ctx.font.match(/(\d+)px/)?.[1] || 40); if (n <= 24) break; ctx.font = `800 ${n - 1}px Nunito, sans-serif`; } ctx.fillText(`"${args.prompt}"`, W / 2, 200);
-  if (args.mode) { ctx.font = '800 22px Nunito, sans-serif'; ctx.fillStyle = color.textDim; ctx.fillText(args.mode === 'demo' ? 'DEMO · EXAMPLE BOT SCORES' : 'PREVIEW · SAMPLE SCORING', W / 2, 230); }
-  const n = args.drawings.length; const cols = n <= 4 ? 2 : 3; const rows = Math.ceil(n / cols);
-  const gap = 30; const tile = Math.min((W - 120 - gap * (cols - 1)) / cols, (H - 500 - gap * (rows - 1)) / rows);
-  const x0 = (W - (tile * cols + gap * (cols - 1))) / 2; const y0 = 250;
-  const loads: Promise<void>[] = [];
-  args.drawings.forEach((d, i) => {
-    const x = x0 + (i % cols) * (tile + gap), y = y0 + Math.floor(i / cols) * (tile + gap);
-    const p = args.players.get(d.playerId);
-    const isImp = d.playerId === args.imposterId;
-    const draw = (img?: HTMLImageElement) => {
-      ctx.save(); ctx.beginPath(); ctx.roundRect(x, y, tile, tile, 28); ctx.clip();
-      if (img) ctx.drawImage(img, x, y, tile, tile);
-      else { const t = document.createElement('canvas'); t.width = t.height = tile; paintStrokes(t.getContext('2d')!, d.strokes, tile); ctx.drawImage(t, x, y); }
-      ctx.restore();
-      ctx.lineWidth = 8; ctx.strokeStyle = d.golden ? color.gold : isImp ? color.red : color.ink; ctx.beginPath(); ctx.roundRect(x, y, tile, tile, 28); ctx.stroke();
-      ctx.fillStyle = color.surface; ctx.strokeStyle = color.ink; ctx.lineWidth = 4; ctx.beginPath(); ctx.roundRect(x + 14, y + tile - 56, Math.min(tile - 28, 60 + (p?.name.length || 4) * 18), 42, 21); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = color.ink; ctx.textAlign = 'left'; ctx.font = '900 26px Nunito, sans-serif'; ctx.fillText(`${p?.name || 'Artist'}`, x + 26, y + tile - 26, tile - 52);
-      if (typeof d.match === 'number' && d.match >= 0) { ctx.textAlign = 'right'; ctx.fillStyle = color.ink; ctx.font = '700 34px Fredoka, sans-serif'; ctx.fillText(`${d.match}/100`, x + tile - 18, y + 48); }
-      if (isImp) {
-        ctx.save(); ctx.translate(x + tile / 2, y + tile / 2); ctx.rotate(-0.2);
-        ctx.font = `700 ${Math.min(56, tile * .13)}px Fredoka, sans-serif`; ctx.lineWidth = 8; ctx.strokeStyle = color.red; ctx.fillStyle = color.surface;
-        ctx.beginPath(); ctx.roundRect(-tile * .42, -tile * .12, tile * .84, tile * .24, 16); ctx.fill(); ctx.stroke();
-        ctx.fillStyle = color.red; ctx.textAlign = 'center'; ctx.fillText('IMPOSTER!', 0, tile * .045); ctx.restore();
-      }
-    };
-    if (d.glowUrl && d.glowStatus === 'done') {
-      loads.push(new Promise((res) => { const img = new Image(); let done = false; const finish = (ok: boolean) => { if (done) return; done = true; clearTimeout(timer); draw(ok ? img : undefined); res(); }; const timer = setTimeout(() => finish(false), 5000); img.onload = () => finish(true); img.onerror = () => finish(false); img.src = d.glowUrl!; }));
-    } else draw();
-  });
-  await Promise.all(loads);
-  await new Promise<void>((resolve) => { const img = new Image(); const timer = setTimeout(resolve, 3000); img.onload = () => { clearTimeout(timer); ctx.drawImage(img, W - 150, 22, 115, 115); resolve(); }; img.onerror = () => { clearTimeout(timer); resolve(); }; img.src = '/mascot/happy.webp'; });
-  ctx.fillStyle = color.ink; ctx.textAlign = 'center'; ctx.font = '700 44px Fredoka, sans-serif'; ctx.fillText('One of you is drawing something different.', W / 2, H - 120);
-  ctx.fillStyle = color.textDim; ctx.font = '800 36px Nunito, sans-serif'; ctx.fillText(args.url, W / 2, H - 60);
-  return c.toDataURL('image/png');
-}
+  ctx.fillStyle = color.grass; ctx.strokeStyle = color.ink; ctx.lineWidth = 5;
+  ctx.beginPath(); ctx.moveTo(0, H - 150); ctx.bezierCurveTo(300, H - 230, 760, H - 100, W, H - 200); ctx.lineTo(W, H); ctx.lineTo(0, H); ctx.closePath(); ctx.fill(); ctx.stroke();
 
-export function downloadDataUrl(url: string, name: string) {
-  const a = document.createElement('a'); a.href = url; a.download = name; document.body.appendChild(a); a.click(); a.remove();
+  // Header: logo, mascot, who and how they did.
+  ctx.textAlign = 'left'; ctx.lineJoin = 'round';
+  ctx.font = font(DISPLAY, 92); ctx.lineWidth = 12; ctx.strokeStyle = color.ink; ctx.strokeText('SKETCHY', 60, 120); ctx.fillStyle = color.yellow; ctx.fillText('SKETCHY', 60, 120);
+  if (mascot) ctx.drawImage(mascot, W - 190, 20, 150, 150);
+  ctx.fillStyle = color.ink; ctx.font = font(DISPLAY, 50);
+  ctx.fillText(`${hero?.name ?? 'Player'} · #${rank} of ${ranked.length}`, 60, 200);
+  ctx.font = font(BODY, 32, 900); ctx.fillStyle = color.textDim;
+  ctx.fillText(`${hero?.score ?? 0} points${room.isDemo ? ' · solo practice vs bots' : ''}`, 60, 246);
+
+  // Hero images.
+  const top = 290;
+  if (prompt) {
+    const s = 450, gap = 60, x0 = (W - (s * 2 + gap)) / 2;
+    tileImage(ctx, targetImg, null, x0, top, s, color.ink, 'Target');
+    const score = typeof best?.d.match === 'number' && best.d.match >= 0 ? `Mine · ${best.d.match}/100` : 'Mine';
+    tileImage(ctx, heroImg, best?.d ?? null, x0 + s + gap, top, s, best?.d.golden ? color.gold : color.ink, score);
+    // Arrow between them.
+    ctx.fillStyle = color.ink; ctx.font = font(DISPLAY, 60); ctx.textAlign = 'center'; ctx.fillText('→', W / 2, top + s / 2 + 20);
+  } else {
+    const s = 560;
+    const score = typeof best?.d.match === 'number' && best.d.match >= 0 ? `${best.d.match}/100 match` : undefined;
+    tileImage(ctx, heroImg, best?.d ?? null, (W - s) / 2, top, s, best?.d.golden ? color.gold : color.ink, score);
+  }
+
+  // The prompt (yours in prompt mode; the round's in sketch mode).
+  const quote = prompt ? best?.d.finalPrompt : best?.r.realPrompt;
+  let y = prompt ? top + 450 + 80 : top + 560 + 70;
+  if (quote) {
+    ctx.textAlign = 'center'; ctx.fillStyle = color.ink; ctx.font = font(DISPLAY, 40);
+    for (const l of wrap(ctx, `“${quote}”`, W - 160, 3)) { ctx.fillText(l, W / 2, y); y += 50; }
+  }
+  // Awards earned.
+  const awards = room.finalAwards.filter((a) => a.playerId === hero?.id).map((a) => a.title);
+  if (awards.length) {
+    y += 16; ctx.font = font(BODY, 30, 900);
+    const pills = awards.slice(0, 3); const widths = pills.map((a) => ctx.measureText(`★ ${a}`).width + 40);
+    let x = (W - (widths.reduce((a, b) => a + b, 0) + 16 * (pills.length - 1))) / 2;
+    pills.forEach((a, i) => {
+      ctx.fillStyle = color.gold2; ctx.strokeStyle = color.ink; ctx.lineWidth = 4; ctx.beginPath(); ctx.roundRect(x, y - 36, widths[i], 52, 26); ctx.fill(); ctx.stroke();
+      ctx.fillStyle = color.ink; ctx.textAlign = 'left'; ctx.fillText(`★ ${a}`, x + 20, y); x += widths[i] + 16;
+    });
+  }
+
+  // Footer invite.
+  ctx.textAlign = 'center'; ctx.fillStyle = color.ink; ctx.font = font(DISPLAY, 46);
+  ctx.fillText(prompt ? 'Can you out-prompt me?' : 'Can you spot the imposter?', W / 2, H - 92);
+  ctx.font = font(BODY, 34, 900); ctx.fillStyle = color.textDim; ctx.fillText(site, W / 2, H - 42);
+
+  return await new Promise<Blob>((res, rej) => c.toBlob((b) => (b ? res(b) : rej(new Error('export failed'))), 'image/png'));
 }

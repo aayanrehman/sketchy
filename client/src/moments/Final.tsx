@@ -8,7 +8,7 @@ import { dur, durRM, ease, stagger } from '@/design/motion';
 import { useSfx } from '@/sound/useSfx';
 import { useToast } from '@/design/components/Toast';
 import { recordGame, levelTitle, level, levelProgress, load } from '@/progression/store';
-import { buildShareCard, downloadDataUrl } from '@/share/card';
+import { HighlightReel, ShareDialog } from './FinalExtras';
 import { send, type MomentProps } from './common';
 import './polish.css';
 
@@ -49,20 +49,14 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
     all.sort((a, b) => (b.d.match ?? -1) - (a.d.match ?? -1));
     const picks = all.slice(0, 8);
     const tags = new Map<typeof picks[number], string>();
-    if (picks[0] && (picks[0].d.match ?? -1) >= 0) tags.set(picks[0], 'Best drawing');
+    if (picks[0] && (picks[0].d.match ?? -1) >= 0) tags.set(picks[0], room.mode === 'prompt' ? 'Best prompt' : 'Best drawing');
     const disguiser = room.finalAwards.find((a) => a.title === 'Best Disguise')?.playerId;
     const disguise = disguiser && all.filter(({ d, r }) => d.playerId === disguiser && r.imposterId === disguiser)[0];
     if (disguise) { if (!picks.includes(disguise)) picks[Math.min(picks.length, 7)] = disguise; tags.set(disguise, 'Best disguise'); }
     return picks.map((x) => ({ ...x, tag: tags.get(x) }));
   }, [room.rounds, room.finalAwards]);
 
-  const share = async () => {
-    const r = room.rounds[room.rounds.length - 1]; if (!r) return;
-    try {
-      const url = await buildShareCard({ drawings: r.drawings, players: view.byId, imposterId: r.imposterId, prompt: r.realPrompt, url: location.host, mode: room.isDemo ? 'demo' : !['openai', 'fal'].includes(room.aiMode) ? 'preview' : undefined });
-      downloadDataUrl(url, `sketchy-${room.code}.png`);
-    } catch { toast.push({ kind: 'info', text: 'Could not save the card. Please try again.' }); }
-  };
+  const [sharing, setSharing] = useState(false);
 
   return (
     <div className="phase" style={{ justifyItems: 'center' }}>
@@ -88,20 +82,7 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
           ); })}
         </Rise>
       )}
-      {reel.length > 0 && (
-        <Rise className="reel">
-          <h2 className="display-sm">Highlight reel</h2>
-          <div className="reel__strip">
-            {reel.map(({ d, r, tag }) => (
-              <figure key={`${r.index}-${d.playerId}`} className="reel__item">
-                {tag && <span className={`chip reel__tag ${tag === 'Best disguise' ? 'chip--red' : 'chip--gold'}`}>{tag}</span>}
-                <img src={d.glowUrl} alt={`${view.byId.get(d.playerId)?.name ?? 'Player'}'s drawing of ${r.realPrompt}`} loading="lazy" />
-                <figcaption><div className="reel__name">{view.byId.get(d.playerId)?.name ?? 'Player'}</div><div className="reel__prompt">{r.realPrompt}</div></figcaption>
-              </figure>
-            ))}
-          </div>
-        </Rise>
-      )}
+      {reel.length > 0 && <Rise style={{ width: '100%' }}><HighlightReel items={reel} view={view} /></Rise>}
       <Rise style={{ width: '100%', maxWidth: 520 }}><ol className="final-ranks" aria-label="Final rankings">
         {ranked.map(p => <li key={p.id}><span>#{1 + ranked.filter(x => x.score > p.score).length} {p.name}</span><b>{p.score} points</b></li>)}
       </ol></Rise>
@@ -114,12 +95,13 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
         </Card></Rise>
       )}
       <Rise style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
-        <Button variant="gold" size="lg" onClick={share}>Download share card</Button>
+        <Button variant="gold" size="lg" onClick={() => setSharing(true)}>Share your result</Button>
         {view.canHost && !room.isDemo && <Button variant="primary" size="lg" onClick={() => send().emit('host:playAgain')}>Play again</Button>}
         {room.isDemo && <Button variant="lime" onClick={() => { send().emit('host:playAgain'); send().emit('host:start'); }}>Try both roles again</Button>}
         {room.isDemo && <Button variant="primary" size="lg" onClick={() => { go('/'); }}>Host a real game</Button>}
         {phone && !me?.isHost && !room.isDemo && <p className="phase__sub">Waiting for the host to play again…</p>}
       </Rise>
+      <ShareDialog open={sharing} onClose={() => setSharing(false)} view={view} />
     </div>
   );
 }
