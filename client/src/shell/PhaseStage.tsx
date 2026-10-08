@@ -37,7 +37,7 @@ export function Rise({ children, className = '', style }: { children: ReactNode;
 
 const DEFAULT_BANNERS: Partial<Record<Phase, { text: string; tone?: 'magenta' | 'cyan' | 'gold' | 'red' }>> = {
   PROMPT: { text: 'Secret prompt', tone: 'magenta' }, DRAW: { text: 'Draw!', tone: 'cyan' }, GALLERY: { text: 'Reveal!', tone: 'gold' },
-  DRAFT: { text: 'Quick draft · 8 words', tone: 'cyan' }, REFINE: { text: 'Refine · up to 30 words', tone: 'gold' },
+  DRAFT: { text: 'Quick draft', tone: 'cyan' }, REFINE: { text: 'Refine it', tone: 'gold' },
   DISCUSS: { text: 'Discuss', tone: 'magenta' }, VOTE: { text: 'Vote!', tone: 'red' }, UNMASK: { text: 'Unmask', tone: 'red' },
   STEAL: { text: 'The steal', tone: 'gold' }, VERDICT: { text: 'Results', tone: 'cyan' }, SCORES: { text: 'Scores', tone: 'magenta' }, FINAL: { text: 'Final', tone: 'gold' },
 };

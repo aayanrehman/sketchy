@@ -20,12 +20,17 @@ import { StealMoment } from '@/moments/Steal';
 import { VerdictMoment } from '@/moments/Verdict';
 import { ScoresMoment } from '@/moments/Scores';
 import { FinalMoment } from '@/moments/Final';
+import { dailyTarget } from '../../../convex/targets';
+import { todayKey, dailyPlayed, dailyStreak } from '@/progression/store';
 
 /**
  * /demo: "Try it solo". One human + 3 bots, two rounds (artist, then imposter), in one tab.
  */
-export function Demo() {
+export function Demo({ daily = false }: { daily?: boolean }) {
   const view = useRoom();
+  const dayKey = todayKey();
+  const target = daily ? dailyTarget(dayKey) : null;
+  const playedToday = daily ? dailyPlayed(dayKey) : undefined;
   const [name, setName] = useState(loadName() || '');
   const [started, setStarted] = useState(false);
   const [error, setError] = useState('');
@@ -35,29 +40,32 @@ export function Demo() {
   // Refresh: rejoin the same demo seat.
   useEffect(() => {
     try {
-      const saved = sessionStorage.getItem('sketchy.demo'); if (!saved) return;
+      const saved = sessionStorage.getItem(daily ? 'sketchy.daily' : 'sketchy.demo'); if (!saved) return;
       const { code, token } = JSON.parse(saved);
       convex.mutation(api.game.join, { code, token, name: loadName() || 'You' }).then((r) => {
         if (r.ok) { setSession({ code, token }); setStarted(true); }
-        else { try { sessionStorage.removeItem('sketchy.demo'); } catch {} }
+        else { try { sessionStorage.removeItem(daily ? 'sketchy.daily' : 'sketchy.demo'); } catch {} }
       }).catch(() => {});
     } catch { /* Storage is optional; the game still works. */ }
   }, []);
 
   const start = () => {
     unlockAudio(); const n = name.trim() || 'You'; saveName(n); setStarted(true); setError('');
-    try { sessionStorage.removeItem('sketchy.demo'); } catch {}
-    convex.mutation(api.game.createDemo, { name: n }).then((r) => {
+    try { sessionStorage.removeItem(daily ? 'sketchy.daily' : 'sketchy.demo'); } catch {}
+    convex.mutation(api.game.createDemo, daily ? { name: n, daily: dayKey } : { name: n }).then((r) => {
       setSession({ code: r.code, token: r.token });
-      try { sessionStorage.setItem('sketchy.demo', JSON.stringify({ code: r.code, token: r.token })); } catch {}
+      try { sessionStorage.setItem(daily ? 'sketchy.daily' : 'sketchy.demo', JSON.stringify({ code: r.code, token: r.token })); } catch {}
     }).catch(() => { setStarted(false); setError('Could not start the demo. Please try again.'); });
   };
 
   if (started && !error && (!view.room || !view.me)) return <Loading label="Setting up your game" />;
   if (!started || !view.room || !view.me) {
     return (
-      <EntryLayout title="Play solo vs. bots" mood="sus" onSubmit={start}
-        subtitle="2 quick rounds against 3 bots: once as a regular player, once as the imposter. Bots use pre-made prompts and example scores; yours are live.">
+      <EntryLayout title={daily ? 'Today’s target' : 'Play solo vs. bots'} mood={daily ? 'judge' : 'sus'} onSubmit={start}
+        subtitle={daily
+          ? <>One picture a day, the same for everyone. One round, about two minutes. {playedToday !== undefined ? <b>You scored {playedToday} today. Play again for practice.</b> : <>Your first score counts for your streak{dailyStreak() ? <b> (🔥 {dailyStreak()} day{dailyStreak() === 1 ? '' : 's'})</b> : null}.</>}</>
+          : '2 quick rounds against 3 bots: once as a regular player, once as the imposter. Bots use pre-made prompts and example scores; yours are live.'}>
+        {daily && target && <img src={target.image} alt="Today's target" className="entry__daily" style={{ filter: 'blur(14px)' }} />}
         <p className="entry__badge">{['openai', 'fal'].includes(aiMode) ? 'Live AI: your prompts become images and get scored' : aiMode === 'loading' ? 'Checking the AI…' : 'Preview mode · sample scoring, no live AI'}</p>
         <label className="entry__label" htmlFor="name">Your name</label>
         <input id="name" className="field field--center" placeholder="What should we call you?" value={name} maxLength={12} onChange={(e) => setName(e.target.value)} />

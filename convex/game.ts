@@ -94,12 +94,12 @@ export const now = mutation({ args: {}, handler: async () => Date.now() });
 export const health = query({ args: {}, handler: async () => ({ aiMode: AI_MODE }) });
 
 export const createDemo = mutation({
-  args: { name: v.string() },
-  handler: async (ctx, { name }) => {
+  args: { name: v.string(), daily: v.optional(v.string()) },
+  handler: async (ctx, { name, daily }) => {
     const { roomId, eng } = await createRoom(ctx, true);
     const seat = eng.addPlayer(name || 'You');
     if (!('player' in seat)) throw new Error(seat.error);
-    eng.setupDemo(seat.player.id);
+    eng.setupDemo(seat.player.id, { daily: daily && /^\d{4}-\d{2}-\d{2}$/.test(daily) ? daily : undefined });
     eng.start();
     await markSeen(ctx, roomId, seat.player.id);
     await commit(ctx, roomId, eng);
@@ -155,6 +155,7 @@ const actionV = v.union(
   v.object({ t: v.literal('draft'), text: v.string() }),
   v.object({ t: v.literal('final'), text: v.string() }),
   v.object({ t: v.literal('setMode'), mode: v.union(v.literal('prompt'), v.literal('sketch')) }),
+  v.object({ t: v.literal('setSettings'), pace: v.optional(v.union(v.literal('quick'), v.literal('classic'))), difficulty: v.optional(v.union(v.literal('easy'), v.literal('normal'), v.literal('hard'))) }),
 );
 
 /** Every in-game action. A player acts with their seat token; the main screen acts with the host token. */
@@ -189,6 +190,7 @@ export const act = mutation({
       case 'draft': if (id) error = eng.submitPrompt(id, 'draft', a.text.slice(0, 400)); break;
       case 'final': if (id) error = eng.submitPrompt(id, 'final', a.text.slice(0, 400)); break;
       case 'setMode': if (isHost) eng.setMode(a.mode); break;
+      case 'setSettings': if (isHost) eng.setSettings({ ...(a.pace ? { pace: a.pace } : {}), ...(a.difficulty ? { difficulty: a.difficulty } : {}) }); break;
     }
     await commit(ctx, room._id, eng);
     return error ? { ok: false, error } : { ok: true };

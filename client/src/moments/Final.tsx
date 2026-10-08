@@ -7,7 +7,7 @@ import { Rise } from '@/shell/PhaseStage';
 import { dur, durRM, ease, stagger } from '@/design/motion';
 import { useSfx } from '@/sound/useSfx';
 import { useToast } from '@/design/components/Toast';
-import { recordGame, levelTitle, level, levelProgress, load } from '@/progression/store';
+import { recordGame, recordDaily, levelTitle, level, levelProgress, load } from '@/progression/store';
 import { HighlightReel, ShareDialog } from './FinalExtras';
 import { send, type MomentProps } from './common';
 import './polish.css';
@@ -39,6 +39,12 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
         gallery: mine.filter(({ d }) => d.glowStatus === 'done' && d.glowUrl && !d.glowMock).map(({ d, r }) => ({ url: d.glowUrl!, golden: d.golden, prompt: r.realPrompt, at: Date.now() })),
       });
       if (res && 'leveledUp' in res) { setXp({ before, after: res.xp, up: !!res.leveledUp }); if (res.leveledUp) toast.push({ kind: 'golden', text: `Level up! You are now a ${levelTitle(res.xp)}`, icon: '⬆️' }); }
+      if (room.daily) {
+        const myMatch = Math.max(0, ...mine.map(({ d }) => (typeof d.match === 'number' ? d.match : 0)));
+        const r = recordDaily(myMatch);
+        if (r.first) toast.push({ kind: 'streak', text: r.streak > 1 ? `🔥 ${r.streak}-day streak! Come back tomorrow for a new picture.` : 'Day 1 of your streak. Same time tomorrow?', icon: '📅' });
+        if (r.newBest && myMatch > 0) toast.push({ kind: 'golden', text: `New personal best: ${myMatch}/100!`, icon: '🏆' });
+      }
     }
     // eslint-disable-next-line
   }, []);

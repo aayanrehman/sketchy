@@ -37,6 +37,17 @@ export const GOLDEN_ODDS = 1 / 15;
 export type GameMode = 'prompt' | 'sketch';
 /** A per-round rule in prompt mode. */
 export type Modifier = 'none' | 'taboo' | 'style';
+
+/** Room settings the host picks in the lobby. */
+export type Pace = 'quick' | 'classic';
+export type Difficulty = 'easy' | 'normal' | 'hard';
+export interface RoomSettings { pace: Pace; difficulty: Difficulty }
+export const DEFAULT_SETTINGS: RoomSettings = { pace: 'quick', difficulty: 'normal' };
+/** Quick pace: a round in about 2 minutes, 2 rounds a game. Classic keeps the PRD timings and 3 rounds. */
+export const QUICK_MS: Partial<Record<Phase, number>> = { PROMPT: 8_000, DRAFT: 25_000, REFINE: 30_000, DRAW: 40_000, GALLERY: 14_000, DISCUSS: 15_000, VOTE: 15_000, SCORES: 7_000 };
+export const ROUNDS_BY_PACE: Record<Pace, number> = { quick: 2, classic: 3 };
+/** Word limits for the two writing passes by difficulty. */
+export const WORD_LIMITS: Record<Difficulty, { draft: number; final: number }> = { easy: { draft: 10, final: 40 }, normal: { draft: 8, final: 30 }, hard: { draft: 6, final: 18 } };
 /** How close an AI image is to the target, five areas of 0-20 each. */
 export interface Breakdown { subject: number; details: number; style: number; color: number; composition: number }
 
@@ -148,6 +159,9 @@ export interface PublicRoom {
   finalAwards: FinalAward[];
   aiMode: 'openai' | 'fal' | 'mock' | 'off';
   mode?: GameMode;
+  settings?: RoomSettings;
+  /** Solo daily challenge: the UTC date key this room plays. */
+  daily?: string;
 }
 
 export interface MeView {

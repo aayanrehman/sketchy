@@ -3,7 +3,8 @@ import { useState } from 'react';
 import { go } from '@/nav';
 import { motion, useReducedMotion } from 'framer-motion';
 import { Button, Card, Modal, Mascot, Scenery } from '@/design/components';
-import { load, level, levelTitle, levelProgress } from '@/progression/store';
+import { load, level, levelTitle, levelProgress, todayKey, dailyPlayed, dailyStreak } from '@/progression/store';
+import { dailyTarget } from '../../../convex/targets';
 import { childVariants, phaseVariants } from '@/design/motion';
 import { unlockAudio } from '@/sound/sfx';
 import { HowTo } from '@/shell/HowTo';
@@ -18,6 +19,7 @@ export function Landing() {
   const [help, setHelp] = useState(false);
   const inst = useInstall();
   const played = prog.games > 0;
+  const today = dailyTarget(todayKey()); const todayScore = dailyPlayed(); const streak = dailyStreak();
   return (
     <div className="landing landing--home"><div className="corner-sound"><SoundControl /></div>
       <Scenery density={3} lively />
@@ -31,6 +33,13 @@ export function Landing() {
         <motion.div variants={childVariants(rm)}><Button size="lg" block onClick={() => { unlockAudio(); go('/host'); }}>Host a game</Button></motion.div>
         <motion.div variants={childVariants(rm)}><Button variant="secondary" size="lg" block onClick={() => { unlockAudio(); go('/play'); }}>Join a game</Button></motion.div>
         <motion.div variants={childVariants(rm)}><Button variant="lime" size="lg" block onClick={() => { unlockAudio(); go('/demo'); }}>Play solo vs. bots</Button></motion.div>
+        <motion.button type="button" className="daily" variants={childVariants(rm)} onClick={() => { unlockAudio(); go('/daily'); }} aria-label="Play today's target">
+          <img src={today.image} alt="" style={{ filter: todayScore === undefined ? 'blur(10px)' : 'none' }} />
+          <span className="daily__body">
+            <span className="daily__title">Today’s target {streak > 0 && <span className="daily__streak">🔥 {streak}</span>}</span>
+            <span className="daily__sub">{todayScore !== undefined ? `You scored ${todayScore}/100. New picture tomorrow.` : 'One picture, one prompt, two minutes. Same for everyone today.'}</span>
+          </span>
+        </motion.button>
         <motion.p className="dim" style={{ fontWeight: 800, fontSize: 'var(--t-body-sm)' }} variants={childVariants(rm)}>4–8 players · 3 rounds · no login · phone or laptop · get better at prompting</motion.p>
         <motion.div variants={childVariants(rm)} style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button type="button" className="level-chip" onClick={() => setGallery(true)} aria-label="Your progress and gallery">

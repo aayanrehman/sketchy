@@ -87,7 +87,10 @@ export function ShareDialog({ open, onClose, view }: { open: boolean; onClose: (
   const file = blob ? new File([blob], `sketchy-${view.room?.code || 'result'}.png`, { type: 'image/png' }) : null;
   const canShare = !!file && typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] });
   const canCopy = !!blob && typeof ClipboardItem !== 'undefined' && !!navigator.clipboard?.write;
-  const invite = `${location.origin}/`;
+  const daily = !!view.room?.daily;
+  const myScore = (() => { const me = view.me?.playerId; if (!me) return 0; return Math.max(0, ...(view.room?.rounds || []).flatMap((r) => r.drawings.filter((d) => d.playerId === me).map((d) => (typeof d.match === 'number' ? d.match : 0)))); })();
+  const invite = daily ? `${location.origin}/daily` : `${location.origin}/`;
+  const shareText = daily ? `I scored ${myScore}/100 on today’s Sketchy target. Beat me:` : 'Can you out-prompt me?';
   const flash = (t: string) => { setNote(t); setTimeout(() => setNote(null), 2200); };
   return (
     <Modal open={open} onClose={onClose} label="Share your result" wide>
@@ -100,10 +103,10 @@ export function ShareDialog({ open, onClose, view }: { open: boolean; onClose: (
         <div className="share__side">
         <p className="dim" style={{ fontWeight: 800 }}>Your card shows the target next to your image, your prompt, score and awards.</p>
         <div className="share__actions">
-          {canShare && <Button variant="gold" size="lg" block onClick={() => navigator.share({ files: [file!], title: 'My Sketchy result', text: 'Can you out-prompt me?', url: invite }).catch(() => {})}>Share…</Button>}
+          {canShare && <Button variant="gold" size="lg" block onClick={() => navigator.share({ files: [file!], title: 'My Sketchy result', text: shareText, url: invite }).catch(() => {})}>Share…</Button>}
           {canCopy && <Button variant={canShare ? 'ghost' : 'gold'} block onClick={() => navigator.clipboard.write([new ClipboardItem({ 'image/png': blob! })]).then(() => flash('Image copied. Paste it anywhere.')).catch(() => flash('Copy isn’t allowed here. Use Download.'))}>Copy image</Button>}
           <Button variant="ghost" block disabled={!url} onClick={() => { const a = document.createElement('a'); a.href = url!; a.download = file!.name; a.click(); flash('Saved to your downloads.'); }}>Download PNG</Button>
-          <Button variant="ghost" block onClick={() => navigator.clipboard?.writeText(invite).then(() => flash('Link copied. Send it to your friends.')).catch(() => flash(invite))}>Copy invite link</Button>
+          <Button variant="ghost" block onClick={() => navigator.clipboard?.writeText(daily ? `${shareText} ${invite}` : invite).then(() => flash(daily ? 'Challenge copied. Paste it to a friend.' : 'Link copied. Send it to your friends.')).catch(() => flash(invite))}>{daily ? 'Copy challenge' : 'Copy invite link'}</Button>
         </div>
         <p className="share__note" role="status">{note || ' '}</p>
         </div>

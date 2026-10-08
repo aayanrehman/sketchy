@@ -5,15 +5,15 @@
  * Timers are cancelled by forgetting their token: a fired timer whose token no longer matches is a no-op.
  */
 import type {
-  Phase, Player, Round, Drawing, PublicRoom, MeView, Stroke, PromptPair, FinalAward, ToastKind, GameMode, Modifier, Breakdown,
+  Phase, Player, Round, Drawing, PublicRoom, MeView, Stroke, PromptPair, FinalAward, ToastKind, GameMode, Modifier, Breakdown, RoomSettings,
 } from '../shared/types';
-import { PHASE_MS, MIN_PLAYERS, MAX_PLAYERS, TOTAL_ROUNDS, GLOWUP_ROOM_CAP, GOLDEN_ODDS } from '../shared/types';
+import { PHASE_MS, MIN_PLAYERS, MAX_PLAYERS, TOTAL_ROUNDS, GLOWUP_ROOM_CAP, GOLDEN_ODDS, DEFAULT_SETTINGS, QUICK_MS, ROUNDS_BY_PACE } from '../shared/types';
 import { PROMPT_PAIRS } from '../shared/prompts';
 import { scoreRound, resolveVotes, validScore } from './scoring';
 import { doodle } from './doodle';
 import demo2 from './demo/2.json';
 import demo9 from './demo/9.json';
-import { TARGETS, DEMO_BOTS, DEMO_TARGETS, targetById, matchOf, promptProblem, type BotAttempt } from './targets';
+import { TARGETS, DEMO_BOTS, DEMO_TARGETS, targetById, matchOf, promptProblem, placeholderBots, dailyTarget, type BotAttempt } from './targets';
 
 export type AiMode = 'openai' | 'fal' | 'mock' | 'off';
 
@@ -88,6 +88,7 @@ export interface EngineState {
   forcedImposters: Record<string, string>; forcedPairs: Record<string, number>;
   botIds: string[]; botUsed: Record<string, number>; toasts: Toast[];
   mode?: GameMode; forcedTargets?: Record<string, string>; usedTargetIds?: string[];
+  settings?: RoomSettings; daily?: string;
 }
 
 export type Effect =
@@ -224,20 +225,46 @@ export class Engine {
   }
 
   // ---------- demo ----------
-  setupDemo(humanId: string) {
+  /**
+   * Solo play. Normal demo: 2 rounds (artist, then imposter) on random targets; recorded bot content where it
+   * exists, placeholder bots elsewhere. Daily: 1 round as an artist on today's shared target.
+   */
+  setupDemo(humanId: string, opts: { daily?: string } = {}) {
     const bots = BOT_NAMES.map((n) => this.addPlayer(n, true)).filter((x): x is Seat => 'player' in x);
     this.s.botIds = bots.map((b) => b.player.id);
-    this.s.totalRounds = 2;
+    this.s.settings = { ...DEFAULT_SETTINGS, pace: 'quick' };
     const withContent = PROMPT_PAIRS.filter((p) => DEMO[p.id]).map((p) => p.id);
     const pool = withContent.length >= 2 ? withContent : PROMPT_PAIRS.map((p) => p.id);
     const [a, b] = shuffle(pool);
     this.s.forcedPairs = { 1: a, 2: b };
+    if (opts.daily) {
+      this.s.daily = opts.daily;
+      this.s.totalRounds = 1;
+      this.s.forcedImposters = { 1: pick(this.s.botIds) };
+      this.s.forcedTargets = { 1: dailyTarget(opts.daily).id };
+      return;
+    }
+    this.s.totalRounds = 2;
     this.s.forcedImposters = { 1: pick(this.s.botIds), 2: humanId };
-    this.s.forcedTargets = { 1: DEMO_TARGETS[0], 2: DEMO_TARGETS[1] };
+    // Prefer a recorded target for the first round (real bot art), then anything else in the library.
+    const recorded = shuffle(DEMO_TARGETS); const rest = shuffle(TARGETS.map((t) => t.id).filter((id) => !DEMO_TARGETS.includes(id)));
+    const first = recorded[0] || rest[0]; const second = pick([...recorded.filter((x) => x !== first), ...rest].filter(Boolean));
+    this.s.forcedTargets = { 1: first, 2: second || first };
   }
 
   get mode(): GameMode { return this.s.mode || 'sketch'; }
   setMode(m: GameMode) { if (this.s.phase === 'LOBBY' || this.s.phase === 'FINAL') this.s.mode = m; }
+  get settings(): RoomSettings { return { ...DEFAULT_SETTINGS, ...(this.s.settings || {}) }; }
+  setSettings(patch: Partial<RoomSettings>) {
+    if (this.s.phase !== 'LOBBY' && this.s.phase !== 'FINAL') return;
+    this.s.settings = { ...this.settings, ...patch };
+    if (!this.s.isDemo) this.s.totalRounds = ROUNDS_BY_PACE[this.settings.pace];
+  }
+  /** Phase length for this room's pace. */
+  ms(phase: Exclude<Phase, 'LOBBY' | 'FINAL' | 'VERDICT'>): number {
+    if (this.settings.pace === 'quick' && QUICK_MS[phase] !== undefined) return QUICK_MS[phase]!;
+    return PHASE_MS[phase];
+  }
 
   private botContent(round: Round, playerId: string): BotDrawing {
     const slot = playerId === round.imposterId ? 'decoy' : 'real';
@@ -318,7 +345,8 @@ export class Engine {
 
   /** A demo bot's pre-made attempt for this round (artists by seat order; the imposter gets the imposter attempt). */
   private botAttempt(r: Round, id: string): BotAttempt | null {
-    const set = DEMO_BOTS[r.targetId || '']; if (!set) return null;
+    const t = targetById(r.targetId || '');
+    const set = DEMO_BOTS[r.targetId || ''] || (t ? placeholderBots(t) : null); if (!set) return null;
     if (id === r.imposterId) return set.imposter || set.artists[0] || null;
     const artists = this.s.botIds.filter((b) => b !== r.imposterId);
     return set.artists[Math.max(0, artists.indexOf(id)) % set.artists.length] || null;
@@ -407,6 +435,7 @@ export class Engine {
       const [a, b] = shuffle(Object.keys(DEMO).map(Number));
       this.s.forcedPairs = { 1: a, 2: b }; this.s.forcedImposters = { 1: pick(this.s.botIds), 2: human?.id || '' };
     }
+    if (!this.s.isDemo) this.s.totalRounds = ROUNDS_BY_PACE[this.settings.pace];
     this.resetGame();
     this.setPhase('HOW_TO', null);
     return null;
@@ -478,11 +507,11 @@ export class Engine {
       Object.assign(round, {
         mode: 'prompt', targetId: t.id, targetUrl: t.image, targetPrompt: t.prompt, theme: t.theme, promptPairId: 0,
         realPrompt: t.key, decoyPrompt: '', stealOptions: shuffle(t.stealOptions),
-        modifier: MODIFIERS[(this.s.round - 1) % MODIFIERS.length],
+        modifier: this.settings.difficulty === 'easy' ? 'none' : this.settings.difficulty === 'hard' ? (this.s.round % 2 ? 'taboo' : 'style') : MODIFIERS[(this.s.round - 1) % MODIFIERS.length],
       });
     }
     this.s.rounds.push(round);
-    this.setPhase('PROMPT', this.mode === 'prompt' ? STUDY_MS : PHASE_MS.PROMPT);
+    this.setPhase('PROMPT', this.mode === 'prompt' && this.settings.pace === 'classic' ? STUDY_MS : this.ms('PROMPT'));
   }
 
   private imposterFled() {
@@ -490,7 +519,7 @@ export class Engine {
     r.fled = true; r.caught = false;
     r.awards = scoreRound(r, this.playersMap());
     this.toast('fled', 'The imposter fled! Artists get +50');
-    this.setPhase('SCORES', PHASE_MS.SCORES);
+    this.setPhase('SCORES', this.ms('SCORES'));
   }
 
   /** Every timed phase ends early when everyone has acted. */
@@ -514,7 +543,7 @@ export class Engine {
     const r = this.currentRound();
     switch (this.s.phase) {
       case 'HOW_TO': return this.startRound();
-      case 'PROMPT': return this.mode === 'prompt' ? this.setPhase('DRAFT', PHASE_MS.DRAFT) : this.setPhase('DRAW', PHASE_MS.DRAW);
+      case 'PROMPT': return this.mode === 'prompt' ? this.setPhase('DRAFT', this.ms('DRAFT')) : this.setPhase('DRAW', this.ms('DRAW'));
       case 'DRAFT': {
         if (!r) return;
         // No draft in time: no draft image, but the player can still write a final prompt in REFINE (never lose a turn).
@@ -522,13 +551,13 @@ export class Engine {
           const p = this.seat(id)?.player;
           if (p && !p.hasSubmitted) { p.hasSubmitted = true; r.drawings.push({ playerId: id, strokes: [], glowStatus: 'fallback', golden: false, judgeStatus: 'fallback', blank: true, draftStatus: 'fallback' }); }
         }
-        return this.setPhase('REFINE', PHASE_MS.REFINE);
+        return this.setPhase('REFINE', this.ms('REFINE'));
       }
       case 'REFINE': {
         if (!r) return;
         // No final prompt in time: the draft stands as the final.
         for (const d of r.drawings) if (d.finalPrompt === undefined) this.useDraftAsFinal(r, d);
-        return this.setPhase('GALLERY', PHASE_MS.GALLERY);
+        return this.setPhase('GALLERY', this.ms('GALLERY'));
       }
       case 'DRAW': {
         if (!r) return;
@@ -536,10 +565,10 @@ export class Engine {
           const p = this.seat(id)?.player;
           if (p && !p.hasSubmitted) this.submitDrawing(id, [], '', true);
         }
-        return this.setPhase('GALLERY', PHASE_MS.GALLERY);
+        return this.setPhase('GALLERY', this.ms('GALLERY'));
       }
-      case 'GALLERY': return this.setPhase('DISCUSS', PHASE_MS.DISCUSS);
-      case 'DISCUSS': return this.setPhase('VOTE', PHASE_MS.VOTE);
+      case 'GALLERY': return this.setPhase('DISCUSS', this.ms('DISCUSS'));
+      case 'DISCUSS': return this.setPhase('VOTE', this.ms('VOTE'));
       case 'VOTE': {
         if (!r) return;
         const top = resolveVotes(r);
@@ -550,15 +579,15 @@ export class Engine {
           this.toast('info', 'It’s a tie! Quick revote between the tied players.');
           return this.setPhase('VOTE', REVOTE_MS);
         }
-        return this.setPhase('UNMASK', PHASE_MS.UNMASK);
+        return this.setPhase('UNMASK', this.ms('UNMASK'));
       }
-      case 'UNMASK': { if (!r) return; return r.caught ? this.setPhase('STEAL', PHASE_MS.STEAL) : this.setPhase('VERDICT', null); }
+      case 'UNMASK': { if (!r) return; return r.caught ? this.setPhase('STEAL', this.ms('STEAL')) : this.setPhase('VERDICT', null); }
       case 'STEAL': { if (!r) return; if (r.stealPick === null) r.stealCorrect = false; return this.setPhase('VERDICT', null); }
       case 'VERDICT': {
         if (!r) return;
         for (const d of r.drawings) if (d.judgeStatus === 'pending') { d.judgeStatus = 'fallback'; d.match = -1; d.roast = JUDGE_FOG; }
         r.awards = scoreRound(r, this.playersMap());
-        return this.setPhase('SCORES', PHASE_MS.SCORES);
+        return this.setPhase('SCORES', this.ms('SCORES'));
       }
       case 'SCORES': {
         if (this.s.round >= this.s.totalRounds) { this.computeFinalAwards(); return this.setPhase('FINAL', null); }
@@ -649,7 +678,7 @@ export class Engine {
     if (!r || !p || r.mode !== 'prompt' || !r.participantIds.includes(playerId)) return null;
     if (this.s.phase !== (pass === 'draft' ? 'DRAFT' : 'REFINE') || (!!this.s.phaseEndsAt && this.now >= this.s.phaseEndsAt + 1500)) return 'Too late for that step.';
     const target = targetById(r.targetId || '');
-    const problem = promptProblem(text, pass, r.modifier === 'taboo' ? target?.taboo || [] : null);
+    const problem = promptProblem(text, pass, r.modifier === 'taboo' ? target?.taboo || [] : null, this.settings.difficulty);
     if (problem) return problem;
     const clean = text.trim().replace(/\s+/g, ' ');
     if (pass === 'draft') {
@@ -823,7 +852,7 @@ export class Engine {
       gameId: s.gameId, chat: s.chat, verdictReady: [...s.verdictReady],
       code: s.code, hostId: s.hostId, isDemo: s.isDemo, round: s.round, totalRounds: s.totalRounds,
       phase: s.phase, phaseEndsAt: s.phaseEndsAt, phaseStartedAt: s.phaseStartedAt,
-      players: this.players, rounds: s.rounds.map((r) => this.publicRound(r, seat?.player.id || null)), mode: this.mode,
+      players: this.players, rounds: s.rounds.map((r) => this.publicRound(r, seat?.player.id || null)), mode: this.mode, settings: this.settings, daily: s.daily,
       aiImageCount: s.aiImageCount, finalAwards: s.finalAwards, aiMode: this.aiMode, toasts: s.toasts,
     };
     let me: MeView | null = null;

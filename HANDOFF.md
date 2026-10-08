@@ -60,6 +60,14 @@ Fit-to-viewport layouts at 100% zoom; player screen with right-hand players + ch
 - Icons: favicon.ico / favicon-64.png (head-and-beret crop), apple-touch-icon, icon-192/512 + maskable, `manifest.webmanifest` (installable), `og.png` + Open Graph / Twitter tags for link previews. "Add to home screen" nudge on the landing page after the first game (`shell/useInstall.ts`).
 - README and docs/SUBMISSION.md rewritten for Prompt mode + Convex/Vercel.
 
+## 4c. Shipped October 8, second pass (NOT yet deployed: run `npm run deploy`)
+
+- **Pace + difficulty** (lobby, host-only): Quick = 2 rounds, Study 8 s / Draft 25 / Refine 30 / Discuss 15 / Vote 15 / Scores 7 (default for new rooms and solo); Classic = PRD timings, 3 rounds. Difficulty: Easy 10+40 words, no rules; Normal 8+30, rules rotate; Hard 6+18, a rule every round. `shared/types.ts` (`QUICK_MS`, `WORD_LIMITS`), `Engine.setSettings/ms()`, action `setSettings`, `SettingsPicker` in `Lobby.tsx`. All word-limit copy is dynamic.
+- **Placeholder bots on every target** (`placeholderBots` in `convex/targets.ts`): artists "produce" the target, the bot imposter produces the masked image, with preset breakdowns. Solo play now picks random targets from the whole library (recorded content preferred for round 1). Record real content to replace them over time.
+- **Daily target** (`/daily`): one UTC-day target for everyone (`dailyTarget` in targets.ts), one quick round as an artist vs bots, first score of the day counts; streak, best streak and "new personal best" in `progression/store.ts`; landing card with blurred preview and 🔥 streak; share text "I scored N/100 on today's Sketchy target. Beat me: /daily". Cost ≈ 1 image + 1 judge (human only; bots are free).
+- **Imposter view**: the masked target now wears a pulsing ERASED stamp and a dashed red frame; copy says "erased", not "blurred".
+- Engine tests: 38 total.
+
 ## 5. Verified vs not verified
 
 Verified: typecheck; 31 old unit tests; `smoke:mp` full 4-player games in Sketch mode (with a forced revote) and Prompt mode (3 rounds, exactly one masked target, no leaks before reveal); live prod draft scored 75/100; solo flows driven in the browser.
@@ -86,7 +94,7 @@ My estimate (not a prediction): Execution 4, Creativity 4–5, Usefulness 4, Pol
 7. Decide whether to keep Sketch mode visible or hide it to keep the pitch focused.
 8. Optional launch/demo video (not listed in the official requirements I read; check the mission page).
 9. Clean-ups: delete or archive `server/` + `/studio` once no longer needed.
-10. Retention ideas not built yet (see the Oct 8 chat): daily target with a shareable score, class/friend leaderboards per room code, "beat my score" deep links.
+10. Not built yet: AI-generated targets (a `generate` call per new target plus a masked variant; needs a mask strategy since masks are hand-made files today), friends/leaderboards (needs identity: at minimum a per-device id and a `dailyScores` table), real recorded bot content for more targets.
 
 ## 9. Working notes for the next session
 

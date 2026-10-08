@@ -4,7 +4,11 @@
 .target { margin: 0; display: grid; gap: 6px; justify-items: center; }
 .target img { width: min(100%, calc(100dvh - 300px), 520px); aspect-ratio: 1; object-fit: cover; border-radius: var(--r-lg); border: var(--ol); box-shadow: var(--sh-card); background: var(--c-paper); }
 .target--compact img { width: min(100%, calc(100dvh - 420px), 300px); }
-.target--imp img { box-shadow: var(--sh-card), 0 0 0 5px var(--c-red); }
+.target__frame { position: relative; display: grid; justify-items: center; }
+.target--imp .target__frame img { box-shadow: var(--sh-card), 0 0 0 5px var(--c-red); filter: saturate(.85); }
+.target--imp .target__frame::before { content: ''; position: absolute; inset: -6px; border-radius: calc(var(--r-lg) + 6px); border: 3px dashed var(--c-red); pointer-events: none; animation: sk-wiggle 2.4s var(--e-smooth) infinite; }
+.target__erased { position: absolute; left: 50%; top: 12px; transform: translateX(-50%) rotate(-6deg); padding: 4px 14px; border-radius: var(--r-sm); background: var(--c-red); border: 3px solid var(--c-ink); color: var(--c-ink); font-family: var(--f-display); font-weight: 700; font-size: var(--t-display-sm); letter-spacing: .08em; box-shadow: 0 4px 0 var(--c-ink); animation: sk-pulse 1.6s var(--e-smooth) infinite; }
+@media (prefers-reduced-motion: reduce) { .target--imp .target__frame::before, .target__erased { animation: none; } }
 .target figcaption { font-weight: 900; font-size: var(--t-body-sm); color: var(--c-text-dim); }
 .target--imp figcaption { color: var(--c-danger-text); }
 .target__none { width: 240px; aspect-ratio: 1; display: grid; place-items: center; border-radius: var(--r-lg); border: 2px dashed var(--c-line); }

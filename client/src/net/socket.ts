@@ -18,6 +18,7 @@ type Events = {
   'draw:submit': { strokes: Stroke[]; png: string }; 'vote': { targetId: string }; 'steal:pick': { option: string };
   'chat:send': { text: string }; 'host:assign': { playerId: string };
   'prompt:draft': { text: string }; 'prompt:final': { text: string }; 'host:mode': { mode: 'prompt' | 'sketch' };
+  'host:settings': { pace?: 'quick' | 'classic'; difficulty?: 'easy' | 'normal' | 'hard' };
   'howto:ready': void; 'verdict:ready': void; 'host:start': void; 'host:skip': void; 'host:playAgain': void; 'leave': void;
 };
 function toAction<E extends keyof Events>(e: E, p: any) {
@@ -30,6 +31,7 @@ function toAction<E extends keyof Events>(e: E, p: any) {
     case 'prompt:draft': return { t: 'draft' as const, text: p.text };
     case 'prompt:final': return { t: 'final' as const, text: p.text };
     case 'host:mode': return { t: 'setMode' as const, mode: p.mode };
+    case 'host:settings': return { t: 'setSettings' as const, pace: p.pace, difficulty: p.difficulty };
     case 'howto:ready': return { t: 'howto' as const };
     case 'verdict:ready': return { t: 'verdictReady' as const };
     case 'host:start': return { t: 'start' as const };

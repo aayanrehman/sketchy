@@ -13,7 +13,7 @@ export default function App() {
   const full = usePath();
   const path = full.split('?')[0].replace(/\/+$/, '') || '/';
   // Keyed by path so each screen mounts fresh on navigation; screens rewriting their own ?code= don't remount.
-  const screen = path === '/host' ? <HostScreen /> : path === '/play' ? <PlayScreen /> : path === '/demo' ? <Demo /> : path === '/studio' ? <Studio /> : path === '/cover' ? <Cover /> : <Landing />;
+  const screen = path === '/host' ? <HostScreen /> : path === '/play' ? <PlayScreen /> : path === '/demo' ? <Demo /> : path === '/daily' ? <Demo daily /> : path === '/studio' ? <Studio /> : path === '/cover' ? <Cover /> : <Landing />;
   return (
     <ErrorBoundary>
       <ToastProvider>

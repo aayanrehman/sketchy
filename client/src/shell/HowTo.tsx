@@ -1,8 +1,8 @@
 import { Button } from '@/design/components';
 
 const PROMPT_STEPS = [
-  { title: 'Recreate the picture with a prompt', text: 'Everyone sees a target image and recreates it with AI in two passes: a quick 8-word draft, then a final prompt of up to 30 words using your draft’s score and tip.' },
-  { title: 'One imposter sees part of it blurred', text: 'They have to guess what’s hidden, so their draft is the best clue. Compare drafts and final images, chat, then vote.' },
+  { title: 'Recreate the picture with a prompt', text: 'Everyone sees a target image and recreates it with AI in two passes: a quick draft, then a longer final prompt using your draft’s score and tip.' },
+  { title: 'One imposter had part of it erased', text: 'They have to guess what was there, so their draft is the best clue. Compare drafts and final images, chat, then vote.' },
   { title: 'Score for prompting and for catching', text: 'Only your final image is judged against the target. Better prompts, bigger improvements and catching the imposter all earn points.' },
 ];
 const STEPS = [

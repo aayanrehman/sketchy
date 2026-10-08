@@ -1,4 +1,5 @@
 import type { MeView, Phase, PublicRoom } from '@shared/types';
+import { WORD_LIMITS } from '@shared/types';
 
 const SKETCH_STEPS = ['Prompt', 'Draw', 'Reveal', 'Discuss', 'Vote', 'Results'];
 const SKETCH_STEP: Partial<Record<Phase, number>> = { PROMPT: 0, DRAW: 1, GALLERY: 2, DISCUSS: 3, VOTE: 4, UNMASK: 5, STEAL: 5, VERDICT: 5, SCORES: 5 };
@@ -11,16 +12,17 @@ function line(room: PublicRoom, me: MeView): { text: string; mood: 'happy' | 'th
   const p = room.players.find((x) => x.id === me.playerId);
   const imp = me.isImposter;
   const last = room.round >= room.totalRounds;
+  const lim = WORD_LIMITS[room.settings?.difficulty || 'normal'];
   if (r?.mode === 'prompt') switch (room.phase) {
     case 'PROMPT': return imp
-      ? { text: 'You’re the imposter! Part of your image is blurred. Guess what’s hidden so your prompt blends in.', mood: 'imposter' }
+      ? { text: 'You’re the imposter! Something in your picture was erased. Guess what it was so your prompt blends in.', mood: 'imposter' }
       : { text: 'Study the target image. You’ll write a prompt to recreate it as closely as you can.', mood: 'think' };
     case 'DRAFT': return p?.hasSubmitted
-      ? { text: 'Draft locked in. Next: you’ll expand it to 30 words. Waiting for the others…', mood: 'happy' }
-      : { text: imp ? 'Step 1 of 2: a quick 8-word draft. Too vague looks suspicious; a wrong guess gives you away.' : 'Step 1 of 2: a quick 8-word draft. Don’t overthink it, you’ll improve it next.', mood: 'think' };
+      ? { text: `Draft locked in. Next: you’ll expand it to ${lim.final} words. Waiting for the others…`, mood: 'happy' }
+      : { text: imp ? `Step 1 of 2: a quick ${lim.draft}-word draft. Too vague looks suspicious; a wrong guess gives you away.` : `Step 1 of 2: a quick ${lim.draft}-word draft. Don’t overthink it, you’ll improve it next.`, mood: 'think' };
     case 'REFINE': return r.drawings.find((d) => d.playerId === me.playerId)?.finalIn
       ? { text: 'Final prompt locked in. Waiting for the others…', mood: 'happy' }
-      : { text: imp ? 'Step 2 of 2: check everyone’s drafts for the hidden detail, then expand your draft to 30 words.' : 'Step 2 of 2: expand your draft to 30 words. Fix what it missed; only the final image is scored.', mood: 'think' };
+      : { text: imp ? `Step 2 of 2: check everyone’s drafts for the erased detail, then expand your draft to ${lim.final} words.` : `Step 2 of 2: expand your draft to ${lim.final} words. Fix what it missed; only the final image is scored.`, mood: 'think' };
     case 'DISCUSS': return imp
       ? { text: 'Act natural! Point suspicion at someone else in the chat. Voting opens when the timer ends.', mood: 'imposter' }
       : { text: 'Check the drafts in the corners: the imposter couldn’t see the hidden part, so their draft may have guessed wrong. Say who in the chat.', mood: 'sus' };

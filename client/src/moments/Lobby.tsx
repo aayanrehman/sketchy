@@ -30,6 +30,7 @@ export function LobbyMain({ view }: MomentProps) {
         </div>
       </Card></Rise>
       <Rise style={{ width: '100%', maxWidth: 640 }}><ModePicker view={view} canPick={!!view.canHost} /></Rise>
+      <Rise style={{ width: '100%', maxWidth: 640 }}><SettingsPicker view={view} canPick={!!view.canHost} /></Rise>
       <Rise className="lobby__cast">
         {room.players.map((p) => <motion.div key={p.id} variants={childVariants(rm)}><Avatar player={p} isHost={p.id === room.hostId} />{view.canHost && p.id !== room.hostId && <Button size="sm" variant="ghost" onClick={() => send().emit('host:assign', { playerId: p.id })}>Make host</Button>}</motion.div>)}
         {Array.from({ length: Math.max(0, MIN_PLAYERS - room.players.length) }, (_, i) => <div key={i} className="lobby__slot" aria-hidden />)}
@@ -53,6 +54,7 @@ export function LobbyPhone({ view }: MomentProps) {
         <div className="lobby__cast">{room.players.map((p) => <Avatar key={p.id} player={p} isHost={p.id === room.hostId} isYou={p.id === me.playerId} />)}</div>
       </Card></Rise>
       <Rise style={{ width: '100%' }}><ModePicker view={view} canPick={isHost} /></Rise>
+      <Rise style={{ width: '100%' }}><SettingsPicker view={view} canPick={isHost} /></Rise>
       <Rise style={{ width: '100%' }}>
         {isHost ? (
           <>
@@ -62,6 +64,38 @@ export function LobbyPhone({ view }: MomentProps) {
         ) : <p className="phase__sub">Waiting for host… ({n}/{MAX_PLAYERS})</p>}
       </Rise>
       <Rise><Button variant="ghost" size="sm" onClick={() => { send().emit('leave'); go('/'); }}>Leave</Button></Rise>
+    </div>
+  );
+}
+
+/** Pace (how long a game takes) and difficulty (word limits and round rules). */
+export function SettingsPicker({ view, canPick }: MomentProps & { canPick: boolean }) {
+  const st = view.room?.settings || { pace: 'quick', difficulty: 'normal' };
+  const prompt = (view.room?.mode || 'prompt') === 'prompt';
+  const row = (label: string, key: 'pace' | 'difficulty', opts: { id: string; title: string; text: string }[]) => (
+    <div className="setting">
+      <span className="setting__label">{label}</span>
+      <div className="setting__opts" role="radiogroup" aria-label={label}>
+        {opts.map((o) => (
+          <button key={o.id} type="button" role="radio" aria-checked={st[key] === o.id} disabled={!canPick} className={`setting__opt ${st[key] === o.id ? 'is-on' : ''}`} title={o.text}
+            onClick={() => canPick && send().emit('host:settings', { [key]: o.id } as any)}>
+            <b>{o.title}</b><small>{o.text}</small>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+  return (
+    <div className="settings">
+      {row('Pace', 'pace', [
+        { id: 'quick', title: 'Quick', text: '2 rounds · ~5 min' },
+        { id: 'classic', title: 'Classic', text: '3 rounds · ~12 min' },
+      ])}
+      {prompt && row('Difficulty', 'difficulty', [
+        { id: 'easy', title: 'Easy', text: '10 + 40 words · no rules' },
+        { id: 'normal', title: 'Normal', text: '8 + 30 words · rules rotate' },
+        { id: 'hard', title: 'Hard', text: '6 + 18 words · a rule every round' },
+      ])}
     </div>
   );
 }

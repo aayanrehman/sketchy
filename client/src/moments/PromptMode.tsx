@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { Drawing, Modifier } from '@shared/types';
+import { WORD_LIMITS } from '@shared/types';
 import { Button, DrawingTile, Timer } from '@/design/components';
 import { Rise } from '@/shell/PhaseStage';
 import { childVariants } from '@/design/motion';
@@ -30,8 +31,11 @@ function ModifierBadge({ modifier, taboo }: { modifier?: Modifier; taboo?: strin
 function TargetCard({ url, imposter, compact }: { url?: string; imposter: boolean; compact?: boolean }) {
   return (
     <figure className={`target ${compact ? 'target--compact' : ''} ${imposter ? 'target--imp' : ''}`}>
-      {url ? <img src={url} alt="The target image" /> : <div className="target__none">No target this round</div>}
-      <figcaption>{imposter ? 'Your target · something is hidden from you!' : 'Your target'}</figcaption>
+      <div className="target__frame">
+        {url ? <img src={url} alt="The target image" /> : <div className="target__none">No target this round</div>}
+        {imposter && <span className="target__erased" aria-hidden>ERASED</span>}
+      </div>
+      <figcaption>{imposter ? 'Something in this picture has been erased. Everyone else can see it.' : 'Your target'}</figcaption>
     </figure>
   );
 }
@@ -66,11 +70,13 @@ export function WritePhone({ view }: MomentProps) {
   const [err, setErr] = useState<string | null>(null);
   const [busy, setBusy] = useState(false);
   useEffect(() => { setText(pass === 'final' ? mine?.draftPrompt || '' : ''); setErr(null); /* eslint-disable-next-line */ }, [pass]);
-  const max = pass === 'draft' ? 8 : 30;
+  const difficulty = room.settings?.difficulty || 'normal';
+  const limits = WORD_LIMITS[difficulty];
+  const max = limits[pass];
   const words = text.trim() ? text.trim().split(/\s+/).length : 0;
-  const problem = text.trim() ? promptProblem(text, pass, me.taboo || null) : null;
+  const problem = text.trim() ? promptProblem(text, pass, me.taboo || null, difficulty) : null;
   const submit = async (value = text) => {
-    if (locked || busy || !value.trim() || promptProblem(value, pass, me.taboo || null)) return;
+    if (locked || busy || !value.trim() || promptProblem(value, pass, me.taboo || null, difficulty)) return;
     setBusy(true); setErr(null);
     const res = await send().emit(pass === 'draft' ? 'prompt:draft' : 'prompt:final', { text: value });
     setBusy(false);
@@ -96,16 +102,16 @@ export function WritePhone({ view }: MomentProps) {
           <ModifierBadge modifier={r.modifier} taboo={me.taboo} />
         </div>
         <div className="write__main">
-          <PassSteps pass={pass} />
+          <PassSteps pass={pass} limits={limits} quick={(room.settings?.pace || 'quick') === 'quick'} />
           {pass === 'final' && mine && <DraftFeedback d={mine} />}
           <motion.form key={pass} className="writer" onSubmit={(e) => { e.preventDefault(); submit(); }}
             initial={{ opacity: 0, y: rm ? 0 : 14 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: rm ? 0.16 : 0.32 }}>
             <label htmlFor="prompt" className="writer__label">
               {pass === 'draft' ? 'Quick draft' : mine?.draftPrompt ? 'Expand your draft into the final prompt' : 'Final prompt'}
-              <small>{pass === 'draft' ? 'up to 8 words · a first try; next you get up to 30' : 'up to 30 words · only your final image is scored'}</small>
+              <small>{pass === 'draft' ? `up to ${limits.draft} words · a first try; next you get up to ${limits.final}` : `up to ${limits.final} words · only your final image is scored`}</small>
             </label>
             {pass === 'final' && mine?.draftPrompt && (
-              <p className="writer__from"><span>Your draft ({draftWords} word{draftWords === 1 ? '' : 's'})</span>“{mine.draftPrompt}” <em>· it’s pre-filled below, add up to {Math.max(0, 30 - draftWords)} more words</em></p>
+              <p className="writer__from"><span>Your draft ({draftWords} word{draftWords === 1 ? '' : 's'})</span>“{mine.draftPrompt}” <em>· it’s pre-filled below, add up to {Math.max(0, limits.final - draftWords)} more words</em></p>
             )}
             <textarea id="prompt" className="field writer__input" rows={pass === 'draft' ? 2 : 3} value={text} disabled={locked}
               placeholder={pass === 'draft' ? 'e.g. frog drumming on a lily pad, watercolor' : 'Add the details, style, colors and lighting your draft missed'}
@@ -119,7 +125,7 @@ export function WritePhone({ view }: MomentProps) {
               {(err || problem) && <span className="writer__err" role="alert">{err || problem}</span>}
             </div>
             {locked
-              ? <Button variant="lime" size="lg" block disabled>{pass === 'draft' ? 'Draft locked ✓ next: expand it to 30 words' : 'Final locked ✓ waiting for the others'}</Button>
+              ? <Button variant="lime" size="lg" block disabled>{pass === 'draft' ? `Draft locked ✓ next: expand it to ${limits.final} words` : 'Final locked ✓ waiting for the others'}</Button>
               : <Button type="submit" variant="secondary" size="lg" block disabled={!text.trim() || !!problem || busy}>{busy ? 'Sending…' : pass === 'draft' ? 'Lock in draft (step 1 of 2)' : 'Lock in final prompt (step 2 of 2)'}</Button>}
           </motion.form>
           {pass === 'final' && others.length > 0 && (
@@ -142,12 +148,12 @@ export function WritePhone({ view }: MomentProps) {
 }
 
 /** The two writing passes, always visible so the 8-word draft and the 30-word final never blur together. */
-function PassSteps({ pass }: { pass: 'draft' | 'final' }) {
+function PassSteps({ pass, limits, quick }: { pass: 'draft' | 'final'; limits: { draft: number; final: number }; quick: boolean }) {
   return (
     <ol className="pass" aria-label="Writing steps">
-      <li className={pass === 'draft' ? 'is-on' : 'is-done'}><b>1</b><span>Quick draft</span><small>8 words · 35 s</small></li>
+      <li className={pass === 'draft' ? 'is-on' : 'is-done'}><b>1</b><span>Quick draft</span><small>{limits.draft} words · {quick ? 25 : 35} s</small></li>
       <li className="pass__arrow" aria-hidden>→</li>
-      <li className={pass === 'final' ? 'is-on' : ''}><b>2</b><span>Final prompt</span><small>30 words · 40 s · scored</small></li>
+      <li className={pass === 'final' ? 'is-on' : ''}><b>2</b><span>Final prompt</span><small>{limits.final} words · {quick ? 30 : 40} s · scored</small></li>
     </ol>
   );
 }
