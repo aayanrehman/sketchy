@@ -19,13 +19,10 @@ export function Landing() {
     <div className="landing landing--home"><div className="corner-sound"><SoundControl /></div>
       <Scenery density={3} lively />
       <motion.div className="landing__inner landing__home-grid" variants={phaseVariants(rm)} initial="initial" animate="enter">
-        <div className="landing__scene">
+        <div className="landing__left">
         <span className="landing__eyebrow">A LITTLE PROMPTING. A LOT OF ACCUSATIONS.</span>
-        <motion.div className="landing__hero" variants={childVariants(rm)}><Mascot mood="happy" size={132} float /></motion.div>
-        <motion.h1 className="landing__logo gold-text" variants={childVariants(rm)}>SKETCHY</motion.h1>
+        <motion.div className="landing__brand" variants={childVariants(rm)}><Mascot mood="happy" size={112} float /><h1 className="landing__logo gold-text">SKETCHY</h1></motion.div>
         <motion.p className="landing__tag" variants={childVariants(rm)}>Recreate the picture with an AI prompt.<br />One of you can’t see all of it. Find them.</motion.p>
-        <motion.div variants={childVariants(rm)} style={{ width: '100%' }}><LiveDemo /></motion.div>
-        </div>
         <div className="landing__menu">
         <p className="landing__menu-title">Who's looking sketchy?</p>
         <motion.div variants={childVariants(rm)}><Button size="lg" block onClick={() => { unlockAudio(); go('/host'); }}>Host a game</Button></motion.div>
@@ -39,6 +36,8 @@ export function Landing() {
           <Button variant="ghost" size="sm" onClick={() => setHelp(true)}>How to play</Button>
         </motion.div>
         </div>
+        </div>
+        <motion.div className="landing__right" variants={childVariants(rm)}><LiveDemo /></motion.div>
       </motion.div>
       <Modal open={help} onClose={() => setHelp(false)} label="How to play"><HowTo onDone={() => setHelp(false)} cta="Close" /></Modal>
       <Modal open={gallery} onClose={() => setGallery(false)} label="Your gallery">

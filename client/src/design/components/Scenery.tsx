@@ -69,13 +69,27 @@ function LivelyScenery({ rm }: { rm: boolean }) {
       ))}
       {SPARKS.map((p, i) => <span key={i} className="spark" style={{ left: `${p.x}%`, top: `${p.y}%`, fontSize: p.s, animationDelay: `${p.d}s` }}>✦</span>)}
       <div className="lhills">
-        <svg className="lhills__far" viewBox="0 0 1200 220" preserveAspectRatio="none"><defs><linearGradient id="hf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#CDEFB4" /><stop offset="1" stopColor="#B3E596" /></linearGradient></defs>
-          <path d="M-40 140 C 140 60, 330 70, 470 120 S 760 170, 930 100 S 1150 60, 1240 110 L1240 240 L-40 240 Z" fill="url(#hf)" /></svg>
-        <svg className="lhills__mid" viewBox="0 0 1200 220" preserveAspectRatio="none"><defs><linearGradient id="hm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#B9F09A" /><stop offset="1" stopColor="#97DE72" /></linearGradient></defs>
-          <path d="M-40 170 C 180 100, 420 120, 600 165 S 980 190, 1240 140 L1240 240 L-40 240 Z" fill="url(#hm)" stroke="var(--c-ink)" strokeWidth="3" /></svg>
-        <svg className="lhills__near" viewBox="0 0 1200 220" preserveAspectRatio="none"><defs><linearGradient id="hn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#A9EC84" /><stop offset="1" stopColor="#7ED35C" /></linearGradient></defs>
-          <path d="M-40 195 C 240 150, 520 170, 760 200 S 1060 200, 1240 180 L1240 240 L-40 240 Z" fill="url(#hn)" stroke="var(--c-ink)" strokeWidth="3" />
-          <path d="M120 186 q 30 -14 60 0 M820 196 q 26 -12 52 0" fill="none" stroke="rgba(255,255,255,.7)" strokeWidth="4" strokeLinecap="round" /></svg>
+        <svg className="lhills__far" viewBox="0 0 1200 240" preserveAspectRatio="xMidYMax slice">
+          <defs><linearGradient id="hf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#D6F3C2" /><stop offset="1" stopColor="#BCE9A2" /></linearGradient></defs>
+          <path d="M-40 120 C 150 70, 330 72, 480 104 S 780 150, 960 96 S 1160 64, 1240 84 L1240 260 L-40 260 Z" fill="url(#hf)" />
+          <path d="M-40 120 C 150 70, 330 72, 480 104 S 780 150, 960 96 S 1160 64, 1240 84" fill="none" stroke="rgba(255,255,255,.55)" strokeWidth="3" />
+        </svg>
+        <svg className="lhills__mid" viewBox="0 0 1200 240" preserveAspectRatio="xMidYMax slice">
+          <defs><linearGradient id="hm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#BDEFA0" /><stop offset=".6" stopColor="#A2E27F" /><stop offset="1" stopColor="#8FD66B" /></linearGradient></defs>
+          <path d="M-40 160 C 160 112, 380 118, 580 150 S 960 182, 1240 128 L1240 260 L-40 260 Z" fill="url(#hm)" />
+          <path d="M-40 160 C 160 112, 380 118, 580 150 S 960 182, 1240 128" fill="none" stroke="rgba(255,255,255,.6)" strokeWidth="3" />
+        </svg>
+        <svg className="lhills__near" viewBox="0 0 1200 240" preserveAspectRatio="xMidYMax slice">
+          <defs><linearGradient id="hn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor="#ACEB86" /><stop offset=".55" stopColor="#8EDB65" /><stop offset="1" stopColor="#74C952" /></linearGradient></defs>
+          <path d="M-40 196 C 220 168, 470 172, 720 192 S 1080 204, 1240 182 L1240 260 L-40 260 Z" fill="url(#hn)" />
+          <path d="M-40 196 C 220 168, 470 172, 720 192 S 1080 204, 1240 182" fill="none" stroke="rgba(255,255,255,.65)" strokeWidth="3" />
+          <g fill="none" stroke="#5FB842" strokeWidth="2.5" strokeLinecap="round">
+            {[90, 260, 410, 640, 870, 1040, 1150].map((x, i) => <path key={i} d={`M${x} ${212 + (i % 3) * 6} q -3 -9 -7 -12 M${x} ${212 + (i % 3) * 6} q 0 -11 1 -15 M${x} ${212 + (i % 3) * 6} q 4 -8 8 -11`} />)}
+          </g>
+          {[[170, 214, '#FFFFFF'], [340, 222, '#FF9EC4'], [520, 216, '#FFE066'], [760, 222, '#FFFFFF'], [960, 216, '#FF9EC4'], [1100, 224, '#FFE066']].map(([x, y, c], i) => (
+            <g key={i} transform={`translate(${x} ${y})`}><circle r="4.5" fill={c as string} /><circle r="1.8" fill="#FFC83D" /></g>
+          ))}
+        </svg>
       </div>
     </div>
   );
