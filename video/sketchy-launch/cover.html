@@ -1,0 +1,27 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+@font-face { font-family: 'Fredoka'; font-weight: 600; src: url(assets/fonts/fredoka-latin-600-normal.woff2); }
+@font-face { font-family: 'Fredoka'; font-weight: 700; src: url(assets/fonts/fredoka-latin-700-normal.woff2); }
+@font-face { font-family: 'Nunito'; font-weight: 800; src: url(assets/fonts/nunito-latin-800-normal.woff2); }
+* { margin: 0; box-sizing: border-box; }
+body { width: 1200px; height: 630px; overflow: hidden; position: relative; font-family: Fredoka; color: #2B2540; background: linear-gradient(180deg, #BDE4FF 0%, #E3F5FF 75%); }
+.sun { position: absolute; right: 40px; top: -150px; width: 420px; height: 420px; border-radius: 50%; background: radial-gradient(circle, rgba(255,241,184,.95) 0%, rgba(255,241,184,0) 68%); }
+svg { position: absolute; left: 0; bottom: 0; width: 1200px; height: 150px; }
+.card { position: absolute; width: 330px; height: 330px; background: #fff; border: 6px solid #2B2540; border-radius: 28px; box-shadow: 0 9px 0 #2B2540; overflow: hidden; }
+.card img { width: 100%; height: 100%; object-fit: cover; display: block; }
+.tag { position: absolute; background: #fff; border: 4px solid #2B2540; border-radius: 999px; padding: 4px 16px; font-weight: 600; font-size: 22px; box-shadow: 0 4px 0 #2B2540; white-space: nowrap; }
+.logo { font-weight: 700; font-size: 128px; line-height: .95; color: #FFD84D; letter-spacing: .02em; text-shadow: 0 6px 0 #2B2540, 4px 0 0 #2B2540, -4px 0 0 #2B2540, 0 -4px 0 #2B2540, 4px 6px 0 #2B2540, -4px 6px 0 #2B2540, 4px -4px 0 #2B2540, -4px -4px 0 #2B2540; }
+.right { position: absolute; left: 640px; top: 70px; width: 520px; display: flex; flex-direction: column; align-items: center; text-align: center; }
+.right img { width: 150px; height: 150px; object-fit: contain; }
+.line { white-space: nowrap; font-weight: 600; font-size: 29px; line-height: 1.2; margin-top: 22px; }
+.url { margin-top: 20px; background: #fff; border: 5px solid #2B2540; border-radius: 20px; padding: 6px 22px 9px; font-weight: 700; font-size: 34px; box-shadow: 0 6px 0 #2B2540; }
+</style></head><body>
+<div class="sun"></div>
+<svg viewBox="0 0 1200 150" preserveAspectRatio="none"><path d="M0 60 C 300 10 600 30 800 60 S 1100 40 1200 50 L1200 150 L0 150Z" fill="#B9F09A"/><path d="M0 105 C 350 80 700 95 900 112 S 1120 100 1200 104 L1200 150 L0 150Z" fill="#7ED35C"/></svg>
+<div class="card" style="left:50px;top:110px;transform:rotate(-5deg)"><img src="assets/img/frog-band.webp"></div>
+<div class="card" style="left:290px;top:150px;transform:rotate(4deg)"><img src="assets/img/frog-band-masked.webp"></div>
+<span class="tag" style="left:70px;top:70px;transform:rotate(-5deg)">Everyone saw</span>
+<span class="tag" style="left:400px;top:505px;transform:rotate(4deg);background:#FF7AB0">The imposter saw</span>
+<div class="right"><img src="assets/img/judge.webp"><div class="logo">SKETCHY</div>
+<div class="line">Recreate the picture with an AI prompt.<br>One of you can’t see all of it.</div>
+<div class="url">sketchy-blue.vercel.app</div></div>
+</body></html>

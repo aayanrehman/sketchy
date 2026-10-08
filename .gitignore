@@ -18,3 +18,6 @@ test-results/
 .env.*
 !.env.example
 .vercel
+video/raw/
+video/*/renders/
+video/*/assets/

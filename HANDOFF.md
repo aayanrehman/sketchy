@@ -92,7 +92,7 @@ My estimate (not a prediction): Execution 4, Creativity 4–5, Usefulness 4, Pol
 5. More solo-demo content (pre-made bot rounds for more targets) so replays vary.
 6. Judge consistency check (same image scored repeatedly; tune `COMPARE_SYSTEM` in `convex/ai.ts` if it swings).
 7. Decide whether to keep Sketch mode visible or hide it to keep the pitch focused.
-8. Optional launch/demo video (not listed in the official requirements I read; check the mission page).
+8. ~~Launch/demo video~~ done (see §10).
 9. Clean-ups: delete or archive `server/` + `/studio` once no longer needed.
 10. Not built yet: AI-generated targets (a `generate` call per new target plus a masked variant; needs a mask strategy since masks are hand-made files today), friends/leaderboards (needs identity: at minimum a per-device id and a `dailyScores` table), real recorded bot content for more targets.
 
@@ -102,3 +102,13 @@ My estimate (not a prediction): Execution 4, Creativity 4–5, Usefulness 4, Pol
 - Every change so far was deployed with `npm run deploy`, then committed and pushed to `codex/finish-sketchy-submission`.
 - The Convex guidelines are in `convex/_generated/ai/guidelines.md`; read them before editing `convex/`.
 - Don't print `.env` / `.env.local` values. Load keys with `set -a; source .env; set +a` inside a command when needed.
+
+## 10. Launch video + cover (October 7, 2026)
+
+All in `video/`:
+- `sketchy-launch-1920x1080.mp4`: 85 s master. `sketchy-launch-1080x1920.mp4`: vertical cut. `sketchy-cover-1200x630.png`: Handshake cover image.
+- Footage is real, captured from the live site by `video/capture.ts` (`node --import tsx video/capture.ts demo desktop|phone`, `join`, `home`, `music`). The music bed is the game's own procedural lofi, recorded from the site. `video/raw/` (gitignored) holds the captures.
+- HyperFrames projects: `video/sketchy-launch/` (landscape; `node gen.mjs` writes index.html, `./build-assets.sh` re-cuts clips from `video/raw`) and `video/sketchy-vertical/` (written by `sketchy-launch/gen-vertical.mjs`, shares `assets/` via symlink). Render: `npx hyperframes render --quality high --output renders/video.mp4` in each folder. If a render stalls or crashes partway (happened on the vertical), use `HF_SEGMENTED_CAPTURE=true npx hyperframes render --quality high --low-memory-mode --resume --output renders/video.mp4` (about 4 min). If frame extraction times out, clear the leftover `.partial` folders in `$TMPDIR/hyperframes-extract-cache-501`. Cover: `video/sketchy-launch/cover.html`.
+- Plan: `video/sketchy-launch/STORYBOARD.md`. To swap in a custom domain, change `URL` in both gen scripts and the cover, then re-render.
+- Known: the live footage shows a blue focus box around the phase area (fixed locally in `client/src/design/tokens.css`, not deployed yet). After deploying, re-capture and re-render to get clean footage.
+

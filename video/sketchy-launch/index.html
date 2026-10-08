@@ -1,0 +1,242 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=1920, height=1080" />
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.14.2/dist/gsap.min.js"></script>
+<style>
+@font-face { font-family: 'Fredoka'; font-weight: 500; src: url(assets/fonts/fredoka-latin-500-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Fredoka'; font-weight: 600; src: url(assets/fonts/fredoka-latin-600-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Fredoka'; font-weight: 700; src: url(assets/fonts/fredoka-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: 'Nunito'; font-weight: 800; src: url(assets/fonts/nunito-latin-800-normal.woff2) format('woff2'); }
+:root { --ink: #2B2540; --sky: #BDE4FF; --sky2: #E3F5FF; --yellow: #FFD84D; --pink: #FF7AB0; --blue: #6CC1FF; --lime: #BDF26E; --purple: #B48BFF; --red: #FF5C5C; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { width: 1920px; height: 1080px; overflow: hidden; background: var(--sky2); }
+#root { position: relative; width: 100%; height: 100%; overflow: hidden; font-family: 'Fredoka', sans-serif; color: var(--ink); }
+.clip { position: absolute; }
+.bg { inset: 0; background: linear-gradient(180deg, var(--sky) 0%, var(--sky2) 72%); }
+.sun { position: absolute; right: 180px; top: -120px; width: 520px; height: 520px; border-radius: 50%; background: radial-gradient(circle, rgba(255,241,184,.95) 0%, rgba(255,241,184,0) 68%); }
+.cloud { position: absolute; background: #fff; border-radius: 999px; box-shadow: 0 6px 0 rgba(43,37,64,.06); }
+.cloud::before, .cloud::after { content: ''; position: absolute; background: #fff; border-radius: 50%; }
+.cloud::before { width: 46%; height: 150%; left: 14%; bottom: 20%; }
+.cloud::after { width: 34%; height: 120%; left: 50%; bottom: 25%; }
+.hills { position: absolute; left: 0; bottom: 0; width: 1920px; height: 260px; }
+.slot { position: absolute; left: 192px; top: 36px; width: 1536px; height: 864px; border-radius: 26px; overflow: hidden; }
+.zoom { position: absolute; inset: 0; }
+.zoom video { inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.frame { left: 186px; top: 30px; width: 1548px; height: 876px; border: 6px solid var(--ink); border-radius: 32px; box-shadow: 0 10px 0 var(--ink); }
+.truth { left: 0; width: 1920px; top: 14px; display: flex; justify-content: center; }
+.truth span { display: block; background: var(--lime); border: 4px solid var(--ink); border-radius: 999px; padding: 6px 20px; font-weight: 600; font-size: 24px; box-shadow: 0 4px 0 var(--ink); }
+.callout { left: 192px; top: 36px; width: 1536px; height: 864px; }
+.callout .dim { position: absolute; inset: 0; border-radius: 26px; background: rgba(43,37,64,.42); }
+.callout img { position: absolute; left: 0; top: 0; display: block; border: 5px solid var(--ink); border-radius: 22px; box-shadow: 0 10px 0 var(--ink), 0 24px 60px rgba(43,37,64,.35); margin-left: -192px; margin-top: -36px; }
+.cap { left: 0; width: 1920px; top: 932px; height: 120px; display: flex; align-items: center; justify-content: center; }
+.pill { display: block; max-width: 1760px; background: #fff; border: 5px solid var(--ink); border-radius: 26px; padding: 14px 34px 16px; font-weight: 600; font-size: 44px; line-height: 1.15; text-align: center; box-shadow: 0 7px 0 var(--ink); }
+.logo { font-weight: 700; color: var(--yellow); letter-spacing: .02em; line-height: .95; text-shadow: 0 6px 0 var(--ink), 4px 0 0 var(--ink), -4px 0 0 var(--ink), 0 -4px 0 var(--ink), 4px 6px 0 var(--ink), -4px 6px 0 var(--ink), 4px -4px 0 var(--ink), -4px -4px 0 var(--ink); }
+.card { position: absolute; background: #fff; border: 6px solid var(--ink); border-radius: 30px; box-shadow: 0 10px 0 var(--ink); overflow: hidden; }
+.card img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.tag { position: absolute; display: block; background: #fff; border: 4px solid var(--ink); border-radius: 999px; padding: 6px 22px; font-weight: 600; font-size: 30px; box-shadow: 0 5px 0 var(--ink); white-space: nowrap; }
+/* hook */
+.hook { inset: 0; }
+#hook-cards { position: absolute; left: 680px; top: 120px; width: 560px; height: 560px; }
+#hook-cards .card { inset: 0; }
+#hook-brand { position: absolute; left: 1040px; top: 150px; width: 760px; display: flex; flex-direction: column; align-items: center; }
+#hook-brand img { width: 250px; height: 250px; object-fit: contain; }
+#hook-brand .logo { font-size: 170px; margin-top: 4px; }
+#hook-brand p { white-space: nowrap; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 26px; letter-spacing: .14em; margin-top: 26px; }
+/* join */
+.join { inset: 0; }
+#host-slot { position: absolute; left: 70px; top: 96px; width: 1290px; height: 726px; border-radius: 24px; overflow: hidden; }
+#host-slot video, #phone-slot video { width: 100%; height: 100%; object-fit: cover; }
+.join-frame { left: 64px; top: 90px; width: 1302px; height: 738px; border: 6px solid var(--ink); border-radius: 30px; box-shadow: 0 10px 0 var(--ink); }
+#phone-slot { position: absolute; left: 1468px; top: 70px; width: 372px; height: 806px; border-radius: 40px; overflow: hidden; }
+.phone-frame { left: 1456px; top: 58px; width: 396px; height: 830px; border: 12px solid var(--ink); border-radius: 52px; box-shadow: 0 10px 0 rgba(43,37,64,.5); }
+.join-tags { inset: 0; }
+/* twist */
+.twist { inset: 0; }
+.twist .card { width: 430px; height: 430px; top: 250px; }
+.twist .tag { top: 186px; }
+.arrow { position: absolute; font-size: 90px; font-weight: 700; top: 400px; }
+#tw-quote { position: absolute; left: 1290px; top: 712px; width: 520px; text-align: center; font-family: 'Nunito', sans-serif; font-weight: 800; font-size: 30px; }
+/* end */
+.end { inset: 0; }
+#end-mascot { position: absolute; left: 150px; top: 200px; width: 600px; height: 600px; object-fit: contain; }
+#end-col { position: absolute; left: 720px; top: 150px; width: 1100px; display: flex; flex-direction: column; align-items: center; }
+#end-col .logo { font-size: 190px; }
+#end-col .play { font-weight: 600; font-size: 46px; margin-top: 40px; }
+#end-url { display: block; margin-top: 14px; background: #fff; border: 7px solid var(--ink); border-radius: 30px; padding: 14px 44px 18px; font-weight: 700; font-size: 82px; box-shadow: 0 10px 0 var(--ink); }
+#end-chips { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; margin-top: 48px; width: 1000px; }
+#end-chips span { display: block; border: 4px solid var(--ink); border-radius: 999px; padding: 8px 24px; font-weight: 600; font-size: 34px; box-shadow: 0 5px 0 var(--ink); }
+</style>
+</head>
+<body>
+<div id="root" data-composition-id="main" data-start="0" data-duration="85" data-width="1920" data-height="1080">
+<div class="bg clip" data-start="0" data-duration="85" data-track-index="0">
+  <div class="sun"></div>
+  <div class="cloud" id="cl1" style="left:140px;top:150px;width:240px;height:64px"></div>
+  <div class="cloud" id="cl2" style="left:1560px;top:330px;width:200px;height:54px"></div>
+  <div class="cloud" id="cl3" style="left:860px;top:70px;width:170px;height:46px"></div>
+  <svg class="hills" viewBox="0 0 1920 260" preserveAspectRatio="none">
+    <path d="M0 120 C 320 40 640 60 960 110 S 1600 70 1920 100 L1920 260 L0 260Z" fill="#B9F09A"/>
+    <path d="M0 170 C 400 110 800 140 1120 175 S 1700 140 1920 160 L1920 260 L0 260Z" fill="#A9EC84"/>
+    <path d="M0 215 C 500 185 900 200 1300 222 S 1750 205 1920 212 L1920 260 L0 260Z" fill="#7ED35C"/>
+  </svg>
+</div>
+
+<div class="hook clip" data-start="0" data-duration="5" data-track-index="1">
+  <div id="hook-cards">
+    <div class="card"><img src="assets/img/frog-band.webp" /></div>
+    <div class="card" id="hook-masked"><img src="assets/img/frog-band-masked.webp" /></div>
+  </div>
+  <div id="hook-brand"><img src="assets/img/judge.webp" /><div class="logo">SKETCHY</div><p>A LITTLE PROMPTING. A LOT OF ACCUSATIONS.</p></div>
+</div>
+
+<div class="join clip" data-start="5" data-duration="9" data-track-index="1">
+  <span class="tag" id="tag-host" style="left:90px;top:30px">TV or laptop: the host screen</span>
+  <span class="tag" id="tag-phone" style="left:1500px;top:-2px">Your phone</span>
+  <span class="tag" id="tag-real" style="left:520px;top:30px;background:var(--lime)">● Real footage · sketchy-blue.vercel.app</span>
+</div>
+<div id="host-slot"><video id="v-join-host" class="clip" src="assets/clips/join-host.mp4" muted playsinline data-start="5" data-duration="9" data-track-index="2"></video></div>
+<div id="phone-slot"><video id="v-join-phone" class="clip" src="assets/clips/join-phone.mp4" muted playsinline data-start="5" data-duration="9" data-track-index="2"></video></div>
+<div class="join-frame clip" data-start="5" data-duration="9" data-track-index="3"></div>
+<div class="phone-frame clip" data-start="5" data-duration="9" data-track-index="3"></div>
+
+<div class="twist clip" data-start="40" data-duration="6" data-track-index="1">
+  <span class="tag" id="tw-t1" style="left:262px">Everyone saw</span>
+  <span class="tag" id="tw-t2" style="left:735px;background:var(--pink)">The imposter saw</span>
+  <span class="tag" id="tw-t3" style="left:1335px;background:var(--yellow)">The imposter’s draft</span>
+  <div class="card" id="tw-c1" style="left:170px"><img src="assets/img/frog-band.webp" /></div>
+  <div class="card" id="tw-c2" style="left:690px"><img src="assets/img/frog-band-masked.webp" /></div>
+  <div class="arrow" id="tw-arrow" style="left:1160px">→</div>
+  <div class="card" id="tw-c3" style="left:1330px"><img src="assets/img/frog-band-bot-imposter-draft.webp" /></div>
+  <p id="tw-quote">“frog playing guitar on a lily pad”</p>
+</div>
+
+<div class="end clip" data-start="78" data-duration="7" data-track-index="1">
+  <img id="end-mascot" src="assets/img/happy.webp" />
+  <div id="end-col">
+    <div class="logo" id="end-logo">SKETCHY</div>
+    <div class="play" id="end-play">Play free at</div>
+    <span id="end-url">sketchy-blue.vercel.app</span>
+    <div id="end-chips">
+      <span style="background:var(--yellow)">4–8 players</span><span style="background:var(--blue)">Room code + QR</span><span style="background:var(--lime)">No login · no install</span><span style="background:#fff">Phone or laptop</span><span style="background:var(--pink)">New picture every round</span>
+    </div>
+  </div>
+</div>
+
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-study" style="transform-origin:25% 40%"><video id="v-study" class="clip" src="assets/clips/study.mp4" muted playsinline data-start="14" data-duration="4" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-draft" style="transform-origin:48% 22%"><video id="v-draft" class="clip" src="assets/clips/draft.mp4" muted playsinline data-start="18" data-duration="5" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-feedback" style="transform-origin:50% 30%"><video id="v-feedback" class="clip" src="assets/clips/feedback.mp4" muted playsinline data-start="23" data-duration="7" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-refine" style="transform-origin:45% 45%"><video id="v-refine" class="clip" src="assets/clips/refine.mp4" muted playsinline data-start="30" data-duration="5" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-reveal" style="transform-origin:45% 60%"><video id="v-reveal" class="clip" src="assets/clips/reveal.mp4" muted playsinline data-start="35" data-duration="5" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-hint" style="transform-origin:60% 50%"><video id="v-hint" class="clip" src="assets/clips/hint.mp4" muted playsinline data-start="46" data-duration="5" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-vote" style="transform-origin:45% 55%"><video id="v-vote" class="clip" src="assets/clips/vote.mp4" muted playsinline data-start="51" data-duration="3" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-unmask" style="transform-origin:45% 60%"><video id="v-unmask" class="clip" src="assets/clips/unmask.mp4" muted playsinline data-start="54" data-duration="3" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-steal" style="transform-origin:45% 25%"><video id="v-steal" class="clip" src="assets/clips/steal.mp4" muted playsinline data-start="57" data-duration="2" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-verdict" style="transform-origin:50% 50%"><video id="v-verdict" class="clip" src="assets/clips/verdict.mp4" muted playsinline data-start="59" data-duration="8" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-bluff" style="transform-origin:18% 50%"><video id="v-bluff" class="clip" src="assets/clips/bluff.mp4" muted playsinline data-start="67" data-duration="4" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-podium" style="transform-origin:50% 40%"><video id="v-podium" class="clip" src="assets/clips/podium.mp4" muted playsinline data-start="71" data-duration="3" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-reel" style="transform-origin:50% 50%"><video id="v-reel" class="clip" src="assets/clips/reel.mp4" muted playsinline data-start="74" data-duration="2" data-track-index="2"></video></div></div>
+<div class="slot"><div class="zoom" data-layout-allow-overflow id="z-share" style="transform-origin:50% 45%"><video id="v-share" class="clip" src="assets/clips/share.mp4" muted playsinline data-start="76" data-duration="2" data-track-index="2"></video></div></div>
+<div class="frame clip" data-start="14" data-duration="26" data-track-index="3"></div>
+<div class="truth clip" data-start="14" data-duration="26" data-track-index="4"><span id="truth-0">● Real gameplay · solo practice vs. 3 bots</span></div>
+<div class="frame clip" data-start="46" data-duration="32" data-track-index="3"></div>
+<div class="truth clip" data-start="46" data-duration="32" data-track-index="4"><span id="truth-1">● Real gameplay · solo practice vs. 3 bots</span></div>
+<div class="callout clip" data-start="25.4" data-duration="4.6" data-track-index="5"><div class="dim" id="d-0"></div><img id="c-0" src="assets/callouts/feedback-card.png" style="left:340px;top:400px;width:1240px" /></div>
+<div class="callout clip" data-start="47.2" data-duration="3.8" data-track-index="5"><div class="dim" id="d-1"></div><img id="c-1" src="assets/callouts/hint-card.png" style="left:520px;top:430px;width:760px" /></div>
+<div class="callout clip" data-start="48.6" data-duration="2.4" data-track-index="5"><img id="c-2" src="assets/callouts/pixel-draft.png" style="left:1305px;top:430px;width:230px" /></div>
+<div class="callout clip" data-start="59.9" data-duration="3.3" data-track-index="5"><div class="dim" id="d-3"></div><img id="c-3" src="assets/callouts/verdict-head.png" style="left:290px;top:410px;width:1340px" /></div>
+<div class="callout clip" data-start="63.4" data-duration="3.6" data-track-index="5"><div class="dim" id="d-4"></div><img id="c-4" src="assets/callouts/sam-card.png" style="left:680px;top:482px;width:560px" /></div>
+<div class="cap clip" data-start="0.3" data-duration="2.2" data-track-index="8"><div class="pill" id="cap-0">Recreate the picture with an AI prompt.</div></div>
+<div class="cap clip" data-start="2.6" data-duration="2.4" data-track-index="8"><div class="pill" id="cap-1">One of you can’t see all of it.</div></div>
+<div class="cap clip" data-start="5.3" data-duration="4.1" data-track-index="8"><div class="pill" id="cap-2">One screen hosts. Everyone joins on their own phone.</div></div>
+<div class="cap clip" data-start="9.5" data-duration="4.5" data-track-index="8"><div class="pill" id="cap-3">Room code or QR. No login. No install.</div></div>
+<div class="cap clip" data-start="14.15" data-duration="3.85" data-track-index="8"><div class="pill" id="cap-4">Everyone studies the same target picture.</div></div>
+<div class="cap clip" data-start="18.15" data-duration="4.85" data-track-index="8"><div class="pill" id="cap-5">Write a quick draft. 8 words, max.</div></div>
+<div class="cap clip" data-start="23.15" data-duration="6.85" data-track-index="8"><div class="pill" id="cap-6">The AI draws your prompt, scores it, and tells you what it missed.</div></div>
+<div class="cap clip" data-start="30.15" data-duration="4.85" data-track-index="8"><div class="pill" id="cap-7">Refine it, up to 30 words. Only the final image is scored.</div></div>
+<div class="cap clip" data-start="35.15" data-duration="4.85" data-track-index="8"><div class="pill" id="cap-8">Final images paint in, each with its draft in the corner.</div></div>
+<div class="cap clip" data-start="40.3" data-duration="2.7" data-track-index="8"><div class="pill" id="cap-9">The twist: one player’s picture had the key detail blurred.</div></div>
+<div class="cap clip" data-start="43.1" data-duration="2.9" data-track-index="8"><div class="pill" id="cap-10">They have to guess what’s there, and blend in.</div></div>
+<div class="cap clip" data-start="46.15" data-duration="4.85" data-track-index="8"><div class="pill" id="cap-11">Sketchy, the AI host, drops one hint. Then everyone argues it out.</div></div>
+<div class="cap clip" data-start="51.15" data-duration="2.85" data-track-index="8"><div class="pill" id="cap-12">Vote for the imposter.</div></div>
+<div class="cap clip" data-start="54.1" data-duration="4.9" data-track-index="8"><div class="pill" id="cap-13">Caught! But they get one guess to steal the round.</div></div>
+<div class="cap clip" data-start="59.15" data-duration="4.05" data-track-index="8"><div class="pill" id="cap-14">Then see the real prompt behind the picture…</div></div>
+<div class="cap clip" data-start="63.3" data-duration="3.7" data-track-index="8"><div class="pill" id="cap-15">…and a 5-area score. Draft 34 → final 74. You get better every round.</div></div>
+<div class="cap clip" data-start="67.15" data-duration="3.85" data-track-index="8"><div class="pill" id="cap-16">Next round, you might be the one bluffing.</div></div>
+<div class="cap clip" data-start="71.15" data-duration="6.75" data-track-index="8"><div class="pill" id="cap-17">Awards, a highlight reel, and a result card to share.</div></div>
+
+<audio id="music" src="assets/music.m4a" data-start="0" data-duration="85" data-track-index="10" data-volume="1"></audio>
+</div>
+<script>
+const tl = gsap.timeline({ paused: true });
+// drifting clouds
+tl.fromTo('#cl1', { x: 0 }, { x: 260, duration: 85, ease: 'none' }, 0);
+tl.fromTo('#cl2', { x: 0 }, { x: -220, duration: 85, ease: 'none' }, 0);
+tl.fromTo('#cl3', { x: 0 }, { x: 160, duration: 85, ease: 'none' }, 0);
+// hook
+tl.fromTo('#hook-cards', { scale: 0.7, opacity: 0, rotation: -4 }, { scale: 1, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.6)' }, 0);
+tl.fromTo('#hook-masked', { opacity: 0 }, { opacity: 1, duration: 0.7, ease: 'power2.inOut' }, 2.5);
+tl.fromTo('#hook-cards', { rotation: 0 }, { rotation: 2, duration: 0.12, yoyo: true, repeat: 3, ease: 'sine.inOut' }, 3.1);
+tl.to('#hook-cards', { x: -400, scale: 0.92, duration: 0.6, ease: 'power3.inOut' }, 3.5);
+tl.fromTo('#hook-brand', { opacity: 0, x: 120 }, { opacity: 1, x: 0, duration: 0.6, ease: 'back.out(1.5)' }, 3.75);
+// join
+tl.fromTo(['#tag-host', '#tag-real', '#tag-phone'], { y: -20, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, stagger: 0.12, ease: 'back.out(2)' }, 5.2);
+// twist
+tl.fromTo(['#tw-c1', '#tw-t1'], { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: 'back.out(1.6)' }, 40.2);
+tl.fromTo(['#tw-c2', '#tw-t2'], { y: 40, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, ease: 'back.out(1.6)' }, 41.0);
+tl.fromTo('#tw-arrow', { x: -30, opacity: 0 }, { x: 0, opacity: 1, duration: 0.35 }, 43.0);
+tl.fromTo(['#tw-c3', '#tw-t3', '#tw-quote'], { y: 40, opacity: 0, rotation: 3 }, { y: 0, opacity: 1, rotation: 0, duration: 0.5, ease: 'back.out(1.6)' }, 43.3);
+// end card
+tl.fromTo('#end-mascot', { y: 80, opacity: 0, rotation: -6 }, { y: 0, opacity: 1, rotation: 0, duration: 0.6, ease: 'back.out(1.6)' }, 78.2);
+tl.fromTo('#end-mascot', { rotation: 0 }, { rotation: 3, duration: 0.6, yoyo: true, repeat: 7, ease: 'sine.inOut' }, 79);
+tl.fromTo('#end-logo', { scale: 0.6, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.55, ease: 'back.out(2)' }, 78.4);
+tl.fromTo(['#end-play', '#end-url'], { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: 0.45, stagger: 0.15, ease: 'back.out(1.8)' }, 78.9);
+tl.fromTo('#end-chips span', { y: 24, opacity: 0 }, { y: 0, opacity: 1, duration: 0.35, stagger: 0.1, ease: 'back.out(2)' }, 79.6);
+tl.fromTo('#z-study', { scale: 1 }, { scale: 1.12, duration: 4, ease: 'sine.inOut' }, 14);
+tl.fromTo('#z-draft', { scale: 1.05 }, { scale: 1.3, duration: 5, ease: 'sine.inOut' }, 18);
+tl.fromTo('#z-feedback', { scale: 1 }, { scale: 1.08, duration: 7, ease: 'sine.inOut' }, 23);
+tl.fromTo('#z-refine', { scale: 1.1 }, { scale: 1.22, duration: 5, ease: 'sine.inOut' }, 30);
+tl.fromTo('#z-reveal', { scale: 1 }, { scale: 1.06, duration: 5, ease: 'sine.inOut' }, 35);
+tl.fromTo('#z-hint', { scale: 1 }, { scale: 1.05, duration: 5, ease: 'sine.inOut' }, 46);
+tl.fromTo('#z-vote', { scale: 1 }, { scale: 1.06, duration: 3, ease: 'sine.inOut' }, 51);
+tl.fromTo('#z-unmask', { scale: 1.06 }, { scale: 1.12, duration: 3, ease: 'sine.inOut' }, 54);
+tl.fromTo('#z-steal', { scale: 1.15 }, { scale: 1.2, duration: 2, ease: 'sine.inOut' }, 57);
+tl.fromTo('#z-verdict', { scale: 1 }, { scale: 1, duration: 8, ease: 'sine.inOut' }, 59);
+tl.fromTo('#z-bluff', { scale: 1 }, { scale: 1.12, duration: 4, ease: 'sine.inOut' }, 67);
+tl.fromTo('#z-podium', { scale: 1 }, { scale: 1.06, duration: 3, ease: 'sine.inOut' }, 71);
+tl.fromTo('#z-reel', { scale: 1.05 }, { scale: 1.1, duration: 2, ease: 'sine.inOut' }, 74);
+tl.fromTo('#z-share', { scale: 1.05 }, { scale: 1.12, duration: 2, ease: 'sine.inOut' }, 76);
+tl.fromTo('#truth-0', { y: -16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'back.out(2)' }, 14.3);
+tl.fromTo('#truth-1', { y: -16, opacity: 0 }, { y: 0, opacity: 1, duration: 0.4, ease: 'back.out(2)' }, 46.3);
+tl.fromTo('#d-0', { opacity: 0 }, { opacity: 1, duration: 0.3 }, 25.4);
+tl.fromTo('#c-0', { yPercent: -50, scale: 0.6, opacity: 0, rotation: -2 }, { yPercent: -50, scale: 1, opacity: 1, rotation: 0, duration: 0.5, ease: 'back.out(1.7)' }, 25.4);
+tl.fromTo('#d-1', { opacity: 0 }, { opacity: 1, duration: 0.3 }, 47.2);
+tl.fromTo('#c-1', { yPercent: -50, scale: 0.6, opacity: 0, rotation: -2 }, { yPercent: -50, scale: 1, opacity: 1, rotation: 0, duration: 0.5, ease: 'back.out(1.7)' }, 47.2);
+tl.fromTo('#c-2', { yPercent: -50, scale: 0.6, opacity: 0, rotation: -2 }, { yPercent: -50, scale: 1, opacity: 1, rotation: 0, duration: 0.5, ease: 'back.out(1.7)' }, 48.6);
+tl.fromTo('#d-3', { opacity: 0 }, { opacity: 1, duration: 0.3 }, 59.9);
+tl.fromTo('#c-3', { yPercent: -50, scale: 0.6, opacity: 0, rotation: -2 }, { yPercent: -50, scale: 1, opacity: 1, rotation: 0, duration: 0.5, ease: 'back.out(1.7)' }, 59.9);
+tl.fromTo('#d-4', { opacity: 0 }, { opacity: 1, duration: 0.3 }, 63.4);
+tl.fromTo('#c-4', { yPercent: -50, scale: 0.6, opacity: 0, rotation: -2 }, { yPercent: -50, scale: 1, opacity: 1, rotation: 0, duration: 0.5, ease: 'back.out(1.7)' }, 63.4);
+tl.fromTo('#cap-0', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 0.3);
+tl.fromTo('#cap-1', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 2.6);
+tl.fromTo('#cap-2', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 5.3);
+tl.fromTo('#cap-3', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 9.5);
+tl.fromTo('#cap-4', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 14.15);
+tl.fromTo('#cap-5', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 18.15);
+tl.fromTo('#cap-6', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 23.15);
+tl.fromTo('#cap-7', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 30.15);
+tl.fromTo('#cap-8', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 35.15);
+tl.fromTo('#cap-9', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 40.3);
+tl.fromTo('#cap-10', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 43.1);
+tl.fromTo('#cap-11', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 46.15);
+tl.fromTo('#cap-12', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 51.15);
+tl.fromTo('#cap-13', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 54.1);
+tl.fromTo('#cap-14', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 59.15);
+tl.fromTo('#cap-15', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 63.3);
+tl.fromTo('#cap-16', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 67.15);
+tl.fromTo('#cap-17', { y: 28, scale: 0.92, opacity: 0 }, { y: 0, scale: 1, opacity: 1, duration: 0.35, ease: 'back.out(1.8)' }, 71.15);
+window.__timelines['main'] = tl;
+</script>
+</body>
+</html>

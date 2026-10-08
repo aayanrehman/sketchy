@@ -112,6 +112,7 @@ button { font: inherit; color: inherit; }
 input { font: inherit; }
 a { color: var(--c-ink); text-decoration-thickness: 2px; text-underline-offset: 3px; }
 :focus-visible { outline: 3px solid var(--c-blue); outline-offset: 3px; }
+[tabindex="-1"]:focus-visible { outline: none; } /* programmatic focus targets (phase regions, modals) */
 .display-xl { font-family: var(--f-display); font-weight: 700; font-size: var(--t-display-xl); line-height: 1; }
 .display-lg { font-family: var(--f-display); font-weight: 700; font-size: var(--t-display-lg); line-height: 1.05; }
 .display-md { font-family: var(--f-display); font-weight: 700; font-size: var(--t-display-md); line-height: 1.1; }
