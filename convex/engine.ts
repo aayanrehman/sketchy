@@ -5,7 +5,7 @@
  * Timers are cancelled by forgetting their token: a fired timer whose token no longer matches is a no-op.
  */
 import type {
-  Phase, Player, Round, Drawing, PublicRoom, MeView, Stroke, PromptPair, FinalAward, ToastKind, GameMode, Modifier, Breakdown, RoomSettings,
+  Phase, Player, Round, Drawing, PublicRoom, MeView, Stroke, PromptPair, FinalAward, ToastKind, GameMode, Modifier, Breakdown, RoomSettings, ChallengeInfo,
 } from '../shared/types';
 import { PHASE_MS, MIN_PLAYERS, MAX_PLAYERS, TOTAL_ROUNDS, GLOWUP_ROOM_CAP, GOLDEN_ODDS, DEFAULT_SETTINGS, QUICK_MS, ROUNDS_BY_PACE } from '../shared/types';
 import { PROMPT_PAIRS } from '../shared/prompts';
@@ -66,7 +66,7 @@ function procedural(pairId: number, slot: 'real' | 'decoy', idx: number): BotDra
 }
 
 // ---------- state & effects ----------
-export interface Seat { player: Player; token: string }
+export interface Seat { player: Player; token: string; deviceId?: string }
 export interface Toast { id: string; kind: ToastKind; text: string; playerId?: string }
 export type TimerAction =
   | { t: 'advance' }
@@ -89,6 +89,7 @@ export interface EngineState {
   botIds: string[]; botUsed: Record<string, number>; toasts: Toast[];
   mode?: GameMode; forcedTargets?: Record<string, string>; usedTargetIds?: string[];
   settings?: RoomSettings; daily?: string;
+  challenge?: ChallengeInfo; crewCode?: string;
 }
 
 export type Effect =
@@ -98,7 +99,8 @@ export type Effect =
   | { t: 'judge'; round: number; playerId: string; gameId: string; prompt: string }
   | { t: 'hint'; round: number; gameId: string }
   | { t: 'gen'; round: number; playerId: string; gameId: string; pass: 'draft' | 'final'; prompt: string }
-  | { t: 'compare'; round: number; playerId: string; gameId: string; pass: 'draft' | 'final'; attemptUrl: string; targetPath: string; styleRound: boolean };
+  | { t: 'compare'; round: number; playerId: string; gameId: string; pass: 'draft' | 'final'; attemptUrl: string; targetPath: string; styleRound: boolean }
+  | { t: 'attempt'; round: number; playerId: string; deviceId: string; name: string; targetId: string; score: number; prompt: string; imageUrl?: string; breakdown?: Breakdown };
 
 const pickBreakdown = (b: Breakdown): Breakdown => ({ subject: b.subject, details: b.details, style: b.style, color: b.color, composition: b.composition });
 
@@ -154,7 +156,7 @@ export class Engine {
   }
 
   // ---------- players ----------
-  addPlayer(name: string, isBot = false): Seat | { error: string } {
+  addPlayer(name: string, isBot = false, deviceId?: string): Seat | { error: string } {
     if (this.players.length >= MAX_PLAYERS) return { error: 'Room is full (8 players).' };
     let clean = name.trim().slice(0, 12) || 'Player';
     const names = new Set(this.players.map((p) => p.name.toLowerCase()));
@@ -173,7 +175,7 @@ export class Engine {
       id: uid(6), name: clean, color, avatar, connected: true, isBot, spectator: inGame,
       score: 0, streak: 0, readyHowTo: false, hasSubmitted: false, hasVoted: false,
     };
-    const seat: Seat = { player, token: uid(16) };
+    const seat: Seat = { player, token: uid(16), ...(deviceId ? { deviceId } : {}) };
     this.s.seats.push(seat);
     if (this.s.isDemo && !this.s.hostId && !isBot) this.s.hostId = player.id;
     this.touch();
@@ -229,7 +231,7 @@ export class Engine {
    * Solo play. Normal demo: 2 rounds (artist, then imposter) on random targets; recorded bot content where it
    * exists, placeholder bots elsewhere. Daily: 1 round as an artist on today's shared target.
    */
-  setupDemo(humanId: string, opts: { daily?: string } = {}) {
+  setupDemo(humanId: string, opts: { daily?: string; challenge?: ChallengeInfo } = {}) {
     const bots = BOT_NAMES.map((n) => this.addPlayer(n, true)).filter((x): x is Seat => 'player' in x);
     this.s.botIds = bots.map((b) => b.player.id);
     this.s.settings = { ...DEFAULT_SETTINGS, pace: 'quick' };
@@ -237,11 +239,14 @@ export class Engine {
     const pool = withContent.length >= 2 ? withContent : PROMPT_PAIRS.map((p) => p.id);
     const [a, b] = shuffle(pool);
     this.s.forcedPairs = { 1: a, 2: b };
-    if (opts.daily) {
-      this.s.daily = opts.daily;
+    if (opts.daily || opts.challenge) {
+      // One round as an artist. A challenge plays the challenger's target; it is also today's daily when the targets match.
+      const target = opts.challenge ? opts.challenge.targetId : dailyTarget(opts.daily!).id;
+      if (opts.daily && (!opts.challenge || dailyTarget(opts.daily).id === target)) this.s.daily = opts.daily;
+      if (opts.challenge) this.s.challenge = opts.challenge;
       this.s.totalRounds = 1;
       this.s.forcedImposters = { 1: pick(this.s.botIds) };
-      this.s.forcedTargets = { 1: dailyTarget(opts.daily).id };
+      this.s.forcedTargets = { 1: target };
       return;
     }
     this.s.totalRounds = 2;
@@ -739,7 +744,13 @@ export class Engine {
     }
     if (pass === 'final' && d.judgeStatus === 'pending') {
       if (match === undefined) { d.judgeStatus = 'fallback'; d.match = -1; d.roast = JUDGE_FOG; }
-      else { d.judgeStatus = 'done'; d.match = match; d.breakdown = res.breakdown; d.sees = res.missed; d.roast = res.tip; }
+      else {
+        d.judgeStatus = 'done'; d.match = match; d.breakdown = res.breakdown; d.sees = res.missed; d.roast = res.tip;
+        const seat = this.seat(playerId);
+        if (seat?.deviceId && !seat.player.isBot && r?.targetId && d.finalPrompt) {
+          this.effects.push({ t: 'attempt', round, playerId, deviceId: seat.deviceId, name: seat.player.name, targetId: r.targetId, score: match, prompt: d.finalPrompt, imageUrl: d.glowUrl, breakdown: res.breakdown && pickBreakdown(res.breakdown) });
+        }
+      }
     }
     // A late score landing on the results screen may be the last thing the ready players were waiting for.
     this.checkEarlyEnd();
@@ -853,6 +864,7 @@ export class Engine {
       code: s.code, hostId: s.hostId, isDemo: s.isDemo, round: s.round, totalRounds: s.totalRounds,
       phase: s.phase, phaseEndsAt: s.phaseEndsAt, phaseStartedAt: s.phaseStartedAt,
       players: this.players, rounds: s.rounds.map((r) => this.publicRound(r, seat?.player.id || null)), mode: this.mode, settings: this.settings, daily: s.daily,
+      challenge: s.challenge, crewCode: s.crewCode,
       aiImageCount: s.aiImageCount, finalAwards: s.finalAwards, aiMode: this.aiMode, toasts: s.toasts,
     };
     let me: MeView | null = null;

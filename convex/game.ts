@@ -61,6 +61,21 @@ async function commit(ctx: MutationCtx, roomId: Id<'rooms'>, eng: Engine) {
         if (await reserve(ctx, 'judge')) await ctx.scheduler.runAfter(0, internal.ai.compare, { roomId, round: fx.round, playerId: fx.playerId, gameId: fx.gameId, pass: fx.pass, attemptUrl: fx.attemptUrl, targetPath: fx.targetPath, styleRound: fx.styleRound, mode: AI_MODE });
         else eng.applyCompare(fx.round, fx.playerId, fx.gameId, fx.pass, { status: 'fallback' });
         break;
+      case 'attempt': {
+        const day = new Date().toISOString().slice(0, 10);
+        const s = eng.s;
+        const kind = s.daily ? 'daily' as const : s.challenge ? 'challenge' as const : s.isDemo ? 'solo' as const : 'party' as const;
+        let counts = kind === 'daily';
+        if (counts) {
+          const prior = await ctx.db.query('attempts').withIndex('by_deviceId_and_day', (q) => q.eq('deviceId', fx.deviceId).eq('day', day)).filter((q) => q.eq(q.field('counts'), true)).first();
+          counts = !prior;
+        }
+        await ctx.db.insert('attempts', {
+          deviceId: fx.deviceId, name: fx.name, targetId: fx.targetId, day, kind, counts, score: fx.score, prompt: fx.prompt, imageUrl: fx.imageUrl, breakdown: fx.breakdown,
+          code: s.code, gameId: s.gameId, playerId: fx.playerId, challengeId: s.challenge ? (s.challenge.id as Id<'attempts'>) : undefined,
+        });
+        break;
+      }
       case 'hint':
         // Give the judge a moment to finish rating late submissions before hinting.
         await ctx.scheduler.runAfter(2_500, internal.ai.hint, { roomId, round: fx.round, gameId: fx.gameId, mode: AI_MODE });
@@ -94,12 +109,14 @@ export const now = mutation({ args: {}, handler: async () => Date.now() });
 export const health = query({ args: {}, handler: async () => ({ aiMode: AI_MODE }) });
 
 export const createDemo = mutation({
-  args: { name: v.string(), daily: v.optional(v.string()) },
-  handler: async (ctx, { name, daily }) => {
+  args: { name: v.string(), daily: v.optional(v.string()), deviceId: v.optional(v.string()), challengeId: v.optional(v.id('attempts')) },
+  handler: async (ctx, { name, daily, deviceId, challengeId }) => {
     const { roomId, eng } = await createRoom(ctx, true);
-    const seat = eng.addPlayer(name || 'You');
+    const seat = eng.addPlayer(name || 'You', false, deviceId?.slice(0, 40));
     if (!('player' in seat)) throw new Error(seat.error);
-    eng.setupDemo(seat.player.id, { daily: daily && /^\d{4}-\d{2}-\d{2}$/.test(daily) ? daily : undefined });
+    const ch = challengeId ? await ctx.db.get('attempts', challengeId) : null;
+    const challenge = ch ? { id: ch._id, name: ch.name, score: ch.score, targetId: ch.targetId } : undefined;
+    eng.setupDemo(seat.player.id, { daily: daily && /^\d{4}-\d{2}-\d{2}$/.test(daily) ? daily : undefined, challenge });
     eng.start();
     await markSeen(ctx, roomId, seat.player.id);
     await commit(ctx, roomId, eng);
@@ -118,8 +135,8 @@ export const createScreen = mutation({
 });
 
 export const join = mutation({
-  args: { code: v.string(), name: v.string(), token: v.optional(v.string()), hostToken: v.optional(v.string()) },
-  handler: async (ctx, { code, name, token, hostToken }) => {
+  args: { code: v.string(), name: v.string(), token: v.optional(v.string()), hostToken: v.optional(v.string()), deviceId: v.optional(v.string()) },
+  handler: async (ctx, { code, name, token, hostToken, deviceId }) => {
     const room = await roomByCode(ctx, code);
     if (!room) return { ok: false as const, error: token ? 'This room has ended. Return home to start a new game.' : 'No room with that code. Check the letters and try again.' };
     const eng = engineFor(room);
@@ -128,7 +145,7 @@ export const join = mutation({
     if (token && !seat) return { ok: false as const, error: 'Your seat in this room has expired. Return home to start or join a new game.' };
     if (seat) eng.connect(seat);
     else {
-      const res = eng.addPlayer(name);
+      const res = eng.addPlayer(name, false, deviceId?.slice(0, 40));
       if (!('player' in res)) return { ok: false as const, error: res.error };
       seat = res;
       eng.toast('join', seat.player.spectator ? `${seat.player.name} is watching, joins next round` : `${seat.player.name} joined`, seat.player.id);

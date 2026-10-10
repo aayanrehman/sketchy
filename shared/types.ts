@@ -48,6 +48,15 @@ export const QUICK_MS: Partial<Record<Phase, number>> = { PROMPT: 8_000, DRAFT: 
 export const ROUNDS_BY_PACE: Record<Pace, number> = { quick: 2, classic: 3 };
 /** Word limits for the two writing passes by difficulty. */
 export const WORD_LIMITS: Record<Difficulty, { draft: number; final: number }> = { easy: { draft: 10, final: 40 }, normal: { draft: 8, final: 30 }, hard: { draft: 6, final: 18 } };
+/** Score tiers: a definite "solved" feeling on top of the 0-100 match. Bronze keeps a daily streak alive. */
+export type Tier = 'gold' | 'silver' | 'bronze' | null;
+export const TIERS: { tier: Exclude<Tier, null>; min: number; label: string; medal: string }[] = [
+  { tier: 'gold', min: 85, label: 'Gold', medal: '🥇' }, { tier: 'silver', min: 75, label: 'Silver', medal: '🥈' }, { tier: 'bronze', min: 60, label: 'Bronze', medal: '🥉' },
+];
+export const tierOf = (score: number | undefined): Tier => (typeof score === 'number' ? TIERS.find((t) => score >= t.min)?.tier ?? null : null);
+export const tierInfo = (tier: Tier) => TIERS.find((t) => t.tier === tier) || null;
+/** A challenge is one recorded attempt another player is invited to beat. */
+export interface ChallengeInfo { id: string; name: string; score: number; targetId: string }
 /** How close an AI image is to the target, five areas of 0-20 each. */
 export interface Breakdown { subject: number; details: number; style: number; color: number; composition: number }
 
@@ -162,6 +171,10 @@ export interface PublicRoom {
   settings?: RoomSettings;
   /** Solo daily challenge: the UTC date key this room plays. */
   daily?: string;
+  /** Solo play started from a challenge link: who to beat. */
+  challenge?: ChallengeInfo;
+  /** A crew created from this room (party games): every client saves it locally. */
+  crewCode?: string;
 }
 
 export interface MeView {

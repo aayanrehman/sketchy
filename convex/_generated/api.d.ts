@@ -14,6 +14,7 @@ import type * as doodle from "../doodle.js";
 import type * as engine from "../engine.js";
 import type * as game from "../game.js";
 import type * as scoring from "../scoring.js";
+import type * as social from "../social.js";
 import type * as targets from "../targets.js";
 
 import type {
@@ -29,6 +30,7 @@ declare const fullApi: ApiFromModules<{
   engine: typeof engine;
   game: typeof game;
   scoring: typeof scoring;
+  social: typeof social;
   targets: typeof targets;
 }>;
 

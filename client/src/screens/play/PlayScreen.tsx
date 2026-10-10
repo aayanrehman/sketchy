@@ -5,6 +5,7 @@ import { useEffect, useState } from 'react';
 import { PhoneShell } from '@/shell/PhoneShell';
 import { PhaseStage, STUDY_BANNER } from '@/shell/PhaseStage';
 import { useRoom } from '@/state/useRoom';
+import { deviceId } from '@/social/identity';
 import { convex, setSession, saveToken, loadToken, saveName, loadName, loadHostToken } from '@/net/socket';
 import { api } from '../../../../convex/_generated/api';
 import { unlockAudio } from '@/sound/sfx';
@@ -34,7 +35,7 @@ export function PlayScreen() {
   const join = (c: string, n: string, token?: string) => {
     setJoining(true); setErr(null);
     const hostToken = loadHostToken(c);
-    convex.mutation(api.game.join, { code: c, name: n, token, hostToken }).then((r) => {
+    convex.mutation(api.game.join, { code: c, name: n, token, hostToken, deviceId: deviceId() }).then((r) => {
       setJoining(false);
       if (!r.ok) { setJoined(false); setErr(r.error); if (token) { try { localStorage.removeItem('sketchy.tokens'); } catch { /* ignore */ } } return; }
       saveToken(c, r.token); saveName(n); setSession({ code: c, token: r.token, hostToken }); setJoined(true);

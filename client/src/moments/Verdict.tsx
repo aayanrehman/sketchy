@@ -2,6 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { Button, DrawingTile, Mascot } from '@/design/components';
 import { childVariants } from '@/design/motion';
 import { send, type MomentProps } from './common';
+import { TierBadge } from '@/social/Social';
 import { BreakdownBars, MODIFIER_INFO } from './PromptMode';
 
 /** Round results on one screen: who it was, both prompts, and every drawing with its votes and match score. */
@@ -94,7 +95,7 @@ function PromptVerdict({ view, ready, waiting, caughtLine }: MomentProps & { rea
               <div className="result__votes">{votes} vote{votes === 1 ? '' : 's'}{typeof d.draftMatch === 'number' && scored ? ` · draft ${d.draftMatch} → final ${d.match} (${d.match! - d.draftMatch >= 0 ? '+' : ''}${d.match! - d.draftMatch})` : ''}</div>
               {d.finalPrompt && <p className="result__prompt">“{d.finalPrompt}”</p>}
               {d.draftPrompt && d.draftPrompt !== d.finalPrompt && <p className="result__draft">Draft: “{d.draftPrompt}”</p>}
-              <div className="result__score"><span>Match with the target</span><div className="result__bar"><i style={{ transform: `scaleX(${scored ? d.match! / 100 : 0})` }} /></div><b>{scored ? `${d.match}/100` : '—'}</b></div>
+              <div className="result__score"><span>Match with the target</span><div className="result__bar"><i style={{ transform: `scaleX(${scored ? d.match! / 100 : 0})` }} /></div><b>{scored ? `${d.match}/100` : '—'}</b>{scored && <TierBadge score={d.match} />}</div>
               {d.breakdown && <BreakdownBars b={d.breakdown} />}
               {(d.sees || d.roast) && <p className="result__note">{d.sees && <><b>Missed:</b> {d.sees}. </>}{d.roast && <><b>Tip:</b> {d.roast}</>}</p>}
             </motion.article>

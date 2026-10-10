@@ -21,7 +21,10 @@ import { VerdictMoment } from '@/moments/Verdict';
 import { ScoresMoment } from '@/moments/Scores';
 import { FinalMoment } from '@/moments/Final';
 import { dailyTarget } from '../../../convex/targets';
-import { todayKey, dailyPlayed, dailyStreak } from '@/progression/store';
+import { todayKey, dailyPlayed, dailyStreak, STREAK_MIN } from '@/progression/store';
+import { deviceId } from '@/social/identity';
+import { ChallengeCard } from '@/social/Social';
+import type { Id } from '../../../convex/_generated/dataModel';
 
 /**
  * /demo: "Try it solo". One human + 3 bots, two rounds (artist, then imposter), in one tab.
@@ -31,6 +34,7 @@ export function Demo({ daily = false }: { daily?: boolean }) {
   const dayKey = todayKey();
   const target = daily ? dailyTarget(dayKey) : null;
   const playedToday = daily ? dailyPlayed(dayKey) : undefined;
+  const challengeId = daily ? new URLSearchParams(location.search).get('c') : null;
   const [name, setName] = useState(loadName() || '');
   const [started, setStarted] = useState(false);
   const [error, setError] = useState('');
@@ -52,7 +56,7 @@ export function Demo({ daily = false }: { daily?: boolean }) {
   const start = () => {
     unlockAudio(); const n = name.trim() || 'You'; saveName(n); setStarted(true); setError('');
     try { sessionStorage.removeItem(daily ? 'sketchy.daily' : 'sketchy.demo'); } catch {}
-    convex.mutation(api.game.createDemo, daily ? { name: n, daily: dayKey } : { name: n }).then((r) => {
+    convex.mutation(api.game.createDemo, daily ? { name: n, daily: dayKey, deviceId: deviceId(), ...(challengeId ? { challengeId: challengeId as Id<'attempts'> } : {}) } : { name: n, deviceId: deviceId() }).then((r) => {
       setSession({ code: r.code, token: r.token });
       try { sessionStorage.setItem(daily ? 'sketchy.daily' : 'sketchy.demo', JSON.stringify({ code: r.code, token: r.token })); } catch {}
     }).catch(() => { setStarted(false); setError('Could not start the demo. Please try again.'); });
@@ -61,11 +65,11 @@ export function Demo({ daily = false }: { daily?: boolean }) {
   if (started && !error && (!view.room || !view.me)) return <Loading label="Setting up your game" />;
   if (!started || !view.room || !view.me) {
     return (
-      <EntryLayout title={daily ? 'Today’s target' : 'Play solo vs. bots'} mood={daily ? 'judge' : 'sus'} onSubmit={start}
+      <EntryLayout title={challengeId ? 'You’ve been challenged' : daily ? 'Today’s target' : 'Play solo vs. bots'} mood={daily ? 'judge' : 'sus'} onSubmit={start}
         subtitle={daily
-          ? <>One picture a day, the same for everyone. One round, about two minutes. {playedToday !== undefined ? <b>You scored {playedToday} today. Play again for practice.</b> : <>Your first score counts for your streak{dailyStreak() ? <b> (🔥 {dailyStreak()} day{dailyStreak() === 1 ? '' : 's'})</b> : null}.</>}</>
+          ? challengeId ? 'One round on the same picture. Score 60+ for Bronze, 75+ Silver, 85+ Gold.' : <>One picture a day, the same for everyone. One round, about two minutes. {playedToday !== undefined ? <b>You scored {playedToday} today. Play again for practice.</b> : <>Your first score counts. Score {STREAK_MIN}+ (Bronze) to keep your streak{dailyStreak() ? <b> (🔥 {dailyStreak()} day{dailyStreak() === 1 ? '' : 's'})</b> : null}.</>}</>
           : '2 quick rounds against 3 bots: once as a regular player, once as the imposter. Bots use pre-made prompts and example scores; yours are live.'}>
-        {daily && target && <img src={target.image} alt="Today's target" className="entry__daily" style={{ filter: 'blur(14px)' }} />}
+        {challengeId ? <ChallengeCard id={challengeId} /> : daily && target && <img src={target.image} alt="Today's target" className="entry__daily" style={{ filter: 'blur(14px)' }} />}
         <p className="entry__badge">{['openai', 'fal'].includes(aiMode) ? 'Live AI: your prompts become images and get scored' : aiMode === 'loading' ? 'Checking the AI…' : 'Preview mode · sample scoring, no live AI'}</p>
         <label className="entry__label" htmlFor="name">Your name</label>
         <input id="name" className="field field--center" placeholder="What should we call you?" value={name} maxLength={12} onChange={(e) => setName(e.target.value)} />

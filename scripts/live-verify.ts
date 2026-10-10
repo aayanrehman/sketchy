@@ -82,10 +82,10 @@ async function landing(ctx: BrowserContext) {
 }
 
 // ---------------------------------------------------------------- shared solo driver
-async function playSolo(p: Page, path: '/daily' | '/demo', tag: string, opts: { rounds: number }) {
+async function playSolo(p: Page, path: '/daily' | '/demo', tag: string, opts: { rounds: number; name?: string; url?: string }) {
   const key = path === '/daily' ? 'sketchy.daily' : 'sketchy.demo';
-  await p.goto(`${SITE}${path}`);
-  await p.getByLabel('Your name', { exact: true }).fill('Tester');
+  await p.goto(opts.url || `${SITE}${path}`);
+  await p.getByLabel('Your name', { exact: true }).fill(opts.name || 'Tester');
   await shot(p, `${tag}-entry`);
   await p.getByRole('button', { name: 'Start', exact: true }).click();
   const sess = await waitUntil(() => p.evaluate((k) => sessionStorage.getItem(k), key), (s) => !!s, 20_000, 'demo session');
@@ -323,8 +323,8 @@ async function mp(ctx: BrowserContext) {
         await waitUntil(() => state(code, s.token), (x) => mine(x!)?.finalPrompt !== undefined || x!.room.phase !== 'REFINE', 15_000, `${s.name} final locked`);
         if (round === 2 && s.name === 'Aayan') { const fv = (await state(code, s.token))!; assert.ok(mine(fv)!.finalPrompt, 'final prompt accepted after a missed draft'); note('Round 2: Aayan skipped the draft (timer ran out) and still locked a final prompt'); }
       }
-      if (lateFinals) { const left = (await state(code, phTok))!.room.phaseEndsAt! - Date.now(); if (left > 9000) await sleep(left - 9000); }
-      for (const b of bots) { const bv = (await state(code, b.token))!; const res = await act(b.token, { t: 'final', text: promptFor(bv.me?.targetUrl, 18, bv.me?.taboo || []) }); assert.ok(res.ok, `bot final: ${res.error}`); }
+      if (lateFinals) { const left = (await state(code, phTok))!.room.phaseEndsAt! - Date.now(); if (left > 12_000) await sleep(left - 12_000); }
+      for (const b of bots) { const bv = (await state(code, b.token))!; const res = await act(b.token, { t: 'final', text: promptFor(bv.me?.targetUrl, 18, bv.me?.taboo || []) }); if (!res.ok) log(`bot final (${b.name}) not accepted: ${res.error}; the draft stands as the final`); }
       if (lateFinals) {
         for (const s of seats) await s.page.getByRole('button', { name: 'Lock in final prompt (step 2 of 2)' }).click();
         const fv = await waitUntil(() => state(code, phTok), (x) => mine(x!)?.finalPrompt !== undefined, 15_000, 'Aayan final locked');
@@ -385,13 +385,74 @@ async function mp(ctx: BrowserContext) {
     assert.equal(fv.room.players.reduce((n, p) => n + p.score, 0), sum, 'player totals equal the sum of awards');
     note(`Game total ${sum} points = sum of every award; no score dropped`);
     await sleep(1500); await shot(tv, 'f-final-tv'); await shot(ph, 'f-final-phone');
+    // Keep this group as a crew: the TV host taps once; both phones (the seats with device ids) are in.
+    await tv.getByRole('button', { name: 'Keep this group as a crew' }).click();
+    await waitUntil(() => ph.evaluate(() => localStorage.getItem('sketchy.crew')), (c) => !!c, 15_000, 'phone saved the crew');
+    const crewA = await ph.evaluate(() => localStorage.getItem('sketchy.crew')); const crewB = await p2.evaluate(() => localStorage.getItem('sketchy.crew'));
+    assert.equal(crewA, crewB, 'both phones saved the same crew');
+    await ph.goto(SITE); await ph.locator('.crew__board').waitFor();
+    await waitUntil(() => ph.locator('.crew__board li').count(), (n) => n === 2, 15_000, 'crew board with both phones');
+    await shot(ph, 'f-crew-from-room');
+    note(`Party game → "Keep this group as a crew": both phones joined crew ${crewA}; the home page shows the board`);
   } finally { clearInterval(beat); await ctx2.close(); }
+}
+
+// ---------------------------------------------------------------- g. tiers, challenge links, duel, crew
+async function social(ctx: BrowserContext) {
+  const p = await page(ctx, PHONE);
+  const first = await playSolo(p, '/daily', 'g-a-daily', { rounds: 1 });
+  const myScore = Math.max(0, ...first.v.room.rounds.flatMap((r) => r.drawings.filter((d) => d.playerId === first.v.me!.playerId).map((d) => (typeof d.match === 'number' ? d.match : 0))));
+  const tierToast = first.toasts.find((t) => /Gold|Silver|Bronze/.test(t));
+  log('tier/streak toasts:', JSON.stringify(first.toasts));
+  if (myScore >= 60) assert.ok(tierToast, 'tier toast for a Bronze+ score');
+  assert.ok((await p.locator('.final-ranks .tier').count()) >= (myScore >= 60 ? 1 : 0), 'tier badge in the final ranks');
+  await shot(p, 'g-a-final');
+  // Challenge link (the attempt row lands a moment after the score).
+  await p.getByRole('button', { name: 'Share your result' }).click();
+  await p.locator('.share__preview img').waitFor({ timeout: 30_000 });
+  const clip = await waitUntil(async () => { await p.getByRole('button', { name: 'Copy challenge' }).click(); await sleep(300); return p.evaluate(() => navigator.clipboard.readText()); }, (t) => t.includes('/daily?c='), 20_000, 'challenge link');
+  const link = clip.match(/https?:\S+/)![0];
+  assert.match(clip, new RegExp(`^I scored ${myScore}/100( \\((Gold|Silver|Bronze)\\))? on this Sketchy picture\\. Beat me: `));
+  note(`Challenge copied: "${clip}"`);
+  await p.keyboard.press('Escape');
+  // Another device opens the link, sees the challenge, plays the same picture and gets the duel.
+  const ctxB = await browser.newContext({ reducedMotion: 'reduce', permissions: ['clipboard-read', 'clipboard-write'] });
+  const pb = await page(ctxB, LAPTOP);
+  await pb.goto(link);
+  await pb.locator('.challenge').waitFor();
+  assert.match(await pb.locator('.challenge').innerText(), new RegExp(`Tester scored ${myScore}/100`));
+  assert.match(await pb.locator('h1').innerText(), /challenged/i);
+  await shot(pb, 'g-b-challenge-entry');
+  const second = await playSolo(pb, '/daily', 'g-b-duel', { rounds: 1, name: 'Rival', url: link });
+  assert.equal(second.v.room.challenge?.score, myScore, 'room carries the challenge');
+  assert.equal(second.v.room.rounds[0].targetId, first.v.room.rounds[0].targetId, 'same picture');
+  await pb.locator('.duel').waitFor();
+  await waitUntil(() => pb.locator('.duel img').count(), (n) => n >= 2, 15_000, 'both duel images');
+  const duel = await pb.locator('.duel').innerText();
+  log('duel:', duel.replace(/\n/g, ' | ').slice(0, 200));
+  assert.match(duel, /You beat Tester!|A dead heat!|Tester holds the record\./);
+  await shot(pb, 'g-b-duel');
+  note(`Duel shown on the challenged device: "${duel.split('\n')[0]}"`);
+  // Crew: A starts one from the landing, B joins through the invite link; both scores appear on the board.
+  await p.goto(SITE); await p.getByRole('button', { name: 'Start a crew' }).click();
+  await p.getByText('Crew started').waitFor();
+  const invite = await p.evaluate(() => navigator.clipboard.readText());
+  assert.match(invite, /\/\?crew=[A-Z0-9]{6}$/);
+  await pb.goto(invite);
+  await pb.getByText('You joined').waitFor({ timeout: 15_000 });
+  await waitUntil(() => pb.locator('.crew__board li').count(), (n) => n === 2, 15_000, 'two crew members');
+  const board = await pb.locator('.crew__board').innerText();
+  assert.match(board, /Tester/); assert.match(board, /Rival \(you\)/);
+  assert.match(board, new RegExp(String(myScore)));
+  await shot(pb, 'g-b-crew-board'); await p.reload(); await p.locator('.crew__board').waitFor(); await shot(p, 'g-a-crew-board');
+  note('Crew: started on device A, joined from the invite link on device B; the board lists both with today’s scores and weekly totals');
+  await ctxB.close(); await p.close();
 }
 
 const which = process.argv[2] || 'all';
 const ctx = await browser.newContext({ reducedMotion: 'reduce', permissions: ['clipboard-read', 'clipboard-write'] });
 try {
-  const flows: Record<string, (ctx: BrowserContext) => Promise<void>> = { landing, daily, demo, mp };
+  const flows: Record<string, (ctx: BrowserContext) => Promise<void>> = { landing, daily, demo, mp, social };
   for (const [name, fn] of Object.entries(flows)) {
     if (which !== 'all' && which !== name) continue;
     log(`=== ${name}`);

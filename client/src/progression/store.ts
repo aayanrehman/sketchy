@@ -1,5 +1,5 @@
 /** Progression saved on the device, no login: XP, level, gallery, personal bests, unlocked colors. */
-import { LEVEL_TITLES, XP_PER_LEVEL } from '@shared/types';
+import { LEVEL_TITLES, XP_PER_LEVEL, TIERS } from '@shared/types';
 import { UNLOCK_COLORS } from '@/design/tokens';
 
 export interface GalleryItem { url: string; golden: boolean; prompt: string; at: number }
@@ -27,18 +27,20 @@ export function dailyStreak(now = Date.now()) {
   if (!d.last) return 0;
   return d.last === t || d.last === prevKey(t) ? d.streak : 0;
 }
-/** Record today's daily score once. Returns the streak after recording, and whether it's a new best score. */
+/** Record today's daily score once. Returns the streak after recording, and whether it's a new best score. Only Bronze or better keeps the streak alive. */
+export const STREAK_MIN = TIERS[TIERS.length - 1].min;
 export function recordDaily(score: number, now = Date.now()) {
   const p = load(); const t = todayKey(now);
-  if (p.daily.played[t] !== undefined) return { streak: dailyStreak(now), first: false, newBest: false };
+  if (p.daily.played[t] !== undefined) return { streak: dailyStreak(now), first: false, newBest: false, kept: false };
   const continues = p.daily.last === prevKey(t);
-  p.daily.streak = continues ? p.daily.streak + 1 : 1;
+  const kept = score >= STREAK_MIN;
+  p.daily.streak = kept ? (continues ? p.daily.streak + 1 : 1) : 0;
   p.daily.bestStreak = Math.max(p.daily.bestStreak, p.daily.streak);
-  p.daily.played[t] = score; p.daily.last = t;
+  p.daily.played[t] = score; if (kept) p.daily.last = t;
   const newBest = score > p.bests.match; p.bests.match = Math.max(p.bests.match, score);
   p.xp += 40 + Math.round(score / 4);
   save(p);
-  return { streak: p.daily.streak, first: true, newBest };
+  return { streak: p.daily.streak, first: true, newBest, kept };
 }
 export function save(p: Progress) {
   try { localStorage.setItem(KEY, JSON.stringify(p)); }

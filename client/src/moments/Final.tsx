@@ -10,6 +10,11 @@ import { useToast } from '@/design/components/Toast';
 import { recordGame, recordDaily, levelTitle, level, levelProgress, load } from '@/progression/store';
 import { HighlightReel, ShareDialog } from './FinalExtras';
 import { send, type MomentProps } from './common';
+import { tierOf, tierInfo } from '@shared/types';
+import { Duel, TierBadge } from '@/social/Social';
+import { saveCrew, crewCode } from '@/social/identity';
+import { convex, getSession } from '@/net/socket';
+import { api } from '../../../convex/_generated/api';
 import './polish.css';
 
 /** FINAL: podium rises for the top 3 with fanfare and confetti, awards, share card, Play again. */
@@ -39,10 +44,12 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
         gallery: mine.filter(({ d }) => d.glowStatus === 'done' && d.glowUrl && !d.glowMock).map(({ d, r }) => ({ url: d.glowUrl!, golden: d.golden, prompt: r.realPrompt, at: Date.now() })),
       });
       if (res && 'leveledUp' in res) { setXp({ before, after: res.xp, up: !!res.leveledUp }); if (res.leveledUp) toast.push({ kind: 'golden', text: `Level up! You are now a ${levelTitle(res.xp)}`, icon: '⬆️' }); }
+      const myMatch = Math.max(0, ...mine.map(({ d }) => (typeof d.match === 'number' ? d.match : 0)));
+      const tier = tierInfo(tierOf(myMatch));
+      if (tier && room.mode === 'prompt') { toast.push({ kind: 'golden', text: `${tier.medal} ${tier.label}! Best match ${myMatch}/100`, icon: tier.medal }); if (tier.tier === 'gold') setTimeout(() => setConfetti((n) => n + 1), rm ? 300 : 1600); }
       if (room.daily) {
-        const myMatch = Math.max(0, ...mine.map(({ d }) => (typeof d.match === 'number' ? d.match : 0)));
         const r = recordDaily(myMatch);
-        if (r.first) toast.push({ kind: 'streak', text: r.streak > 1 ? `🔥 ${r.streak}-day streak! Come back tomorrow for a new picture.` : 'Day 1 of your streak. Same time tomorrow?', icon: '📅' });
+        if (r.first) toast.push({ kind: 'streak', text: !r.kept ? `Below Bronze (60), so the streak doesn’t count today. Tomorrow’s a new picture.` : r.streak > 1 ? `🔥 ${r.streak}-day streak! Come back tomorrow for a new picture.` : 'Day 1 of your streak. Same time tomorrow?', icon: '📅' });
         if (r.newBest && myMatch > 0) toast.push({ kind: 'golden', text: `New personal best: ${myMatch}/100!`, icon: '🏆' });
       }
     }
@@ -63,6 +70,14 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
   }, [room.rounds, room.finalAwards]);
 
   const [sharing, setSharing] = useState(false);
+  // A crew made from this room: every device in it keeps the code.
+  useEffect(() => { if (room.crewCode && crewCode() !== room.crewCode) { saveCrew(room.crewCode); toast.push({ kind: 'info', text: 'This group is now your crew. See the board on the home page.', icon: '👥' }); } /* eslint-disable-next-line */ }, [room.crewCode]);
+  const [crewBusy, setCrewBusy] = useState(false);
+  const keepCrew = () => {
+    const s = getSession(); if (!s) return; setCrewBusy(true);
+    convex.mutation(api.social.crewFromRoom, { code: s.code, token: s.token, hostToken: s.hostToken }).then((r) => { setCrewBusy(false); if (!r.ok) toast.push({ kind: 'info', text: r.error, icon: '👥' }); }).catch(() => setCrewBusy(false));
+  };
+  const myDrawing = me ? room.rounds.flatMap((r) => r.drawings).filter((d) => d.playerId === me.playerId).sort((a, b) => (b.match ?? -1) - (a.match ?? -1))[0] : undefined;
 
   return (
     <div className="phase" style={{ justifyItems: 'center' }}>
@@ -88,9 +103,10 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
           ); })}
         </Rise>
       )}
+      {room.challenge && <Rise style={{ width: '100%', display: 'grid', justifyItems: 'center' }}><Duel room={room} mine={myDrawing} /></Rise>}
       {reel.length > 0 && <Rise style={{ width: '100%' }}><HighlightReel items={reel} view={view} /></Rise>}
       <Rise style={{ width: '100%', maxWidth: 520 }}><ol className="final-ranks" aria-label="Final rankings">
-        {ranked.map(p => <li key={p.id}><span>#{1 + ranked.filter(x => x.score > p.score).length} {p.name}</span><b>{p.score} points</b></li>)}
+        {ranked.map(p => { const best = Math.max(-1, ...room.rounds.flatMap((r) => r.drawings.filter((d) => d.playerId === p.id && typeof d.match === 'number').map((d) => d.match!))); return <li key={p.id}><span>#{1 + ranked.filter(x => x.score > p.score).length} {p.name} {room.mode === 'prompt' && best >= 0 && <TierBadge score={best} />}</span><b>{p.score} points</b></li>; })}
       </ol></Rise>
       {xp && (
         <Rise style={{ width: '100%', maxWidth: 420 }}><Card variant="cyan">
@@ -103,6 +119,7 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
       <Rise style={{ display: 'flex', gap: 8, flexWrap: 'wrap', justifyContent: 'center' }}>
         <Button variant="gold" size="lg" onClick={() => setSharing(true)}>Share your result</Button>
         {view.canHost && !room.isDemo && <Button variant="primary" size="lg" onClick={() => send().emit('host:playAgain')}>Play again</Button>}
+        {view.canHost && !room.isDemo && !room.crewCode && <Button variant="secondary" size="lg" onClick={keepCrew} disabled={crewBusy}>{crewBusy ? 'Saving…' : 'Keep this group as a crew'}</Button>}
         {room.isDemo && <Button variant="lime" onClick={() => { send().emit('host:playAgain'); send().emit('host:start'); }}>Try both roles again</Button>}
         {room.isDemo && <Button variant="primary" size="lg" onClick={() => { go('/'); }}>Host a real game</Button>}
         {phone && !me?.isHost && !room.isDemo && <p className="phase__sub">Waiting for the host to play again…</p>}

@@ -10,6 +10,7 @@ import { unlockAudio } from '@/sound/sfx';
 import { HowTo } from '@/shell/HowTo';
 import { LiveDemo } from './LiveDemo';
 import { useInstall } from '@/shell/useInstall';
+import { CrewCard, TierBadge } from '@/social/Social';
 
 /** / landing: Host a game, Join a game, Try it solo. Shows your level and gallery. */
 export function Landing() {
@@ -36,10 +37,11 @@ export function Landing() {
         <motion.button type="button" className="daily" variants={childVariants(rm)} onClick={() => { unlockAudio(); go('/daily'); }} aria-label="Play today's target">
           <img src={today.image} alt="" style={{ filter: todayScore === undefined ? 'blur(10px)' : 'none' }} />
           <span className="daily__body">
-            <span className="daily__title">Today’s target {streak > 0 && <span className="daily__streak">🔥 {streak}</span>}</span>
+            <span className="daily__title">Today’s target {streak > 0 && <span className="daily__streak">🔥 {streak}</span>}{todayScore !== undefined && <TierBadge score={todayScore} />}</span>
             <span className="daily__sub">{todayScore !== undefined ? `You scored ${todayScore}/100. New picture tomorrow.` : 'One picture, one prompt, two minutes. Same for everyone today.'}</span>
           </span>
         </motion.button>
+        <motion.div variants={childVariants(rm)}><CrewCard /></motion.div>
         <motion.p className="dim" style={{ fontWeight: 800, fontSize: 'var(--t-body-sm)' }} variants={childVariants(rm)}>4–8 players · 3 rounds · no login · phone or laptop · get better at prompting</motion.p>
         <motion.div variants={childVariants(rm)} style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button type="button" className="level-chip" onClick={() => setGallery(true)} aria-label="Your progress and gallery">

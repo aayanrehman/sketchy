@@ -1,3 +1,7 @@
+import { useQuery } from 'convex/react';
+import { api } from '../../../convex/_generated/api';
+import { tierOf, tierInfo } from '@shared/types';
+import { challengeLink } from '@/social/identity';
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import type { Drawing, Round } from '@shared/types';
@@ -88,9 +92,12 @@ export function ShareDialog({ open, onClose, view }: { open: boolean; onClose: (
   const canShare = !!file && typeof navigator.canShare === 'function' && navigator.canShare({ files: [file] });
   const canCopy = !!blob && typeof ClipboardItem !== 'undefined' && !!navigator.clipboard?.write;
   const daily = !!view.room?.daily;
+  const prompt = view.room?.mode === 'prompt';
+  const attempt = useQuery(api.social.attemptFor, open && prompt && view.room && view.me ? { code: view.room.code, gameId: view.room.gameId || '', playerId: view.me.playerId } : 'skip');
   const myScore = (() => { const me = view.me?.playerId; if (!me) return 0; return Math.max(0, ...(view.room?.rounds || []).flatMap((r) => r.drawings.filter((d) => d.playerId === me).map((d) => (typeof d.match === 'number' ? d.match : 0)))); })();
-  const invite = daily ? `${location.origin}/daily` : `${location.origin}/`;
-  const shareText = daily ? `I scored ${myScore}/100 on today’s Sketchy target. Beat me:` : 'Can you out-prompt me?';
+  const tier = tierInfo(tierOf(myScore));
+  const invite = attempt ? challengeLink(attempt.id) : daily ? `${location.origin}/daily` : `${location.origin}/`;
+  const shareText = attempt ? `I scored ${myScore}/100${tier ? ` (${tier.label})` : ''} on this Sketchy picture. Beat me:` : daily ? `I scored ${myScore}/100 on today’s Sketchy target. Beat me:` : 'Can you out-prompt me?';
   const flash = (t: string) => { setNote(t); setTimeout(() => setNote(null), 2200); };
   return (
     <Modal open={open} onClose={onClose} label="Share your result" wide>
@@ -106,7 +113,7 @@ export function ShareDialog({ open, onClose, view }: { open: boolean; onClose: (
           {canShare && <Button variant="gold" size="lg" block onClick={() => navigator.share({ files: [file!], title: 'My Sketchy result', text: shareText, url: invite }).catch(() => {})}>Share…</Button>}
           {canCopy && <Button variant={canShare ? 'ghost' : 'gold'} block onClick={() => navigator.clipboard.write([new ClipboardItem({ 'image/png': blob! })]).then(() => flash('Image copied. Paste it anywhere.')).catch(() => flash('Copy isn’t allowed here. Use Download.'))}>Copy image</Button>}
           <Button variant="ghost" block disabled={!url} onClick={() => { const a = document.createElement('a'); a.href = url!; a.download = file!.name; a.click(); flash('Saved to your downloads.'); }}>Download PNG</Button>
-          <Button variant="ghost" block onClick={() => navigator.clipboard?.writeText(daily ? `${shareText} ${invite}` : invite).then(() => flash(daily ? 'Challenge copied. Paste it to a friend.' : 'Link copied. Send it to your friends.')).catch(() => flash(invite))}>{daily ? 'Copy challenge' : 'Copy invite link'}</Button>
+          <Button variant="ghost" block onClick={() => navigator.clipboard?.writeText(daily || attempt ? `${shareText} ${invite}` : invite).then(() => flash(daily || attempt ? 'Challenge copied. Paste it to a friend.' : 'Link copied. Send it to your friends.')).catch(() => flash(invite))}>{daily || attempt ? 'Copy challenge' : 'Copy invite link'}</Button>
         </div>
         <p className="share__note" role="status">{note || ' '}</p>
         </div>

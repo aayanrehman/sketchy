@@ -1,6 +1,6 @@
 # Sketchy: current handoff
 
-Last updated October 8, 2026, evening (Claude session: deployed the Oct 8 work to prod and verified it in a real browser; see §5). Earlier that day: Draft→Refine clarity, engine edge cases, icons/manifest, docs. Previous: October 7 (Convex + Vercel move, Prompt mode). Older handoffs (`CODEX_FINISH_HANDOFF.md`, earlier versions of this file in git history) describe the previous Socket.IO/drawing-only build and are superseded.
+Last updated October 10, 2026 (Claude session: tiers, challenge duels, crews, 28 targets; see §4d and §5). October 8: deployed and browser-verified the Draft→Refine, settings and daily work. Earlier that day: Draft→Refine clarity, engine edge cases, icons/manifest, docs. Previous: October 7 (Convex + Vercel move, Prompt mode). Older handoffs (`CODEX_FINISH_HANDOFF.md`, earlier versions of this file in git history) describe the previous Socket.IO/drawing-only build and are superseded.
 
 ## 1. Where things live
 
@@ -68,6 +68,16 @@ Fit-to-viewport layouts at 100% zoom; player screen with right-hand players + ch
 - **Imposter view**: the masked target now wears a pulsing ERASED stamp and a dashed red frame; copy says "erased", not "blurred".
 - Engine tests: 38 total.
 
+## 4d. Shipped October 10 (deployed and browser-verified Oct 10): the come-back loop
+
+- **Tiers** (`TIERS`/`tierOf` in `shared/types.ts`): Gold 85, Silver 75, Bronze 60. Badges on results tiles, final ranks, the landing daily card and crew boards; a tier toast on every prompt-mode final (Gold adds a confetti burst). The daily streak only survives at Bronze or better (`STREAK_MIN`, `recordDaily` returns `kept`).
+- **Identity without login**: `deviceId()` (`client/src/social/identity.ts`, localStorage `sketchy.device`) is sent on `join` and `createDemo` and stored on the seat (`Seat.deviceId`).
+- **Attempts table** (`convex/schema.ts`): the engine emits an `attempt` effect when a human's final score lands (`applyCompare`); `commit()` inserts it with kind daily/challenge/party/solo and `counts` (first daily attempt of the device's day). Scripted http seats without a device id record nothing.
+- **Challenges** (`convex/social.ts`): "Copy challenge" in the share dialog copies `I scored N/100 (Tier) on this Sketchy picture. Beat me: <site>/daily?c=<attemptId>`. The link opens the daily entry as "You've been challenged" (`ChallengeCard`), `createDemo` takes `challengeId` and forces that target, and FINAL shows the **duel** (`Duel`: both images, prompts, tiers, winner highlighted). A challenge on today's target also counts as the daily; another target is kind `challenge` and leaves the streak alone.
+- **Crews** (friends): `crews` table (code + members by device id). Landing `CrewCard`: start a crew (copies `/?crew=CODE`), join from the link, board with today's score + tier, streak and the week's total (`crewBoard`, client passes the last 7 UTC day keys). Party games: the host's "Keep this group as a crew" on FINAL (`crewFromRoom`) puts every seated device in a crew; the room carries `crewCode` so every phone saves it.
+- **Target generation**: `scripts/make-targets.ts` (LLM spec → gpt-image-1-mini paints → the edit model erases the key prop under a grey "?" cloud). 16 new targets reviewed and kept (koala-gamer dropped: the console stayed visible in the mask). Library is now 28. Cost ≈ 2 medium images + 1 text call per target (≈ 4–5¢). Adding targets changes that day's daily pick for everyone (`dailyTarget` indexes by library length), so add them late in the day. Never run it while people are playing: on Oct 10 it starved fal and a whole live round fell back ("The image model couldn't draw that prompt", judge fallback, settle timer), which at least proved every fallback path live.
+- Verification flow `social` in `scripts/live-verify.ts`; the `mp` flow now ends with the crew step.
+
 ## 5. Verified vs not verified
 
 **Verified October 8, 2026 on prod (commit deployed = `git rev-parse HEAD`, typecheck clean, 38 tests)** with `scripts/live-verify.ts` (Playwright on the live site, extra seats scripted through the Convex client; screenshots in `artifacts/live/`, gitignored). Run: `VITE_CONVEX_URL=https://curious-chickadee-740.convex.cloud node --import tsx scripts/live-verify.ts [landing|daily|demo|mp|all]` (each run costs real AI jobs: daily ≈ 4, demo ≈ 8, mp ≈ 31).
@@ -77,6 +87,8 @@ Fit-to-viewport layouts at 100% zoom; player screen with right-hand players + ch
 - Lobby (host TV + 2 phones + 2 scripted seats): TV switches Classic (3 rounds) ↔ Quick (2 rounds) and Easy; the phone host (first player to join) switches Hard; the other phone sees the choice with disabled radios. In game: Quick Draft = 25 s, Refine = 30 s; Hard = 6/18 words with taboo then style rules.
 - Prompt mode on the phone: two-step strip, draft recap + pre-fill in Refine, "+3 since your draft", imposter ERASED copy. Missing the draft on purpose (timer ran out) still allowed a final prompt, which was generated and scored.
 - Results: every final image was judged; the game total equalled the sum of all awards (no score dropped). The "Waiting for the judge's last score…" state could NOT be reached live: even with finals locked 9 s before the buzzer, every score had landed before anyone could tap "See scores". It is covered by `convex/engine.test.ts` only.
+
+Verified October 10 on prod (live-verify `social` + `mp`): tier toast and badges ("🥈 Silver! Best match 82/100"); challenge copied with the attempt link; a second browser profile opened it, saw "Tester scored 82/100 Silver", played the same picture and got the duel ("A dead heat!" with both images); crew started on device A, joined from the invite on device B, board listed both with today's scores and weekly totals; party game → "Keep this group as a crew" put both phones in the same crew and the home page showed the board. Also reached live for the first time: "Waiting for the judge's last score…" with 4 scores pending, then the settle timer (while fal was saturated by the target generator).
 
 **Not verified:** a real group of humans on phones; "Add to home screen" on a real iPhone/Android (this Mac has no full Xcode, so no simulator; manifest is `display: standalone` with 192/512/maskable icons); the phone share sheet; audio by ear; judge score consistency at scale; the fal dashboard spend (Claude in Chrome wasn't connected; see §6 for the job-count-based estimate).
 
@@ -104,7 +116,7 @@ My estimate (not a prediction): Execution 4, Creativity 4–5, Usefulness 4, Pol
 7. Decide whether to keep Sketch mode visible or hide it to keep the pitch focused.
 8. ~~Launch/demo video~~ done (see §10).
 9. Clean-ups: delete or archive `server/` + `/studio` once no longer needed.
-10. Not built yet: AI-generated targets (a `generate` call per new target plus a masked variant; needs a mask strategy since masks are hand-made files today), friends/leaderboards (needs identity: at minimum a per-device id and a `dailyScores` table), real recorded bot content for more targets.
+10. Done Oct 10: generated targets (`scripts/make-targets.ts`), friends (crews) and challenges on the `attempts` table. Still not built: real recorded bot content for more targets; a global or per-target leaderboard UI (`social.leaders` exists, unused); a "Challenge a friend" button on the party FINAL for non-prompt rounds; crew member removal; a way to recover a crew code on a new device.
 
 ## 9. Working notes for the next session
 
@@ -112,6 +124,7 @@ My estimate (not a prediction): Execution 4, Creativity 4–5, Usefulness 4, Pol
 - Every change so far was deployed with `npm run deploy`, then committed and pushed to `codex/finish-sketchy-submission`.
 - The Convex guidelines are in `convex/_generated/ai/guidelines.md`; read them before editing `convex/`.
 - Don't print `.env` / `.env.local` values. Load keys with `set -a; source .env; set +a` inside a command when needed.
+- The live-verify flows: `landing` (free), `daily` (≈4 AI jobs), `demo` (≈8), `social` (≈4), `mp` (≈31). Run one at a time; fal throughput is shared with real players.
 - `VITE_CONVEX_URL` in `.env.local` points at the DEV deployment. Scripts that should hit prod (`smoke:mp`, `live-verify`) need `VITE_CONVEX_URL=https://curious-chickadee-740.convex.cloud` on the command line.
 
 ## 10. Launch video + cover (October 7, 2026)

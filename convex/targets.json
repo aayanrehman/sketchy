@@ -249,6 +249,342 @@
       "image": "/targets/bear-picnic.webp",
       "masked": "/targets/bear-picnic-masked.webp",
       "maskFallback": false
+    },
+    {
+      "id": "alien-gardener",
+      "theme": "sci-fi nature",
+      "prompt": "A green-skinned alien wearing a wide-brimmed hat waters glowing plants with a futuristic silver watering can, in a moonlit garden, digital painting",
+      "key": "a futuristic silver watering can",
+      "stealOptions": [
+        "a futuristic silver watering can",
+        "a glowing plant",
+        "a wide-brimmed hat",
+        "a moonlit garden"
+      ],
+      "taboo": [
+        "alien",
+        "watering can",
+        "plants",
+        "garden"
+      ],
+      "image": "/targets/alien-gardener.webp",
+      "masked": "/targets/alien-gardener-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "octopus-barista",
+      "theme": "underwater café",
+      "prompt": "A cheerful octopus wearing a tiny hat serves coffee using a vintage espresso machine underwater, in a colorful coral reef, in the style of claymation.",
+      "key": "a vintage espresso machine",
+      "stealOptions": [
+        "a vintage espresso machine",
+        "a steaming coffee cup",
+        "a coral reef table",
+        "a tiny hat"
+      ],
+      "taboo": [
+        "octopus",
+        "espresso machine",
+        "coffee",
+        "underwater"
+      ],
+      "image": "/targets/octopus-barista.webp",
+      "masked": "/targets/octopus-barista-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "squirrel-painter",
+      "theme": "animal hobbies",
+      "prompt": "A determined squirrel wearing a tiny beret paints a colorful portrait on an easel in a sunny park, in gouache style.",
+      "key": "a tiny beret",
+      "stealOptions": [
+        "a tiny beret",
+        "a paintbrush",
+        "an easel",
+        "a picnic blanket"
+      ],
+      "taboo": [
+        "squirrel",
+        "beret",
+        "painting",
+        "easel"
+      ],
+      "image": "/targets/squirrel-painter.webp",
+      "masked": "/targets/squirrel-painter-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "hedgehog-bakery",
+      "theme": "whimsical animals",
+      "prompt": "A cheerful hedgehog wearing a tiny apron, holding a wooden rolling pin inside a cozy bakery, illustrated in warm gouache style",
+      "key": "a wooden rolling pin",
+      "stealOptions": [
+        "a wooden rolling pin",
+        "a straw basket",
+        "a chef's hat",
+        "a cupcake stand"
+      ],
+      "taboo": [
+        "hedgehog",
+        "rolling pin",
+        "bakery",
+        "apron"
+      ],
+      "image": "/targets/hedgehog-bakery.webp",
+      "masked": "/targets/hedgehog-bakery-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "hedgehog-astronomy",
+      "theme": "space",
+      "prompt": "A curious hedgehog wearing tiny round glasses examines a glowing telescope under a starry night sky, digital illustration.",
+      "key": "a glowing telescope",
+      "stealOptions": [
+        "a glowing telescope",
+        "a shiny astronaut helmet",
+        "a sparkling comet",
+        "a glowing planet model"
+      ],
+      "taboo": [
+        "hedgehog",
+        "telescope",
+        "glasses",
+        "space"
+      ],
+      "image": "/targets/hedgehog-astronomy.webp",
+      "masked": "/targets/hedgehog-astronomy-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "dinosaur-dance",
+      "theme": "prehistoric fun",
+      "prompt": "A cheerful green dinosaur wearing a bright party hat dancing next to a disco ball in a lively jungle, illustrated in vibrant comic book style.",
+      "key": "a bright party hat",
+      "stealOptions": [
+        "a bright party hat",
+        "a shiny disco ball",
+        "a colorful jungle vine",
+        "a pair of funky sunglasses"
+      ],
+      "taboo": [
+        "dinosaur",
+        "party",
+        "hat",
+        "dance"
+      ],
+      "image": "/targets/dinosaur-dance.webp",
+      "masked": "/targets/dinosaur-dance-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "llama-hiker",
+      "theme": "adventure",
+      "prompt": "A cheerful llama wearing a colorful scarf carries a wooden walking stick in a vibrant mountain trail, in a gouache art style.",
+      "key": "a wooden walking stick",
+      "stealOptions": [
+        "a wooden walking stick",
+        "a red backpack",
+        "a green tent",
+        "a blue water bottle"
+      ],
+      "taboo": [
+        "llama",
+        "walking stick",
+        "scarf",
+        "mountain",
+        "hike"
+      ],
+      "image": "/targets/llama-hiker.webp",
+      "masked": "/targets/llama-hiker-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "sloth-circus",
+      "theme": "circus",
+      "prompt": "A sleepy sloth in a colorful circus tent juggling three bright flaming torches, illustrated in vibrant comic book style.",
+      "key": "three bright flaming torches",
+      "stealOptions": [
+        "three bright flaming torches",
+        "a unicycle",
+        "a striped circus tent",
+        "a clown nose"
+      ],
+      "taboo": [
+        "sloth",
+        "torches",
+        "juggling",
+        "circus"
+      ],
+      "image": "/targets/sloth-circus.webp",
+      "masked": "/targets/sloth-circus-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "meerkat-magician",
+      "theme": "magic show",
+      "prompt": "A meerkat wearing a top hat performs a magic trick with a shiny silver wand on a small stage, illustrated in vibrant comic book style.",
+      "key": "a shiny silver wand",
+      "stealOptions": [
+        "a shiny silver wand",
+        "a colorful magic hat",
+        "a sparkling magic cape",
+        "a mysterious magic box"
+      ],
+      "taboo": [
+        "meerkat",
+        "wand",
+        "magic",
+        "trick",
+        "top hat"
+      ],
+      "image": "/targets/meerkat-magician.webp",
+      "masked": "/targets/meerkat-magician-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "owl-detective",
+      "theme": "noir mystery",
+      "prompt": "A solemn owl detective in a trench coat inspects a magnifying glass on a foggy city rooftop at night, painted in moody noir comic book style.",
+      "key": "a magnifying glass",
+      "stealOptions": [
+        "a magnifying glass",
+        "a fedora hat",
+        "a trench coat",
+        "a detective badge"
+      ],
+      "taboo": [
+        "owl",
+        "detective",
+        "magnifying glass"
+      ],
+      "image": "/targets/owl-detective.webp",
+      "masked": "/targets/owl-detective-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "turtle-library",
+      "theme": "quiet adventure",
+      "prompt": "A sleepy turtle wearing round glasses reads a giant ancient book inside a cozy, dimly lit wooden library, in watercolor style.",
+      "key": "a giant ancient book",
+      "stealOptions": [
+        "a giant ancient book",
+        "a stack of colorful books",
+        "a glowing candle",
+        "a leather armchair"
+      ],
+      "taboo": [
+        "turtle",
+        "book",
+        "glasses",
+        "library"
+      ],
+      "image": "/targets/turtle-library.webp",
+      "masked": "/targets/turtle-library-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "mermaid-carnival",
+      "theme": "fantasy fest",
+      "prompt": "A joyful mermaid juggling colorful seashells beside a glowing coral reef, in vibrant stained glass art style.",
+      "key": "colorful seashells",
+      "stealOptions": [
+        "colorful seashells",
+        "glowing coral reef",
+        "joyful mermaid",
+        "vibrant stained glass"
+      ],
+      "taboo": [
+        "mermaid",
+        "seashell"
+      ],
+      "image": "/targets/mermaid-carnival.webp",
+      "masked": "/targets/mermaid-carnival-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "porcupine-puppeteer",
+      "theme": "puppet show",
+      "prompt": "A nervous porcupine controlling a wooden marionette puppet on a small stage, illustrated in charming gouache style.",
+      "key": "a wooden marionette puppet",
+      "stealOptions": [
+        "a wooden marionette puppet",
+        "a glowing lantern",
+        "a velvet curtain",
+        "a tiny spotlight"
+      ],
+      "taboo": [
+        "porcupine",
+        "puppet",
+        "marionette",
+        "stage"
+      ],
+      "image": "/targets/porcupine-puppeteer.webp",
+      "masked": "/targets/porcupine-puppeteer-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "penguin-pizzaiolo",
+      "theme": "animal chef",
+      "prompt": "A penguin wearing a chef’s hat tosses a spinning pizza dough high in a cozy wood-fired kitchen, in expressive gouache style.",
+      "key": "a spinning pizza dough",
+      "stealOptions": [
+        "a spinning pizza dough",
+        "a chef’s hat",
+        "a wood-fired oven",
+        "a rolling pin"
+      ],
+      "taboo": [
+        "penguin",
+        "pizza",
+        "dough"
+      ],
+      "image": "/targets/penguin-pizzaiolo.webp",
+      "masked": "/targets/penguin-pizzaiolo-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "cactus-barbeque",
+      "theme": "desert party",
+      "prompt": "A cheerful cactus wearing sunglasses flips sizzling burgers on a rusty grill at a sunny desert picnic, in vibrant gouache style.",
+      "key": "a rusty grill",
+      "stealOptions": [
+        "a rusty grill",
+        "a colorful sombrero",
+        "a wooden picnic table",
+        "a cactus-shaped balloon"
+      ],
+      "taboo": [
+        "cactus",
+        "grill",
+        "barbecue",
+        "burgers",
+        "desert"
+      ],
+      "image": "/targets/cactus-barbeque.webp",
+      "masked": "/targets/cactus-barbeque-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "rhino-astronaut",
+      "theme": "space adventure",
+      "prompt": "A determined rhino wearing a bulky helmet floats beside a glowing blue rocket ship on a dusty Martian landscape, claymation style.",
+      "key": "a glowing blue rocket ship",
+      "stealOptions": [
+        "a glowing blue rocket ship",
+        "a shiny silver helmet",
+        "a swirling red planet",
+        "a flickering control panel"
+      ],
+      "taboo": [
+        "rhino",
+        "rocket ship",
+        "helmet",
+        "space",
+        "martian"
+      ],
+      "image": "/targets/rhino-astronaut.webp",
+      "masked": "/targets/rhino-astronaut-masked.webp",
+      "maskFallback": false
     }
   ],
   "demo": {
