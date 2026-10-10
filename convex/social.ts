@@ -87,6 +87,20 @@ export const crewFromRoom = mutation({
   },
 });
 
+/** A member hosts a game for the crew: the room code goes on every member's crew card. */
+export const setCrewRoom = mutation({
+  args: { code: v.string(), deviceId: v.string(), roomCode: v.string() },
+  handler: async (ctx, { code, deviceId, roomCode }) => {
+    const crew = await crewByCode(ctx, code);
+    const me = crew?.members.find((m) => m.deviceId === deviceId.slice(0, 40));
+    if (!crew || !me) return { ok: false as const, error: 'Not in this crew.' };
+    const room = await ctx.db.query('rooms').withIndex('by_code', (q) => q.eq('code', roomCode.toUpperCase())).unique();
+    if (!room) return { ok: false as const, error: 'No such room.' };
+    await ctx.db.patch('crews', crew._id, { room: { code: room.code, hostName: me.name, at: Date.now() } });
+    return { ok: true as const };
+  },
+});
+
 /** The crew board. `days` are the UTC day keys to total (the client passes the last 7, newest first). */
 export const crewBoard = query({
   args: { code: v.string(), days: v.array(v.string()) },
@@ -102,6 +116,6 @@ export const crewBoard = query({
       return { deviceId: m.deviceId, name: m.name, today: scores[0], week: scores.reduce<number>((n, x) => n + (x ?? 0), 0), played: scores.filter((x) => x !== null).length, streak };
     }));
     members.sort((a, b) => b.week - a.week || (b.today ?? -1) - (a.today ?? -1));
-    return { code: crew.code, name: crew.name, members };
+    return { code: crew.code, name: crew.name, members, room: crew.room ?? null };
   },
 });

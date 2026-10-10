@@ -76,6 +76,7 @@ Fit-to-viewport layouts at 100% zoom; player screen with right-hand players + ch
 - **Challenges** (`convex/social.ts`): "Copy challenge" in the share dialog copies `I scored N/100 (Tier) on this Sketchy picture. Beat me: <site>/daily?c=<attemptId>`. The link opens the daily entry as "You've been challenged" (`ChallengeCard`), `createDemo` takes `challengeId` and forces that target, and FINAL shows the **duel** (`Duel`: both images, prompts, tiers, winner highlighted). A challenge on today's target also counts as the daily; another target is kind `challenge` and leaves the streak alone.
 - **Crews** (friends): `crews` table (code + members by device id). Landing `CrewCard`: start a crew (copies `/?crew=CODE`), join from the link, board with today's score + tier, streak and the week's total (`crewBoard`, client passes the last 7 UTC day keys). Party games: the host's "Keep this group as a crew" on FINAL (`crewFromRoom`) puts every seated device in a crew; the room carries `crewCode` so every phone saves it.
 - **Target generation**: `scripts/make-targets.ts` (LLM spec → gpt-image-1-mini paints → the edit model erases the key prop under a grey "?" cloud). 16 new targets reviewed and kept (koala-gamer dropped: the console stayed visible in the mask). Library is now 28. Cost ≈ 2 medium images + 1 text call per target (≈ 4–5¢). Adding targets changes that day's daily pick for everyone (`dailyTarget` indexes by library length), so add them late in the day. Never run it while people are playing: on Oct 10 it starved fal and a whole live round fell back ("The image model couldn't draw that prompt", judge fallback, settle timer), which at least proved every fallback path live.
+- **Crew games**: "Host a crew game" on the crew card opens `/host?crew=CODE`; the host page records the room on the crew (`social.setCrewRoom`), and every member's crew card shows "X is hosting · room CODE · Tap to join" for two hours (free `crewgame` verification flow).
 - Verification flow `social` in `scripts/live-verify.ts`; the `mp` flow now ends with the crew step.
 
 ## 4e. Shipped October 10, evening: bots fill the table, duels, favicon, mobile pass
@@ -118,7 +119,7 @@ My estimate (not a prediction): Execution 4, Creativity 4–5, Usefulness 4, Pol
 ## 8. What's left (highest impact first)
 
 1. Real playtest: 4+ people, phones, Prompt mode. Note confusion and bugs.
-2. Cover image still shows Sketch-mode art: regenerate `docs/sketchy-cover.png` and `client/public/og.png` from Prompt-mode screens (SUBMISSION.md and README are updated).
+2. ~~Cover image~~ done Oct 10: `/cover` route (`screens/Cover.tsx` + `cover.css`) rendered by `scripts/make-cover.ts` into `og.png`, `docs/sketchy-cover.png` and the video cover (render from a local `vite preview` or the live site).
 3. Domain (planned playsketchy.com or trysketchy.com): buy, add to the Vercel project, update the share-card site text (it uses `location.host`, so it updates automatically).
 4. Phone pass of Prompt-mode screens (study, writer, refine, results) on a real small phone.
 5. More solo-demo content (pre-made bot rounds for more targets) so replays vary.

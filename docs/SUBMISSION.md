@@ -4,7 +4,7 @@
 
 **Title:** Sketchy — One of you can’t see the whole picture.
 
-**Cover:** [sketchy-cover.png](sketchy-cover.png), 1200×630. (Regenerate from the live game before submitting: the current cover shows Sketch mode art.)
+**Cover:** [sketchy-cover.png](sketchy-cover.png), 1200×630, rendered from the `/cover` route by `scripts/make-cover.ts` (also the link-preview image `client/public/og.png`).
 
 **Public game URL:** https://sketchy-blue.vercel.app (custom domain planned; the share card and invite link follow `location.host` automatically).
 
@@ -32,7 +32,7 @@ Sources: the mission page and the official rules PDF. The mission requires a liv
 ## Before you submit
 
 1. Run two first-time group playtests on phones (see PLAYTEST.md). Fix what confused people.
-2. Regenerate the cover from Prompt-mode screens (target, drafts, IMPOSTER stamp, a match score).
+2. ~~Regenerate the cover~~ done (Prompt-mode target, AI recreation with score and tier, the imposter's erased view).
 3. Point the custom domain at Vercel and confirm HTTPS.
 4. Raise `AI_DAILY_JOB_LIMIT` to 400 for judging week and set a fal spending alert.
 5. Record real bot content for at least four more targets so repeat solo plays differ.

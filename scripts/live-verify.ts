@@ -543,10 +543,29 @@ async function duel(ctx: BrowserContext) {
   } finally { await ctx2.close(); }
 }
 
+// ---------------------------------------------------------------- j. crew game (free): host from the crew card, the other member sees the room and joins
+async function crewgame(ctx: BrowserContext) {
+  const p = await page(ctx, PHONE);
+  await p.goto(SITE); await p.getByRole('button', { name: 'Start a crew' }).click(); await p.getByText('Crew started').waitFor();
+  const invite = await p.evaluate(() => navigator.clipboard.readText());
+  const ctxB = await browser.newContext({ reducedMotion: 'reduce' }); const pb = await page(ctxB, PHONE);
+  await pb.goto(invite); await pb.getByText('You joined').waitFor({ timeout: 15_000 });
+  await p.getByRole('button', { name: 'Host a crew game' }).click();
+  await p.waitForURL('**/host?code=*'); const code = new URL(p.url()).searchParams.get('code')!;
+  await pb.locator('.crew__live').waitFor({ timeout: 15_000 });
+  assert.match(await pb.locator('.crew__live').innerText(), new RegExp(`is hosting · room ${code}`));
+  await shot(pb, 'j-crew-live'); await shot(p, 'j-crew-host');
+  await pb.locator('.crew__live').click(); await pb.waitForURL(`**/play?code=${code}`);
+  await pb.getByLabel('Your name', { exact: true }).fill('Friend'); await pb.getByRole('button', { name: 'Join game' }).click(); await pb.getByText('Pace').waitFor();
+  await shot(pb, 'j-crew-joined');
+  note(`Crew game: "Host a crew game" opened room ${code}; the other member's crew card showed the live room and the Join link landed in the lobby`);
+  await ctxB.close(); await p.close();
+}
+
 const which = process.argv[2] || 'all';
 const ctx = await browser.newContext({ reducedMotion: 'reduce', permissions: ['clipboard-read', 'clipboard-write'] });
 try {
-  const flows: Record<string, (ctx: BrowserContext) => Promise<void>> = { landing, daily, demo, mp, social, audit, duel };
+  const flows: Record<string, (ctx: BrowserContext) => Promise<void>> = { landing, daily, demo, mp, social, audit, duel, crewgame };
   for (const [name, fn] of Object.entries(flows)) {
     if (which !== 'all' && which !== name) continue;
     log(`=== ${name}`);

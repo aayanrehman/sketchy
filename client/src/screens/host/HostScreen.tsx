@@ -5,6 +5,7 @@ import { go } from '@/nav';
 import { MainShell } from '@/shell/MainShell';
 import { PhaseStage, STUDY_BANNER } from '@/shell/PhaseStage';
 import { useRoom } from '@/state/useRoom';
+import { deviceId } from '@/social/identity';
 import { convex, setSession, saveHostToken, loadHostToken } from '@/net/socket';
 import { api } from '../../../../convex/_generated/api';
 import { LobbyMain } from '@/moments/Lobby';
@@ -30,9 +31,12 @@ export function HostScreen() {
     if (code) { setSession({ code, hostToken: loadHostToken(code) }); return; }
     if (creating.current) return;
     creating.current = true;
+    const crew = new URLSearchParams(location.search).get('crew');
     convex.mutation(api.game.createScreen, {}).then((r) => {
       saveHostToken(r.code, r.hostToken); history.replaceState(null, '', `/host?code=${r.code}`);
       setSession({ code: r.code, hostToken: r.hostToken }); setErr(null);
+      // Hosting for a crew: put the room on everyone's crew card.
+      if (crew) convex.mutation(api.social.setCrewRoom, { code: crew, deviceId: deviceId(), roomCode: r.code }).catch(() => {});
     }).catch(() => setErr('Could not create a room. Please try again.')).finally(() => { creating.current = false; });
   }, []);
 

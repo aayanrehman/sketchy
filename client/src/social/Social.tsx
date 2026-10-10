@@ -8,6 +8,7 @@ import { Button, Card } from '@/design/components';
 import { convex, loadName } from '@/net/socket';
 import { targetById } from '../../../convex/targets';
 import { deviceId, crewCode, saveCrew, lastDays, crewLink } from './identity';
+import { go } from '@/nav';
 import './social.css';
 
 /** 🥇 Gold · 🥈 Silver · 🥉 Bronze, or nothing. */
@@ -112,7 +113,11 @@ export function CrewCard() {
           ))}
         </ol>
       )}
+      {board?.room && Date.now() - board.room.at < 2 * 60 * 60 * 1000 && (
+        <a className="crew__live" href={`/play?code=${board.room.code}`}><b>🎮 {board.room.hostName} is hosting · room {board.room.code}</b><span>Tap to join</span></a>
+      )}
       <div className="crew__actions">
+        <Button size="sm" onClick={() => go(`/host?crew=${code}`)}>Host a crew game</Button>
         <Button size="sm" variant="secondary" onClick={invite}>Invite</Button>
         <Button size="sm" variant="ghost" onClick={() => { saveCrew(null); setCode(null); }}>Leave</Button>
       </div>

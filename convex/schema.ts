@@ -30,6 +30,8 @@ export default defineSchema({
   crews: defineTable({
     code: v.string(), name: v.string(),
     members: v.array(v.object({ deviceId: v.string(), name: v.string(), joinedAt: v.number() })),
+    /** A game a member is hosting right now, shown on everyone's crew card with a Join link. */
+    room: v.optional(v.object({ code: v.string(), hostName: v.string(), at: v.number() })),
   }).index('by_code', ['code']),
   /** Daily cap on paid AI jobs across all rooms. */
   aiBudget: defineTable({ day: v.string(), image: v.number(), judge: v.number() }).index('by_day', ['day']),
