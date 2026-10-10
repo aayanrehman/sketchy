@@ -2,7 +2,7 @@ import { motion, useReducedMotion } from 'framer-motion';
 import { go } from '@/nav';
 import { useEffect, useRef } from 'react';
 import QRCode from 'qrcode';
-import { MIN_PLAYERS, MAX_PLAYERS } from '@shared/types';
+import { MIN_PLAYERS, MAX_PLAYERS, FULL_TABLE } from '@shared/types';
 import { Avatar, Button, Card } from '@/design/components';
 import { Rise } from '@/shell/PhaseStage';
 import { childVariants } from '@/design/motion';
@@ -21,7 +21,7 @@ export function LobbyMain({ view }: MomentProps) {
   const url = `${location.origin}/play`;
   return (
     <div className="lobby lobby--host">
-      <Rise><h1 className="entry__title lobby__title">Your room is ready</h1><p className="entry__sub">Everyone joins on their own phone or laptop. You need at least {MIN_PLAYERS} players.</p></Rise>
+      <Rise><h1 className="entry__title lobby__title">Your room is ready</h1><p className="entry__sub">Everyone joins on their own phone or laptop. {MIN_PLAYERS}–{MAX_PLAYERS} players; with fewer than {FULL_TABLE}, bots fill the empty seats.</p></Rise>
       <Rise><Card className="lobby__join">
         <JoinQr url={`${url}?code=${room.code}`} />
         <div>
@@ -33,10 +33,11 @@ export function LobbyMain({ view }: MomentProps) {
       <Rise style={{ width: '100%', maxWidth: 640 }}><SettingsPicker view={view} canPick={!!view.canHost} /></Rise>
       <Rise className="lobby__cast">
         {room.players.map((p) => <motion.div key={p.id} variants={childVariants(rm)}><Avatar player={p} isHost={p.id === room.hostId} />{view.canHost && p.id !== room.hostId && <Button size="sm" variant="ghost" onClick={() => send().emit('host:assign', { playerId: p.id })}>Make host</Button>}</motion.div>)}
-        {Array.from({ length: Math.max(0, MIN_PLAYERS - room.players.length) }, (_, i) => <div key={i} className="lobby__slot" aria-hidden />)}
+        {Array.from({ length: Math.max(0, FULL_TABLE - room.players.length) }, (_, i) => <div key={i} className="lobby__slot" aria-hidden title="Bot seat">🤖</div>)}
       </Rise>
       <Rise>
-        {n < MIN_PLAYERS ? <p className="phase__sub">Need {MIN_PLAYERS} players (or try Demo Mode) · {n}/{MAX_PLAYERS}</p> : view.canHost ? <Button size="lg" onClick={() => send().emit('host:start')}>Start the show</Button> : <p className="phase__sub">Watching · Waiting for the host</p>}
+        {n < MIN_PLAYERS ? <p className="phase__sub">Need {MIN_PLAYERS} players (or try solo mode) · {n}/{MAX_PLAYERS}</p> : view.canHost ? <Button size="lg" onClick={() => send().emit('host:start')}>{n < FULL_TABLE ? `Start with ${FULL_TABLE - n} bot${FULL_TABLE - n === 1 ? '' : 's'}` : 'Start the show'}</Button> : <p className="phase__sub">Watching · Waiting for the host</p>}
+        {n === 2 && <p className="mute" style={{ fontWeight: 700 }}>Two players: a head-to-head. A bot plays the imposter; you both hunt it and compete on score.</p>}
       </Rise>
       <Rise><p className="mute" style={{ fontWeight: 700 }}>Playing on this phone? <a href={`/play?code=${room.code}`}>Join as a player</a></p></Rise>
     </div>
@@ -58,8 +59,9 @@ export function LobbyPhone({ view }: MomentProps) {
       <Rise style={{ width: '100%' }}>
         {isHost ? (
           <>
-            <Button size="lg" block disabled={n < MIN_PLAYERS} onClick={() => send().emit('host:start')}>{n < MIN_PLAYERS ? `Need ${MIN_PLAYERS} players (${n}/${MIN_PLAYERS})` : 'Start the show'}</Button>
-            {n < MIN_PLAYERS && <p className="mute" style={{ marginTop: 8, fontWeight: 700 }}>or <a href="/demo">try Demo Mode</a></p>}
+            <Button size="lg" block disabled={n < MIN_PLAYERS} onClick={() => send().emit('host:start')}>{n < MIN_PLAYERS ? `Need ${MIN_PLAYERS} players (${n}/${MIN_PLAYERS})` : n < FULL_TABLE ? `Start with ${FULL_TABLE - n} bot${FULL_TABLE - n === 1 ? '' : 's'}` : 'Start the show'}</Button>
+            {n < MIN_PLAYERS && <p className="mute" style={{ marginTop: 8, fontWeight: 700 }}>or <a href="/demo">play solo vs. bots</a></p>}
+            {n === 2 && <p className="mute" style={{ marginTop: 8, fontWeight: 700 }}>Head-to-head: a bot plays the imposter, you both hunt it and compete on score.</p>}
           </>
         ) : <p className="phase__sub">Waiting for host… ({n}/{MAX_PLAYERS})</p>}
       </Rise>

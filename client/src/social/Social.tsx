@@ -34,27 +34,34 @@ export function ChallengeCard({ id }: { id: string }) {
   );
 }
 
-/** Final screen of a challenge play: you vs them, side by side. */
-export function Duel({ room, mine }: { room: PublicRoom; mine: Drawing | undefined }) {
-  const ch = room.challenge!;
-  const a = useQuery(api.social.attempt, { id: ch.id as Id<'attempts'> });
+export interface Rival { name: string; score: number; imageUrl?: string; prompt?: string; loading?: boolean }
+/** Head-to-head result: you vs one rival, side by side. */
+export function Duel({ mine, rival, title }: { mine: Drawing | undefined; rival: Rival; title?: string }) {
   const my = typeof mine?.match === 'number' && mine.match >= 0 ? mine.match : null;
-  const verdict = my === null ? 'No score this time.' : my > ch.score ? `You beat ${ch.name}!` : my === ch.score ? 'A dead heat!' : `${ch.name} holds the record.`;
+  const verdict = my === null ? 'No score this time.' : my > rival.score ? `You beat ${rival.name}!` : my === rival.score ? 'A dead heat!' : `${rival.name} takes it.`;
   return (
-    <Card className="duel" variant={my !== null && my > ch.score ? 'gold' : 'default'}>
+    <Card className="duel" variant={my !== null && my > rival.score ? 'gold' : 'default'}>
+      {title && <span className="duel__kicker">{title}</span>}
       <h2 className="display-sm">{verdict}</h2>
       <div className="duel__row">
-        <figure className={my !== null && my >= ch.score ? 'is-win' : ''}>
+        <figure className={my !== null && my >= rival.score ? 'is-win' : ''}>
           {mine?.glowUrl ? <img src={mine.glowUrl} alt="Your image" /> : <div className="duel__none">No image</div>}
           <figcaption><b>You · {my ?? '—'}</b> <TierBadge score={my ?? undefined} /><small>{mine?.finalPrompt}</small></figcaption>
         </figure>
-        <figure className={my === null || ch.score >= my ? 'is-win' : ''}>
-          {a?.imageUrl ? <img src={a.imageUrl} alt={`${ch.name}'s image`} /> : <div className="duel__none">{a === undefined ? 'Loading…' : 'No image'}</div>}
-          <figcaption><b>{ch.name} · {ch.score}</b> <TierBadge score={ch.score} /><small>{a?.prompt}</small></figcaption>
+        <figure className={my === null || rival.score >= my ? 'is-win' : ''}>
+          {rival.imageUrl ? <img src={rival.imageUrl} alt={`${rival.name}'s image`} /> : <div className="duel__none">{rival.loading ? 'Loading…' : 'No image'}</div>}
+          <figcaption><b>{rival.name} · {rival.score}</b> <TierBadge score={rival.score} /><small>{rival.prompt}</small></figcaption>
         </figure>
       </div>
     </Card>
   );
+}
+
+/** Final screen of a challenge play: the challenger's recorded attempt is the rival. */
+export function ChallengeDuel({ room, mine }: { room: PublicRoom; mine: Drawing | undefined }) {
+  const ch = room.challenge!;
+  const a = useQuery(api.social.attempt, { id: ch.id as Id<'attempts'> });
+  return <Duel mine={mine} rival={{ name: ch.name, score: ch.score, imageUrl: a?.imageUrl, prompt: a?.prompt, loading: a === undefined }} title="Challenge" />;
 }
 
 /** Landing: your crew's board, or a way to start one. Joins from ?crew=CODE links. */

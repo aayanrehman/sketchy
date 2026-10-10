@@ -79,3 +79,4 @@
 .writer__from span { font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--c-text-mute); }
 .writer__from em { font-style: normal; font-weight: 700; color: var(--c-text-dim); }
 @media (max-width: 480px) { .pass li small { display: none; } }
+@media (max-width: 360px) { .pass li span { white-space: normal; line-height: 1.1; } .pass li { padding: 4px 8px 4px 4px; } }

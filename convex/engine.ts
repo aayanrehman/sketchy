@@ -7,7 +7,7 @@
 import type {
   Phase, Player, Round, Drawing, PublicRoom, MeView, Stroke, PromptPair, FinalAward, ToastKind, GameMode, Modifier, Breakdown, RoomSettings, ChallengeInfo,
 } from '../shared/types';
-import { PHASE_MS, MIN_PLAYERS, MAX_PLAYERS, TOTAL_ROUNDS, GLOWUP_ROOM_CAP, GOLDEN_ODDS, DEFAULT_SETTINGS, QUICK_MS, ROUNDS_BY_PACE } from '../shared/types';
+import { PHASE_MS, MIN_PLAYERS, MAX_PLAYERS, FULL_TABLE, TOTAL_ROUNDS, GLOWUP_ROOM_CAP, GOLDEN_ODDS, DEFAULT_SETTINGS, QUICK_MS, ROUNDS_BY_PACE } from '../shared/types';
 import { PROMPT_PAIRS } from '../shared/prompts';
 import { scoreRound, resolveVotes, validScore } from './scoring';
 import { doodle } from './doodle';
@@ -121,6 +121,9 @@ export class Engine {
   // ---------- helpers ----------
   get players(): Player[] { return this.s.seats.map((x) => x.player); }
   get activePlayers(): Player[] { return this.players.filter((p) => !p.spectator); }
+  get humans(): Player[] { return this.players.filter((p) => !p.isBot); }
+  /** Two humans at the table: a head-to-head where a bot is always the imposter. */
+  get duel(): boolean { return !this.s.isDemo && this.humans.length === 2; }
   seat(id: string) { return this.s.seats.find((x) => x.player.id === id) || null; }
   findByToken(token: string) { return this.s.seats.find((x) => x.token === token) || null; }
   playersMap() { return new Map(this.players.map((p) => [p.id, p])); }
@@ -301,7 +304,7 @@ export class Engine {
             : [`${target}'s drawing is giving different energy.`, `Hmm, ${target}, explain yourself.`, `I'm looking at ${target}. Something doesn't match.`, `Is it just me or is ${target}'s one weird?`]);
         };
         shuffle(bots).slice(0, 3).forEach((id, i) => this.botLater(2000 + i * 3500 + Math.random() * 1000, 'chat', id, lines(id)));
-        this.botLater(16_000, 'skip', bots[0] || '');
+        if (this.s.isDemo) this.botLater(16_000, 'skip', bots[0] || '');
         break;
       }
       case 'VOTE': {
@@ -408,7 +411,7 @@ export class Engine {
     this.s.phaseEndsAt = ms ? this.now + ms : null;
     if (ms) this.schedule('advance', ms, { t: 'advance' });
     this.touch();
-    if (this.s.isDemo) this.demoOnPhase(phase);
+    if (this.s.botIds.some((id) => this.seat(id))) this.demoOnPhase(phase);
     if (phase === 'GALLERY') this.checkEarlyEnd();
   }
 
@@ -422,7 +425,7 @@ export class Engine {
 
   canStart(): string | null {
     if (this.s.phase !== 'LOBBY' && this.s.phase !== 'FINAL') return 'Already started';
-    if (this.activePlayers.length < MIN_PLAYERS) return `Need ${MIN_PLAYERS} players (or try the solo demo)`;
+    if (!this.s.isDemo && this.activePlayers.filter((p) => !p.isBot).length < MIN_PLAYERS) return `Need ${MIN_PLAYERS} players (or try the solo demo)`;
     return null;
   }
 
@@ -440,14 +443,29 @@ export class Engine {
       const [a, b] = shuffle(Object.keys(DEMO).map(Number));
       this.s.forcedPairs = { 1: a, 2: b }; this.s.forcedImposters = { 1: pick(this.s.botIds), 2: human?.id || '' };
     }
-    if (!this.s.isDemo) this.s.totalRounds = ROUNDS_BY_PACE[this.settings.pace];
+    if (!this.s.isDemo) { this.s.totalRounds = ROUNDS_BY_PACE[this.settings.pace]; this.fillBots(); }
     this.resetGame();
     this.setPhase('HOW_TO', null);
     return null;
   }
 
+  /** Fewer than a full table of humans: bots take the empty seats (pre-made prompts and scores, no AI cost). */
+  private fillBots() {
+    const humans = this.humans.filter((p) => !p.spectator).length;
+    const want = Math.max(0, FULL_TABLE - humans);
+    const have = this.s.botIds.filter((id) => this.seat(id));
+    for (const id of have.slice(want)) this.s.seats = this.s.seats.filter((x) => x.player.id !== id);
+    const names = BOT_NAMES.filter((n) => !this.players.some((p) => p.name === n));
+    const added: string[] = [];
+    for (let i = have.length; i < want; i++) { const seat = this.addPlayer(names.shift() || `Bot ${i + 1}`, true); if ('player' in seat) added.push(seat.player.id); }
+    this.s.botIds = [...have.slice(0, want), ...added];
+    if (added.length) this.toast('join', `${added.map((id) => this.seat(id)!.player.name).join(' and ')} join${added.length === 1 ? 's' : ''} as bot${added.length === 1 ? '' : 's'} to fill the table`);
+  }
+
   playAgain() {
     if (this.s.phase !== 'FINAL') return;
+    // Bots leave the lobby so real players can take the seats; start() fills again if needed.
+    if (!this.s.isDemo) { this.s.seats = this.s.seats.filter((x) => !x.player.isBot); this.s.botIds = []; }
     this.resetGame();
     this.setPhase('LOBBY', null);
   }
@@ -465,6 +483,7 @@ export class Engine {
   private pickImposter(ids: string[]): string {
     const forced = this.s.forcedImposters[String(this.s.round)];
     if (forced && ids.includes(forced)) return forced;
+    if (this.duel) { const bots = ids.filter((id) => this.seat(id)?.player.isBot); if (bots.length) return pick(bots); }
     let pool = ids.filter((id) => !this.s.imposterHistory.includes(id));
     if (!pool.length) { this.s.imposterHistory = []; pool = ids; }
     return pick(pool);
@@ -864,7 +883,7 @@ export class Engine {
       code: s.code, hostId: s.hostId, isDemo: s.isDemo, round: s.round, totalRounds: s.totalRounds,
       phase: s.phase, phaseEndsAt: s.phaseEndsAt, phaseStartedAt: s.phaseStartedAt,
       players: this.players, rounds: s.rounds.map((r) => this.publicRound(r, seat?.player.id || null)), mode: this.mode, settings: this.settings, daily: s.daily,
-      challenge: s.challenge, crewCode: s.crewCode,
+      challenge: s.challenge, crewCode: s.crewCode, duel: this.duel || undefined,
       aiImageCount: s.aiImageCount, finalAwards: s.finalAwards, aiMode: this.aiMode, toasts: s.toasts,
     };
     let me: MeView | null = null;

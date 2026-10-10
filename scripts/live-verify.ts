@@ -42,7 +42,10 @@ async function shot(p: Page, name: string) {
   await sleep(400);
   const v = p.viewportSize()!; const file = `${out}/${name}-${v.width}x${v.height}.png`;
   await p.screenshot({ path: file }); log('📸', file);
+  const over = await p.evaluate(() => Math.max(0, document.documentElement.scrollWidth - window.innerWidth)).catch(() => 0);
+  if (over > 1) { overflows.push(`${name} @${v.width}: ${over}px wider than the viewport`); log('⚠️ horizontal overflow', over, 'px'); }
 }
+const overflows: string[] = [];
 type View = Awaited<ReturnType<typeof state>>;
 const state = (code: string, token?: string, hostToken?: string) => c.query(api.game.state, { code, token, hostToken });
 async function waitPhase(code: string, token: string | undefined, phases: string | string[], ms = 90_000, hostToken?: string): Promise<NonNullable<View>> {
@@ -60,6 +63,7 @@ const waitUntil = async <T,>(fn: () => Promise<T>, ok: (t: T) => boolean, ms = 6
   while (Date.now() - t0 < ms) { last = await fn(); if (ok(last)) return last; await sleep(500); }
   throw new Error(`timed out waiting for ${label}: ${JSON.stringify(last!)?.slice(0, 300)}`);
 };
+const act = (token: string | undefined, action: any, host: boolean, code: string, hostToken?: string) => c.mutation(api.game.act, { code, token, hostToken: host ? hostToken : undefined, action });
 const mine = (v: NonNullable<View>) => v.room.rounds[v.room.round - 1]?.drawings.find((d) => d.playerId === v.me?.playerId);
 
 // ---------------------------------------------------------------- a. landing
@@ -218,9 +222,9 @@ async function demo(ctx: BrowserContext) {
       assert.equal(d.glowStatus, 'done', `bot final image present (round ${i + 1})`);
       assert.equal(d.draftStatus, 'done', `bot draft image present (round ${i + 1})`);
       assert.ok(typeof d.match === 'number' && d.match >= 0, 'bot scored');
-      if (!recorded) assert.ok(d.glowUrl!.endsWith(t.image) || d.glowUrl!.endsWith(t.masked), `placeholder bot uses the target/masked image: ${d.glowUrl}`);
+      assert.ok(d.glowUrl!.startsWith('/targets/'), `bot image is recorded content or a placeholder: ${d.glowUrl}`);
     }
-    note(`Demo round ${i + 1}: target ${r.targetId} (${recorded ? 'recorded bots' : 'placeholder bots'}), resolved to scores`);
+    note(`Demo round ${i + 1}: target ${r.targetId} (${recorded ? 'hand-made' : 'recorded'} bots), resolved to scores`);
   }
   await p.close();
 }
@@ -449,15 +453,106 @@ async function social(ctx: BrowserContext) {
   await ctxB.close(); await p.close();
 }
 
+// ---------------------------------------------------------------- h. viewport audit (free): lobby, how-to, study and writer on small phones
+async function audit(ctx: BrowserContext) {
+  const tv = await page(ctx, LAPTOP);
+  await tv.goto(`${SITE}/host`); await tv.waitForURL('**/host?code=*');
+  const code = new URL(tv.url()).searchParams.get('code')!;
+  const sizes = [{ width: 320, height: 568 }, { width: 360, height: 740 }, { width: 390, height: 844 }, { width: 430, height: 932 }];
+  const ctxs = await Promise.all(sizes.map(() => browser.newContext({ reducedMotion: 'reduce' })));
+  const phones = await Promise.all(ctxs.map((c, i) => page(c, sizes[i])));
+  for (const [i, ph] of phones.entries()) {
+    await ph.goto(`${SITE}/play?code=${code}`);
+    await ph.getByLabel('Your name', { exact: true }).fill(`P${sizes[i].width}`); await ph.getByRole('button', { name: 'Join game' }).click();
+    await ph.getByText('Pace').waitFor();
+  }
+  // 4 humans here, so no bots: the audit is about layout. Landing + lobby + how-to + study + writer, every size.
+  for (const ph of phones) await shot(ph, 'h-lobby');
+  await shot(tv, 'h-lobby-tv');
+  await tv.getByRole('button', { name: 'Start the show' }).click();
+  for (const ph of phones) { await ph.getByRole('button', { name: 'Let’s play' }).waitFor(); await shot(ph, 'h-howto'); }
+  for (const ph of phones) await ph.getByRole('button', { name: 'Let’s play' }).click();
+  for (const ph of phones) { await ph.locator('.target__frame img').waitFor(); await shot(ph, 'h-study'); }
+  for (const ph of phones) { await ph.locator('#prompt').waitFor({ timeout: 20_000 }); await ph.locator('#prompt').fill('a cheerful animal, watercolor'); await shot(ph, 'h-writer'); }
+  for (const ph of phones) { await ph.goto(SITE); await ph.getByRole('button', { name: 'Host a game' }).waitFor(); await shot(ph, 'h-landing'); await ph.goto(`${SITE}/daily`); await ph.getByLabel('Your name', { exact: true }).waitFor(); await shot(ph, 'h-daily-entry'); }
+  for (const c of ctxs) await c.close(); await tv.close();
+  note(`Viewport audit at ${sizes.map((s) => s.width).join('/')}px: lobby, how-to, study, writer, landing, daily entry${overflows.length ? ` — ${overflows.length} overflow(s)` : ', no horizontal overflow'}`);
+}
+
+// ---------------------------------------------------------------- i. two humans + two bots: bot imposter, head-to-head final
+async function duel(ctx: BrowserContext) {
+  const tv = await page(ctx, LAPTOP);
+  await tv.goto(`${SITE}/host`); await tv.waitForURL('**/host?code=*');
+  const code = new URL(tv.url()).searchParams.get('code')!;
+  const hostToken = (await tv.evaluate((c) => localStorage.getItem(`sketchy.host.${c}`), code))!;
+  const ph = await page(ctx, PHONE);
+  await ph.goto(`${SITE}/play?code=${code}`); await ph.getByLabel('Your name', { exact: true }).fill('Aayan'); await ph.getByRole('button', { name: 'Join game' }).click(); await ph.getByText('Pace').waitFor();
+  const ctx2 = await browser.newContext({ reducedMotion: 'reduce' }); const p2 = await page(ctx2, PHONE);
+  await p2.goto(`${SITE}/play?code=${code}`); await p2.getByLabel('Your name', { exact: true }).fill('Nia'); await p2.getByRole('button', { name: 'Join game' }).click(); await p2.getByText('Pace').waitFor();
+  try {
+    await waitUntil(() => state(code, undefined, hostToken), (v) => v!.room.players.length === 2, 15_000, '2 players');
+    assert.match(await tv.locator('.lobby').innerText(), /head-to-head/i);
+    await shot(tv, 'i-lobby-tv'); await shot(ph, 'i-lobby-phone');
+    await tv.getByRole('button', { name: 'Start with 2 bots' }).click();
+    const phTok = (await ph.evaluate((c) => JSON.parse(localStorage.getItem('sketchy.tokens') || '{}')[c], code))!;
+    const p2Tok = (await p2.evaluate((c) => JSON.parse(localStorage.getItem('sketchy.tokens') || '{}')[c], code))!;
+    const seats = [{ name: 'Aayan', token: phTok, page: ph }, { name: 'Nia', token: p2Tok, page: p2 }];
+    let v = await waitPhase(code, phTok, 'HOW_TO');
+    assert.equal(v.room.players.length, 4); assert.equal(v.room.players.filter((p) => p.isBot).length, 2, 'two bots filled the table');
+    assert.ok(v.room.duel, 'room is a duel');
+    for (const s of seats) await s.page.getByRole('button', { name: 'Let’s play' }).click();
+    for (let round = 1; round <= 2; round++) {
+      v = await waitPhase(code, phTok, ['PROMPT', 'DRAFT']);
+      const views = await Promise.all(seats.map((s) => state(code, s.token)));
+      assert.ok(views.every((x) => !x!.me?.isImposter), `round ${round}: neither human is the imposter`);
+      v = await waitPhase(code, phTok, 'DRAFT');
+      for (const [i, s] of seats.entries()) {
+        await s.page.locator('#prompt').fill(promptFor(views[i]!.me?.targetUrl, 6, views[i]!.me?.taboo || []));
+        await s.page.getByRole('button', { name: 'Lock in draft (step 1 of 2)' }).click();
+        await waitUntil(() => state(code, s.token), (x) => !!x!.room.players.find((p) => p.id === x!.me!.playerId)?.hasSubmitted || x!.room.phase !== 'DRAFT', 15_000, `${s.name} draft locked`);
+      }
+      v = await waitPhase(code, phTok, 'REFINE', 60_000);
+      if (round === 1) { await sleep(3000); await shot(ph, 'i-r1-refine-phone'); await shot(tv, 'i-r1-refine-tv'); }
+      for (const [i, s] of seats.entries()) {
+        await s.page.locator('#prompt').fill(promptFor(views[i]!.me?.targetUrl, 18, views[i]!.me?.taboo || []));
+        await s.page.getByRole('button', { name: 'Lock in final prompt (step 2 of 2)' }).click();
+        await waitUntil(() => state(code, s.token), (x) => mine(x!)?.finalPrompt !== undefined || x!.room.phase !== 'REFINE', 15_000, `${s.name} final locked`);
+      }
+      await waitPhase(code, phTok, 'GALLERY', 120_000); await sleep(4000); await shot(tv, `i-r${round}-reveal-tv`);
+      await waitPhase(code, phTok, 'DISCUSS'); await sleep(2500); await shot(ph, `i-r${round}-discuss-phone`);
+      await act(undefined, { t: 'skip' }, true, code, hostToken);
+      v = await waitPhase(code, phTok, 'VOTE');
+      const bots = v.room.players.filter((p) => p.isBot).map((p) => p.id);
+      for (const s of seats) await s.page.locator(`[data-tile="${bots[round % 2]}"]`).click();
+      v = await waitPhase(code, phTok, ['UNMASK', 'STEAL', 'VERDICT'], 60_000); await sleep(2500); await shot(tv, `i-r${round}-unmask-tv`);
+      const rr = (await waitUntil(() => state(code, phTok), (x) => !!x!.room.rounds[round - 1].imposterId, 30_000, 'imposter revealed'))!.room.rounds[round - 1];
+      assert.ok(bots.includes(rr.imposterId), `round ${round}: the imposter was a bot`);
+      v = await waitPhase(code, phTok, 'VERDICT', 90_000);
+      for (const s of seats) await s.page.getByRole('button', { name: 'See scores →' }).click();
+      v = await waitPhase(code, phTok, ['SCORES', 'PROMPT', 'DRAFT', 'FINAL'], 60_000);
+      const done = v.room.rounds[round - 1];
+      log(`round ${round}`, done.drawings.map((d) => `${v.room.players.find((p) => p.id === d.playerId)?.name}:${d.draftMatch ?? '-'}→${d.match ?? '-'} ${d.judgeStatus}`).join(' '));
+      assert.ok(done.drawings.filter((d) => v.room.players.find((p) => p.id === d.playerId)?.isBot).every((d) => d.glowStatus === 'done' && d.judgeStatus === 'done'), 'bots had images and scores');
+    }
+    const fv = await waitPhase(code, phTok, 'FINAL', 60_000);
+    await ph.locator('.duel').waitFor({ timeout: 15_000 });
+    const text = await ph.locator('.duel').innerText();
+    assert.match(text, /HEAD-TO-HEAD/i); assert.match(text, /Nia/);
+    await shot(ph, 'i-final-duel-phone'); await shot(p2, 'i-final-duel-phone2'); await shot(tv, 'i-final-tv');
+    note(`Duel: 2 humans + 2 bots, bot imposter both rounds, head-to-head panel on both phones ("${text.split('\n')[1]}"); scores ${fv.room.players.map((p) => `${p.name}:${p.score}`).join(' ')}`);
+  } finally { await ctx2.close(); }
+}
+
 const which = process.argv[2] || 'all';
 const ctx = await browser.newContext({ reducedMotion: 'reduce', permissions: ['clipboard-read', 'clipboard-write'] });
 try {
-  const flows: Record<string, (ctx: BrowserContext) => Promise<void>> = { landing, daily, demo, mp, social };
+  const flows: Record<string, (ctx: BrowserContext) => Promise<void>> = { landing, daily, demo, mp, social, audit, duel };
   for (const [name, fn] of Object.entries(flows)) {
     if (which !== 'all' && which !== name) continue;
     log(`=== ${name}`);
     await fn(ctx);
   }
   assert.deepEqual(errors, [], 'no page errors');
+  if (overflows.length) console.log('OVERFLOWS:\n' + overflows.map((n) => ' - ' + n).join('\n'));
   console.log('\nPASS\n' + notes.map((n) => ' - ' + n).join('\n'));
 } finally { await browser.close(); }

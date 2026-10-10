@@ -27,7 +27,9 @@ export const PHASE_MS: Record<Exclude<Phase, 'LOBBY' | 'FINAL' | 'VERDICT'>, num
 export const VERDICT_BASE_MS = 4_000;
 export const VERDICT_PER_DRAWING_MS = 3_200;
 
-export const MIN_PLAYERS = 4;
+export const MIN_PLAYERS = 2;
+/** Rooms with fewer humans than this are filled with bots at start. */
+export const FULL_TABLE = 4;
 export const MAX_PLAYERS = 8;
 export const TOTAL_ROUNDS = 3;
 export const GLOWUP_ROOM_CAP = 24;
@@ -175,6 +177,8 @@ export interface PublicRoom {
   challenge?: ChallengeInfo;
   /** A crew created from this room (party games): every client saves it locally. */
   crewCode?: string;
+  /** Exactly two humans (plus bots): the imposter is always a bot and the final shows a head-to-head. */
+  duel?: boolean;
 }
 
 export interface MeView {

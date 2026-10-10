@@ -2,7 +2,7 @@
 
 **One of you can’t see the whole picture.**
 
-A party game for 4–8 people on phones or laptops, no login, no install. Everyone sees a target image and recreates it by writing AI prompts: a quick 8-word draft, then a final prompt of up to 30 words. One imposter sees the same image with the key detail blurred and has to bluff. Compare the images, chat, vote, then an AI judge scores every final image against the target.
+A party game for 2–8 people on phones or laptops (bots fill empty seats below four), no login, no install. Everyone sees a target image and recreates it by writing AI prompts: a quick 8-word draft, then a final prompt of up to 30 words. One imposter sees the same image with the key detail blurred and has to bluff. Compare the images, chat, vote, then an AI judge scores every final image against the target.
 
 **Play:** https://sketchy-blue.vercel.app · **Solo practice:** `/demo` · **Host screen (TV):** `/host`
 
@@ -30,6 +30,8 @@ Scoring: correct vote +100 (+150 on a streak) · imposter escapes +200 · steal 
 - `/daily`: one shared target per UTC day, one quick round vs bots. Scores earn tiers (Bronze 60, Silver 75, Gold 85); Bronze or better keeps the streak.
 - Every scored prompt-mode final is recorded in the `attempts` table under a per-device id (no login). "Copy challenge" on any result makes a link (`/daily?c=<attempt>`) that opens the same picture and ends in a side-by-side duel.
 - Crews: "Start a crew" on the home page or "Keep this group as a crew" at the end of a party game; the invite link (`/?crew=CODE`) joins; the board shows today's score, tier, streak and the week's total per member.
+- Fewer than 4 players: bots (Pixel, Doodle, Smudge) fill the table at start with recorded prompts, images and scores (no AI cost). With exactly 2 humans a bot is always the imposter and the final shows a head-to-head.
+- Bot content: `node --import tsx scripts/make-bot-content.ts` records 3 artists + 1 imposter per target (8 images + 8 judge calls ≈ 10¢ per target). Icons: `node --import tsx scripts/make-icons.ts`.
 - New targets: `node --import tsx scripts/make-targets.ts --count 5` (needs `FAL_KEY`; writes images + `convex/targets.json`; review the masked versions before committing; never run it while people are playing, it starves the live image model).
 
 ## Run it

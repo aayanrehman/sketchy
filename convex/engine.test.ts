@@ -140,3 +140,34 @@ test('solo play works on any target with placeholder bots; daily uses today\'s t
   const d = r.drawings.find((x) => x.playerId === bot)!;
   assert.ok(d && d.draftPrompt, 'placeholder bot drafted');
 });
+
+test('2 or 3 humans: bots fill the table at start; with 2 humans the imposter is always a bot', () => {
+  const e = new Engine(newState('BOTS', false, 1_000), 'mock', 1_000);
+  const seats = ['Ana', 'Ben'].map((n) => e.addPlayer(n) as Seat);
+  for (const s of seats) e.connect(s);
+  assert.equal(e.start(), null);
+  assert.equal(e.players.length, 4);
+  assert.equal(e.players.filter((p) => p.isBot).length, 2);
+  assert.ok(e.duel);
+  for (const s of seats) e.howToReady(s.player.id);
+  for (const id of e.s.botIds) e.howToReady(id); // the bots' how-to timers would do this
+  assert.equal(e.s.phase, 'PROMPT');
+  const r = e.s.rounds[0];
+  assert.ok(e.seat(r.imposterId)!.player.isBot, 'a bot is the imposter in a duel');
+  assert.ok(e.effects.some((x: any) => x.t === 'timer' && x.action?.t === 'bot'), 'bots are scheduled to act');
+  // A third human makes it a normal game: one bot, anyone can be the imposter.
+  const e2 = new Engine(newState('BOT3', false, 1_000), 'mock', 1_000);
+  for (const n of ['Ana', 'Ben', 'Cy']) e2.connect(e2.addPlayer(n) as Seat);
+  assert.equal(e2.start(), null);
+  assert.equal(e2.players.filter((p) => p.isBot).length, 1);
+  assert.ok(!e2.duel);
+  // Play again drops the bots so humans can take the seats.
+  e2.s.phase = 'FINAL'; e2.playAgain();
+  assert.equal(e2.players.filter((p) => p.isBot).length, 0);
+});
+
+test('a lone player cannot start', () => {
+  const e = new Engine(newState('ONE', false, 1_000), 'mock', 1_000);
+  e.connect(e.addPlayer('Ana') as Seat);
+  assert.match(e.start() || '', /Need 2 players/);
+});

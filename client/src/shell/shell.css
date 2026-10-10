@@ -50,7 +50,7 @@
 .lobby__url { font-weight: 900; color: var(--c-text-dim); font-size: var(--t-body-lg); }
 .lobby__url b { color: var(--c-ink); }
 .lobby__cast { display: flex; gap: var(--s-4); flex-wrap: wrap; justify-content: center; min-height: 100px; }
-.lobby__slot { width: 68px; height: 54px; border-radius: var(--r-pill); border: 3px dashed var(--c-line); }
+.lobby__slot { width: 68px; height: 54px; border-radius: var(--r-pill); border: 3px dashed var(--c-line); display: grid; place-items: center; font-size: 22px; opacity: .55; }
 .lobby__join { display: grid; grid-template-columns: auto 1fr; gap: var(--s-4); align-items: center; text-align: left; }
 .lobby__qr { width: 132px; height: 132px; border-radius: var(--r-md); border: var(--ol); background: var(--c-surface); padding: 6px; display: block; }
 @media (max-width: 560px) { .lobby__join { grid-template-columns: 1fr; justify-items: center; text-align: center; } }
@@ -452,6 +452,7 @@
 .setting__opt { display: grid; gap: 1px; text-align: left; padding: 8px 10px; border-radius: var(--r-sm); border: 2px solid var(--c-ink); background: var(--c-surface); color: var(--c-text-dim); cursor: pointer; box-shadow: 0 3px 0 rgba(43,37,64,.12); min-height: var(--tap); }
 .setting__opt b { font-family: var(--f-display); font-size: var(--t-body-md); color: var(--c-ink); }
 .setting__opt small { font-size: 11px; font-weight: 800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+@media (max-width: 560px) { .setting__opt small { white-space: normal; line-height: 1.25; } .setting__opt { padding: 8px 8px; } }
 .setting__opt.is-on { background: var(--c-blue); box-shadow: 0 3px 0 var(--c-ink); }
 .setting__opt:disabled { cursor: default; }
 
@@ -463,3 +464,10 @@
 .daily__streak { padding: 1px 8px; border-radius: var(--r-pill); background: var(--c-yellow); border: 2px solid var(--c-ink); font-size: var(--t-body-xs); font-weight: 900; }
 .daily__sub { font-size: var(--t-body-sm); font-weight: 800; color: var(--c-text-dim); }
 .entry__daily { width: 120px; height: 120px; object-fit: cover; border-radius: var(--r-md); border: var(--ol); justify-self: center; }
+/* Small phones: keep the header to two rows (you + round + controls, then the timer). */
+@media (max-width: 560px) {
+  .phone-shell__head { gap: var(--s-2); }
+  .phone-shell__me { flex: 1 1 0; }
+  .phone-shell__ctl { gap: 4px; }
+  .phone-shell__ctl .btn { width: 40px; height: 40px; min-width: 40px; padding: 0; }
+}

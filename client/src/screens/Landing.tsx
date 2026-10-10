@@ -42,7 +42,7 @@ export function Landing() {
           </span>
         </motion.button>
         <motion.div variants={childVariants(rm)}><CrewCard /></motion.div>
-        <motion.p className="dim" style={{ fontWeight: 800, fontSize: 'var(--t-body-sm)' }} variants={childVariants(rm)}>4–8 players · 3 rounds · no login · phone or laptop · get better at prompting</motion.p>
+        <motion.p className="dim" style={{ fontWeight: 800, fontSize: 'var(--t-body-sm)' }} variants={childVariants(rm)}>2–8 players · bots fill empty seats · no login · phone or laptop · get better at prompting</motion.p>
         <motion.div variants={childVariants(rm)} style={{ display: 'flex', gap: 8, justifyContent: 'center', flexWrap: 'wrap' }}>
           <button type="button" className="level-chip" onClick={() => setGallery(true)} aria-label="Your progress and gallery">
             <span>Lv {level(prog.xp)} {levelTitle(prog.xp)}</span><span className="level-bar"><i style={{ transform: `scaleX(${levelProgress(prog.xp)})` }} /></span>

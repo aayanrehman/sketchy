@@ -11,7 +11,7 @@ import { recordGame, recordDaily, levelTitle, level, levelProgress, load } from 
 import { HighlightReel, ShareDialog } from './FinalExtras';
 import { send, type MomentProps } from './common';
 import { tierOf, tierInfo } from '@shared/types';
-import { Duel, TierBadge } from '@/social/Social';
+import { Duel, ChallengeDuel, TierBadge } from '@/social/Social';
 import { saveCrew, crewCode } from '@/social/identity';
 import { convex, getSession } from '@/net/socket';
 import { api } from '../../../convex/_generated/api';
@@ -78,6 +78,10 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
     convex.mutation(api.social.crewFromRoom, { code: s.code, token: s.token, hostToken: s.hostToken }).then((r) => { setCrewBusy(false); if (!r.ok) toast.push({ kind: 'info', text: r.error, icon: '👥' }); }).catch(() => setCrewBusy(false));
   };
   const myDrawing = me ? room.rounds.flatMap((r) => r.drawings).filter((d) => d.playerId === me.playerId).sort((a, b) => (b.match ?? -1) - (a.match ?? -1))[0] : undefined;
+  // Two-human room: the other human is the rival (their best image).
+  const rivalPlayer = room.duel && me ? room.players.find((p) => !p.isBot && p.id !== me.playerId) : undefined;
+  const rivalDrawing = rivalPlayer ? room.rounds.flatMap((r) => r.drawings).filter((d) => d.playerId === rivalPlayer.id && typeof d.match === 'number' && d.match >= 0).sort((a, b) => (b.match ?? -1) - (a.match ?? -1))[0] : undefined;
+  const rival = rivalPlayer ? { name: rivalPlayer.name, score: rivalDrawing?.match ?? 0, imageUrl: rivalDrawing?.glowUrl, prompt: rivalDrawing?.finalPrompt } : undefined;
 
   return (
     <div className="phase" style={{ justifyItems: 'center' }}>
@@ -103,7 +107,8 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
           ); })}
         </Rise>
       )}
-      {room.challenge && <Rise style={{ width: '100%', display: 'grid', justifyItems: 'center' }}><Duel room={room} mine={myDrawing} /></Rise>}
+      {room.challenge && <Rise style={{ width: '100%', display: 'grid', justifyItems: 'center' }}><ChallengeDuel room={room} mine={myDrawing} /></Rise>}
+      {!room.challenge && room.duel && me && rival && <Rise style={{ width: '100%', display: 'grid', justifyItems: 'center' }}><Duel mine={myDrawing} rival={rival} title="Head-to-head" /></Rise>}
       {reel.length > 0 && <Rise style={{ width: '100%' }}><HighlightReel items={reel} view={view} /></Rise>}
       <Rise style={{ width: '100%', maxWidth: 520 }}><ol className="final-ranks" aria-label="Final rankings">
         {ranked.map(p => { const best = Math.max(-1, ...room.rounds.flatMap((r) => r.drawings.filter((d) => d.playerId === p.id && typeof d.match === 'number').map((d) => d.match!))); return <li key={p.id}><span>#{1 + ranked.filter(x => x.score > p.score).length} {p.name} {room.mode === 'prompt' && best >= 0 && <TierBadge score={best} />}</span><b>{p.score} points</b></li>; })}

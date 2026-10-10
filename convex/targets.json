@@ -483,25 +483,6 @@
       "maskFallback": false
     },
     {
-      "id": "mermaid-carnival",
-      "theme": "fantasy fest",
-      "prompt": "A joyful mermaid juggling colorful seashells beside a glowing coral reef, in vibrant stained glass art style.",
-      "key": "colorful seashells",
-      "stealOptions": [
-        "colorful seashells",
-        "glowing coral reef",
-        "joyful mermaid",
-        "vibrant stained glass"
-      ],
-      "taboo": [
-        "mermaid",
-        "seashell"
-      ],
-      "image": "/targets/mermaid-carnival.webp",
-      "masked": "/targets/mermaid-carnival-masked.webp",
-      "maskFallback": false
-    },
-    {
       "id": "porcupine-puppeteer",
       "theme": "puppet show",
       "prompt": "A nervous porcupine controlling a wooden marionette puppet on a small stage, illustrated in charming gouache style.",
@@ -770,6 +751,2606 @@
           }
         }
       ]
+    },
+    "robot-dog": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "silver robot walks white fluffy poodle",
+          "draftImage": "/targets/robot-dog-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 14,
+            "style": 10,
+            "color": 8,
+            "composition": 12,
+            "missed": "robot design and lighting style",
+            "tip": "use a dark, rainy city background with glowing eyes"
+          },
+          "finalPrompt": "a small silver robot walking a fluffy white poodle down a rainy city street at night with cinematic lighting",
+          "finalImage": "/targets/robot-dog-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 14,
+            "style": 15,
+            "color": 13,
+            "composition": 12,
+            "missed": "dog breed and robot eye glow color",
+            "tip": "specify dog breed and robot eye color more clearly"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "robot walking white dog city street",
+          "draftImage": "/targets/robot-dog-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 10,
+            "style": 8,
+            "color": 6,
+            "composition": 10,
+            "missed": "robot and dog design and environment differ",
+            "tip": "specify robot style and dog breed, include rainy night city background"
+          },
+          "finalPrompt": "a small robot walking a white fluffy dog down a wet city street at night",
+          "finalImage": "/targets/robot-dog-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 14,
+            "color": 13,
+            "composition": 13,
+            "missed": "robot eye color and dog breed details",
+            "tip": "use specific eye color and dog breed descriptions"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "robot with dog on city street",
+          "draftImage": "/targets/robot-dog-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 10,
+            "style": 8,
+            "color": 7,
+            "composition": 9,
+            "missed": "robot and dog design, lighting, and background",
+            "tip": "specify nighttime rain with glowing robot eyes and fluffy white dog"
+          },
+          "finalPrompt": "robot walking a dog on a rainy city street at night",
+          "finalImage": "/targets/robot-dog-bot-smudge-final.webp",
+          "final": {
+            "subject": 9,
+            "details": 7,
+            "style": 14,
+            "color": 13,
+            "composition": 11,
+            "missed": "robot and dog design differ significantly",
+            "tip": "specify robot and dog appearance and breed clearly"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "silver robot with white cat city street",
+        "draftImage": "/targets/robot-dog-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 8,
+          "details": 6,
+          "style": 7,
+          "color": 5,
+          "composition": 6,
+          "missed": "robot and dog design, setting, and lighting",
+          "tip": "specify small robot with glowing eyes and fluffy dog in rainy night"
+        },
+        "finalPrompt": "a small silver robot walking a fluffy white cat down a rainy city street at night with cinematic lighting",
+        "finalImage": "/targets/robot-dog-bot-imposter-final.webp",
+        "final": {
+          "subject": 12,
+          "details": 10,
+          "style": 14,
+          "color": 15,
+          "composition": 14,
+          "missed": "dog instead of cat, robot details differ",
+          "tip": "specify a white cat with fluffy fur and robot details"
+        }
+      }
+    },
+    "shark-interview": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Shark in business suit at interview",
+          "draftImage": "/targets/shark-interview-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 10,
+            "details": 8,
+            "style": 6,
+            "color": 7,
+            "composition": 9,
+            "missed": "missing the orange fish character",
+            "tip": "include both shark and orange fish characters at desk"
+          },
+          "finalPrompt": "A shark wearing a blue business suit sitting at a desk across from a nervous goldfish during a job interview, flat vector art style",
+          "finalImage": "/targets/shark-interview-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 12,
+            "style": 9,
+            "color": 10,
+            "composition": 14,
+            "missed": "cartoon style and facial expressions",
+            "tip": "use flat cartoon style with sharp lines and exaggerated expressions"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Shark and fish at a desk",
+          "draftImage": "/targets/shark-interview-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 10,
+            "style": 12,
+            "color": 14,
+            "composition": 16,
+            "missed": "shark and fish posture and interaction",
+            "tip": "depict shark leaning on desk, fish sitting on chair"
+          },
+          "finalPrompt": "A shark in a blue suit interviewing a nervous goldfish at a desk, simple flat vector style",
+          "finalImage": "/targets/shark-interview-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 12,
+            "style": 13,
+            "color": 12,
+            "composition": 13,
+            "missed": "fish's facial expressions and props differ",
+            "tip": "include specific facial expressions and objects like paper and sweat drops"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Fish and shark talking at desk",
+          "draftImage": "/targets/shark-interview-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 10,
+            "style": 14,
+            "color": 13,
+            "composition": 15,
+            "missed": "shark and fish positions and expressions swapped",
+            "tip": "swap shark and fish positions and add speech bubbles"
+          },
+          "finalPrompt": "A shark and a fish sitting at a desk in an office setting, flat cartoon vector art",
+          "finalImage": "/targets/shark-interview-bot-smudge-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 9,
+            "style": 11,
+            "color": 13,
+            "composition": 12,
+            "missed": "fish and shark roles swapped",
+            "tip": "keep shark on left, fish on right, same poses"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Shark and a confident clownfish meeting",
+        "draftImage": "/targets/shark-interview-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 8,
+          "details": 6,
+          "style": 7,
+          "color": 10,
+          "composition": 7,
+          "missed": "fish characters and setting details",
+          "tip": "include anthropomorphic fish with office setting and props"
+        },
+        "finalPrompt": "A shark in a blue suit at a job interview sitting across from a confident clownfish, flat vector art style",
+        "finalImage": "/targets/shark-interview-bot-imposter-final.webp",
+        "final": {
+          "subject": 10,
+          "details": 7,
+          "style": 12,
+          "color": 10,
+          "composition": 9,
+          "missed": "fish species and facial expressions",
+          "tip": "specify shark and goldfish with distinct expressions"
+        }
+      }
+    },
+    "ghost-cake": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Friendly ghost selfies with birthday cake",
+          "draftImage": "/targets/ghost-cake-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 10,
+            "style": 12,
+            "color": 10,
+            "composition": 13,
+            "missed": "number of candles and cake details",
+            "tip": "match candle count and cake decoration exactly"
+          },
+          "finalPrompt": "A friendly little ghost happily taking a selfie holding a slice of birthday cake in a spooky kitchen, rendered in a cute 3D style",
+          "finalImage": "/targets/ghost-cake-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 15,
+            "color": 14,
+            "composition": 15,
+            "missed": "cake shape and candle color",
+            "tip": "specify cake as rectangular with orange candle"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Ghost and cake in spooky kitchen",
+          "draftImage": "/targets/ghost-cake-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 8,
+            "details": 10,
+            "style": 7,
+            "color": 6,
+            "composition": 8,
+            "missed": "ghost's expression and cake style",
+            "tip": "make ghost cute and cartoonish with bright colors"
+          },
+          "finalPrompt": "A little ghost posing with a slice of cake in a haunted kitchen setting, focusing on the cute atmosphere without specific artistic style",
+          "finalImage": "/targets/ghost-cake-bot-doodle-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 8,
+            "style": 7,
+            "color": 10,
+            "composition": 12,
+            "missed": "ghost holding smartphone and candle",
+            "tip": "include smartphone and candle on cake plate"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Ghost in spooky kitchen",
+          "draftImage": "/targets/ghost-cake-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 5,
+            "details": 4,
+            "style": 3,
+            "color": 6,
+            "composition": 7,
+            "missed": "cute ghost with cake and phone",
+            "tip": "make ghost cartoonish and include cake with candle"
+          },
+          "finalPrompt": "A small ghost standing in a spooky kitchen, no clear details about what it’s holding or doing",
+          "finalImage": "/targets/ghost-cake-bot-smudge-final.webp",
+          "final": {
+            "subject": 5,
+            "details": 5,
+            "style": 6,
+            "color": 5,
+            "composition": 7,
+            "missed": "ghost's expression and props",
+            "tip": "include ghost holding cake and phone with happy face"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Ghost with a pumpkin in kitchen",
+        "draftImage": "/targets/ghost-cake-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 10,
+          "details": 8,
+          "style": 12,
+          "color": 10,
+          "composition": 14,
+          "missed": "ghost holding pumpkin instead of cake",
+          "tip": "include a lit candle on a slice of cake"
+        },
+        "finalPrompt": "A friendly ghost taking a selfie holding a pumpkin instead of cake, inside a spooky kitchen, with a cute 3D look",
+        "finalImage": "/targets/ghost-cake-bot-imposter-final.webp",
+        "final": {
+          "subject": 14,
+          "details": 10,
+          "style": 15,
+          "color": 14,
+          "composition": 13,
+          "missed": "wrong object held by ghost",
+          "tip": "specify ghost holding cake with candle"
+        }
+      }
+    },
+    "wizard-car": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "grumpy wizard in small yellow car",
+          "draftImage": "/targets/wizard-car-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 14,
+            "style": 12,
+            "color": 10,
+            "composition": 16,
+            "missed": "cartoon style and background details missing",
+            "tip": "use cartoon style with detailed background and expressive face"
+          },
+          "finalPrompt": "A grumpy wizard stuck in traffic, driving a tiny yellow car, honking loudly, cartoon style with warm golden hour lighting",
+          "finalImage": "/targets/wizard-car-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 15,
+            "color": 15,
+            "composition": 14,
+            "missed": "Facial expression and hand position differ",
+            "tip": "Specify exact facial expression and hand grip on steering wheel"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "wizard stuck in traffic honking horn",
+          "draftImage": "/targets/wizard-car-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 14,
+            "style": 10,
+            "color": 12,
+            "composition": 13,
+            "missed": "cartoon style and car shape",
+            "tip": "use cartoon style and simplified car design"
+          },
+          "finalPrompt": "A wizard stuck in traffic honking the horn, driving a small car, cartoon style with warm light",
+          "finalImage": "/targets/wizard-car-bot-doodle-final.webp",
+          "final": {
+            "subject": 12,
+            "details": 10,
+            "style": 13,
+            "color": 13,
+            "composition": 11,
+            "missed": "Wizard's expression and hand position",
+            "tip": "Specify wizard's angry expression and hands gripping steering wheel"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "wizard in car honking horn",
+          "draftImage": "/targets/wizard-car-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 12,
+            "style": 14,
+            "color": 10,
+            "composition": 13,
+            "missed": "Wizard's expression and car color",
+            "tip": "Specify angry expression and yellow car color"
+          },
+          "finalPrompt": "A wizard sitting in a car honking the horn, in a cartoon style, bright afternoon",
+          "finalImage": "/targets/wizard-car-bot-smudge-final.webp",
+          "final": {
+            "subject": 11,
+            "details": 9,
+            "style": 13,
+            "color": 7,
+            "composition": 9,
+            "missed": "angry expression and sunset background",
+            "tip": "use angry expression and sunset lighting"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "wizard stuck in traffic driving red car",
+        "draftImage": "/targets/wizard-car-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 14,
+          "details": 12,
+          "style": 8,
+          "color": 10,
+          "composition": 15,
+          "missed": "cartoon style and exaggerated features",
+          "tip": "use cartoon style with bold lines and simplified shapes"
+        },
+        "finalPrompt": "A grumpy wizard stuck in traffic, driving a small red car, honking the horn, cartoon style with golden hour lighting",
+        "finalImage": "/targets/wizard-car-bot-imposter-final.webp",
+        "final": {
+          "subject": 14,
+          "details": 12,
+          "style": 13,
+          "color": 11,
+          "composition": 14,
+          "missed": "car color and wizard's beard color",
+          "tip": "use exact car and beard colors, emphasize cartoon style"
+        }
+      }
+    },
+    "snowman-beach": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Melting snowman on tropical beach",
+          "draftImage": "/targets/snowman-beach-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 10,
+            "style": 8,
+            "color": 14,
+            "composition": 15,
+            "missed": "melting snowman holding ice cream cone",
+            "tip": "include melting snowman holding colorful ice cream cone"
+          },
+          "finalPrompt": "A melting snowman standing on a sunny tropical beach holding an ice cream cone, rendered in bright pop art style",
+          "finalImage": "/targets/snowman-beach-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 12,
+            "style": 14,
+            "color": 15,
+            "composition": 13,
+            "missed": "Ice cream cone has one scoop, not two",
+            "tip": "Add two scoops of ice cream with distinct colors on cone"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Snowman melting on sunny beach",
+          "draftImage": "/targets/snowman-beach-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 10,
+            "style": 12,
+            "color": 14,
+            "composition": 13,
+            "missed": "missing melting sweat drops and ice cream cone",
+            "tip": "include melting sweat drops and ice cream cone in hand"
+          },
+          "finalPrompt": "Snowman melting under the sun on a tropical beach, holding a sweet treat, without the focus on artistic style",
+          "finalImage": "/targets/snowman-beach-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 12,
+            "style": 4,
+            "color": 13,
+            "composition": 14,
+            "missed": "cartoon style and melting ice cream cone",
+            "tip": "use cartoon style with exaggerated melting and colorful ice cream"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Snowman on a beach",
+          "draftImage": "/targets/snowman-beach-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 10,
+            "style": 5,
+            "color": 12,
+            "composition": 15,
+            "missed": "melting snowman and ice cream cone",
+            "tip": "include melting details and cartoon style"
+          },
+          "finalPrompt": "A snowman melting on a sunny beach surrounded by sand and palm trees",
+          "finalImage": "/targets/snowman-beach-bot-smudge-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 9,
+            "style": 5,
+            "color": 13,
+            "composition": 12,
+            "missed": "melting snowman holding ice cream cone",
+            "tip": "include melting snowman holding ice cream cone explicitly"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Melting snowman on tropical beach holding popsicle",
+        "draftImage": "/targets/snowman-beach-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 18,
+          "details": 12,
+          "style": 10,
+          "color": 14,
+          "composition": 15,
+          "missed": "melting snowman holding different frozen treat",
+          "tip": "specify melting snowman holding ice cream cone with three scoops"
+        },
+        "finalPrompt": "A melting snowman on a bright tropical beach holding a colorful popsicle under the sunny sky in a pop art style",
+        "finalImage": "/targets/snowman-beach-bot-imposter-final.webp",
+        "final": {
+          "subject": 14,
+          "details": 10,
+          "style": 14,
+          "color": 12,
+          "composition": 13,
+          "missed": "Ice cream cone replaced with rainbow popsicle",
+          "tip": "Include melting snowman holding a triple scoop ice cream cone"
+        }
+      }
+    },
+    "pirate-skate": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "pirate with parrot skateboarding on pier",
+          "draftImage": "/targets/pirate-skate-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 16,
+            "details": 14,
+            "style": 12,
+            "color": 14,
+            "composition": 15,
+            "missed": "parrot's headgear and pirate's coat color",
+            "tip": "add parrot's headgear and match pirate's coat color"
+          },
+          "finalPrompt": "a pirate with a colorful parrot on his shoulder riding a skateboard down a wooden pier, drawn in comic book style with bold lines and vibrant colors",
+          "finalImage": "/targets/pirate-skate-bot-pixel-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 10,
+            "style": 12,
+            "color": 11,
+            "composition": 14,
+            "missed": "parrot color and skateboard details",
+            "tip": "use a green parrot and detailed skateboard wheels"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "pirate and parrot on wooden pier",
+          "draftImage": "/targets/pirate-skate-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 10,
+            "details": 8,
+            "style": 6,
+            "color": 12,
+            "composition": 7,
+            "missed": "pirate's pose and skateboard missing",
+            "tip": "include pirate crouching on skateboard with exaggerated expression"
+          },
+          "finalPrompt": "a pirate carrying a parrot on his shoulder standing on a wooden pier, moving quickly on a board, detailed background but no specific art style",
+          "finalImage": "/targets/pirate-skate-bot-doodle-final.webp",
+          "final": {
+            "subject": 7,
+            "details": 5,
+            "style": 4,
+            "color": 6,
+            "composition": 5,
+            "missed": "pirate skateboarding with parrot on shoulder",
+            "tip": "include pirate on skateboard with parrot and exaggerated expression"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "pirate and bird on dock",
+          "draftImage": "/targets/pirate-skate-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 8,
+            "style": 10,
+            "color": 14,
+            "composition": 10,
+            "missed": "Pirate's pose and parrot's color",
+            "tip": "Depict pirate crouching on skateboard with green parrot"
+          },
+          "finalPrompt": "a pirate with a bird on his shoulder on a dock, casual setting with wooden planks underfoot, simple drawing focusing on characters",
+          "finalImage": "/targets/pirate-skate-bot-smudge-final.webp",
+          "final": {
+            "subject": 11,
+            "details": 7,
+            "style": 6,
+            "color": 2,
+            "composition": 9,
+            "missed": "pirate's pose and skateboard missing",
+            "tip": "include dynamic pose and skateboard, specify colored comic style"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "pirate with parrot riding a surfboard",
+        "draftImage": "/targets/pirate-skate-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 14,
+          "details": 10,
+          "style": 12,
+          "color": 13,
+          "composition": 11,
+          "missed": "skateboard replaced by surfboard, different parrot colors",
+          "tip": "use skateboard and green parrot with orange beak"
+        },
+        "finalPrompt": "a pirate with a parrot on his shoulder riding a surfboard down a wooden pier, comic book style with dynamic action lines and bright colors",
+        "finalImage": "/targets/pirate-skate-bot-imposter-final.webp",
+        "final": {
+          "subject": 10,
+          "details": 9,
+          "style": 13,
+          "color": 12,
+          "composition": 11,
+          "missed": "skateboard replaced by surfboard, parrot missing",
+          "tip": "include skateboard and parrot on shoulder, keep pier details"
+        }
+      }
+    },
+    "astronaut-garden": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Astronaut watering huge sunflowers on moon",
+          "draftImage": "/targets/astronaut-garden-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 17,
+            "style": 8,
+            "color": 10,
+            "composition": 16,
+            "missed": "background and lighting style",
+            "tip": "use softer pastel colors and a cartoonish style"
+          },
+          "finalPrompt": "An astronaut gently watering giant sunflowers on the moon, illustrated in soft pastel colors, styled like a whimsical children's book drawing",
+          "finalImage": "/targets/astronaut-garden-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 14,
+            "color": 12,
+            "composition": 15,
+            "missed": "watering can shape and water flow",
+            "tip": "Specify watering can style and water pouring details"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Astronaut watering big flowers on moon",
+          "draftImage": "/targets/astronaut-garden-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 12,
+            "style": 14,
+            "color": 10,
+            "composition": 13,
+            "missed": "Different flowers and watering can color",
+            "tip": "Specify sunflower with yellow watering can and soft pastel style"
+          },
+          "finalPrompt": "A person in an astronaut suit watering large flowers on the moon's surface, soft pastel tones, simple setting without strong lighting",
+          "finalImage": "/targets/astronaut-garden-bot-doodle-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 8,
+            "style": 12,
+            "color": 10,
+            "composition": 11,
+            "missed": "Sunflowers replaced by different flowers",
+            "tip": "Specify sunflower with bright yellow petals and brown center"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Astronaut with flowers on moon",
+          "draftImage": "/targets/astronaut-garden-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 10,
+            "style": 12,
+            "color": 8,
+            "composition": 13,
+            "missed": "Astronaut holding flowers, not watering sunflowers",
+            "tip": "Specify astronaut watering sunflowers on moon surface"
+          },
+          "finalPrompt": "An astronaut standing on the moon near flowers, calm scene with pastel colors, children's illustration feel",
+          "finalImage": "/targets/astronaut-garden-bot-smudge-final.webp",
+          "final": {
+            "subject": 11,
+            "details": 7,
+            "style": 16,
+            "color": 14,
+            "composition": 13,
+            "missed": "astronaut watering sunflowers, not standing",
+            "tip": "include watering action and sunflower plants explicitly"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Astronaut watering giant cacti on moon",
+        "draftImage": "/targets/astronaut-garden-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 14,
+          "details": 10,
+          "style": 12,
+          "color": 6,
+          "composition": 15,
+          "missed": "wrong plants and watering details",
+          "tip": "use specific plant type and watering action details"
+        },
+        "finalPrompt": "An astronaut watering giant cacti on the moon, soft pastel colors, children's book style illustration",
+        "finalImage": "/targets/astronaut-garden-bot-imposter-final.webp",
+        "final": {
+          "subject": 9,
+          "details": 7,
+          "style": 12,
+          "color": 13,
+          "composition": 10,
+          "missed": "watering cactus instead of sunflowers",
+          "tip": "specify watering sunflowers on moon surface"
+        }
+      }
+    },
+    "bear-picnic": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "brown bear picnic under cherry blossoms",
+          "draftImage": "/targets/bear-picnic-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 10,
+            "style": 15,
+            "color": 14,
+            "composition": 13,
+            "missed": "Different food items and bear's pose",
+            "tip": "Include specific food items and bear's action in prompt"
+          },
+          "finalPrompt": "A brown bear enjoying a picnic with a basket full of honey jars beneath blooming cherry blossom trees, painted in delicate watercolor style",
+          "finalImage": "/targets/bear-picnic-bot-pixel-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 12,
+            "style": 15,
+            "color": 15,
+            "composition": 13,
+            "missed": "bear's face expression and honey action",
+            "tip": "specify bear smiling and honey dripping from stick"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "bear picnic with jars under tree",
+          "draftImage": "/targets/bear-picnic-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 12,
+            "style": 17,
+            "color": 13,
+            "composition": 14,
+            "missed": "honey jars and honey dipper missing or different",
+            "tip": "include honey jars and honey dipper with bear"
+          },
+          "finalPrompt": "A bear having a picnic with jars on a blanket under a cherry blossom tree during daytime",
+          "finalImage": "/targets/bear-picnic-bot-doodle-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 10,
+            "style": 13,
+            "color": 12,
+            "composition": 11,
+            "missed": "Bear's facial expression and jar colors",
+            "tip": "Specify bear's gentle smile and honey jars with golden color"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "bear sitting under tree",
+          "draftImage": "/targets/bear-picnic-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 6,
+            "style": 17,
+            "color": 10,
+            "composition": 14,
+            "missed": "bear holding honey and picnic setup",
+            "tip": "include bear with honey jars and picnic blanket"
+          },
+          "finalPrompt": "A bear sitting peacefully under a cherry blossom tree in nature",
+          "finalImage": "/targets/bear-picnic-bot-smudge-final.webp",
+          "final": {
+            "subject": 11,
+            "details": 5,
+            "style": 13,
+            "color": 14,
+            "composition": 9,
+            "missed": "bear's activity and basket with jars",
+            "tip": "include bear holding honey dipper and basket with jars"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "brown bear picnic with basket of berries",
+        "draftImage": "/targets/bear-picnic-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 16,
+          "details": 12,
+          "style": 15,
+          "color": 14,
+          "composition": 17,
+          "missed": "honey jars and cherry basket difference",
+          "tip": "include honey jars and cherry basket explicitly"
+        },
+        "finalPrompt": "A brown bear having a picnic with a basket of berries under a cherry blossom tree in a watercolor painting",
+        "finalImage": "/targets/bear-picnic-bot-imposter-final.webp",
+        "final": {
+          "subject": 13,
+          "details": 9,
+          "style": 15,
+          "color": 14,
+          "composition": 14,
+          "missed": "bear holding honey dipper and jars",
+          "tip": "include honey jars and dipper in bear's hands"
+        }
+      }
+    },
+    "alien-gardener": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Green alien with hat watering glowing plants",
+          "draftImage": "/targets/alien-gardener-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 10,
+            "style": 8,
+            "color": 7,
+            "composition": 10,
+            "missed": "alien's pose and watering can details",
+            "tip": "describe alien's posture and watering can shape more precisely"
+          },
+          "finalPrompt": "A green-skinned alien wearing a wide-brimmed hat waters luminous plants with a sleek silver futuristic watering can, in a moonlit garden, digital painting style",
+          "finalImage": "/targets/alien-gardener-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 14,
+            "color": 15,
+            "composition": 14,
+            "missed": "flower shapes and watering can angle",
+            "tip": "specify glowing tulip-like flowers and watering can tilted downward"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Alien waters glowing plants at night",
+          "draftImage": "/targets/alien-gardener-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 2,
+            "details": 4,
+            "style": 10,
+            "color": 12,
+            "composition": 6,
+            "missed": "alien figure and watering can missing",
+            "tip": "include alien with watering can and glowing flowers"
+          },
+          "finalPrompt": "An alien with green skin waters glowing plants in a garden at night, holding a shiny silver watering can",
+          "finalImage": "/targets/alien-gardener-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 13,
+            "color": 12,
+            "composition": 14,
+            "missed": "alien's hat and flower shape",
+            "tip": "include wide-brimmed hat and specific flower details"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Alien in garden with glowing plants",
+          "draftImage": "/targets/alien-gardener-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 10,
+            "details": 7,
+            "style": 12,
+            "color": 14,
+            "composition": 8,
+            "missed": "alien's pose and watering action",
+            "tip": "include alien watering glowing flowers with a hat"
+          },
+          "finalPrompt": "A green alien stands among glowing plants in a garden under moonlight",
+          "finalImage": "/targets/alien-gardener-bot-smudge-final.webp",
+          "final": {
+            "subject": 9,
+            "details": 7,
+            "style": 14,
+            "color": 13,
+            "composition": 11,
+            "missed": "alien's pose and watering can missing",
+            "tip": "include alien holding watering can and watering glowing flowers"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Green alien waters glowing plants with metal bucket",
+        "draftImage": "/targets/alien-gardener-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 14,
+          "details": 12,
+          "style": 15,
+          "color": 13,
+          "composition": 14,
+          "missed": "alien's hat and moon in background",
+          "tip": "include wide-brimmed hat and moonlit night sky"
+        },
+        "finalPrompt": "A green-skinned alien wearing a wide-brimmed hat waters glowing plants in a moonlit garden using a large metallic bucket",
+        "finalImage": "/targets/alien-gardener-bot-imposter-final.webp",
+        "final": {
+          "subject": 15,
+          "details": 13,
+          "style": 14,
+          "color": 12,
+          "composition": 14,
+          "missed": "Alien's body is bare, not clothed",
+          "tip": "Specify alien wearing dark robe and detailed watering can"
+        }
+      }
+    },
+    "squirrel-painter": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Squirrel painting with a small beret",
+          "draftImage": "/targets/squirrel-painter-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 12,
+            "style": 16,
+            "color": 10,
+            "composition": 17,
+            "missed": "painting subject and palette colors",
+            "tip": "specify portrait painting with bright colors on palette"
+          },
+          "finalPrompt": "A determined squirrel wearing a small beret, painting a colorful portrait on an easel in a sunny park, in vibrant gouache style",
+          "finalImage": "/targets/squirrel-painter-bot-pixel-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 10,
+            "style": 14,
+            "color": 13,
+            "composition": 12,
+            "missed": "painting subject is a squirrel, not a human",
+            "tip": "specify the painting subject as a human portrait"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Squirrel painting in the park",
+          "draftImage": "/targets/squirrel-painter-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 10,
+            "style": 16,
+            "color": 14,
+            "composition": 13,
+            "missed": "painting subject and props differ",
+            "tip": "include detailed painting content and props explicitly"
+          },
+          "finalPrompt": "A squirrel painting a bright portrait on an easel in a sunny park, wearing a hat, with no particular art style mentioned",
+          "finalImage": "/targets/squirrel-painter-bot-doodle-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 12,
+            "style": 14,
+            "color": 13,
+            "composition": 13,
+            "missed": "portrait subject and hat style differ",
+            "tip": "specify beret hat and human portrait on canvas"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Squirrel with paintbrush outside",
+          "draftImage": "/targets/squirrel-painter-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 6,
+            "style": 5,
+            "color": 10,
+            "composition": 8,
+            "missed": "Squirrel painting on canvas with palette",
+            "tip": "Include squirrel wearing beret and holding palette"
+          },
+          "finalPrompt": "A squirrel outdoors holding a paintbrush near an easel, in a park setting, with a hat on its head",
+          "finalImage": "/targets/squirrel-painter-bot-smudge-final.webp",
+          "final": {
+            "subject": 16,
+            "details": 9,
+            "style": 7,
+            "color": 6,
+            "composition": 14,
+            "missed": "painting on canvas and palette missing",
+            "tip": "include detailed painting and palette in the scene"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Squirrel painting with a tiny scarf",
+        "draftImage": "/targets/squirrel-painter-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 10,
+          "details": 6,
+          "style": 14,
+          "color": 12,
+          "composition": 8,
+          "missed": "Squirrel painting on easel with palette and brush",
+          "tip": "Include painting setup and artist props explicitly"
+        },
+        "finalPrompt": "A determined squirrel wearing a tiny scarf, painting a colorful portrait on an easel in a sunny park, in gouache style",
+        "finalImage": "/targets/squirrel-painter-bot-imposter-final.webp",
+        "final": {
+          "subject": 13,
+          "details": 10,
+          "style": 14,
+          "color": 14,
+          "composition": 12,
+          "missed": "squirrel's beret and painting details",
+          "tip": "include a beret and detailed human portrait on canvas"
+        }
+      }
+    },
+    "hedgehog-bakery": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Cheerful hedgehog with apron baking indoors",
+          "draftImage": "/targets/hedgehog-bakery-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 16,
+            "details": 14,
+            "style": 18,
+            "color": 15,
+            "composition": 14,
+            "missed": "hedgehog's activity and props differ",
+            "tip": "specify hedgehog holding rolling pin and bread background"
+          },
+          "finalPrompt": "A cheerful hedgehog wearing a small apron, holding a wooden rolling pin inside a cozy bakery, illustrated in warm gouache style with soft lighting",
+          "finalImage": "/targets/hedgehog-bakery-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 14,
+            "style": 15,
+            "color": 13,
+            "composition": 14,
+            "missed": "Facial expression and bread placement differ",
+            "tip": "Make facial expression and bread arrangement more precise"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Hedgehog in apron baking in bakery",
+          "draftImage": "/targets/hedgehog-bakery-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 16,
+            "details": 14,
+            "style": 15,
+            "color": 13,
+            "composition": 14,
+            "missed": "hedgehog's action and kitchen setup",
+            "tip": "specify hedgehog mixing dough with bowl and oven background"
+          },
+          "finalPrompt": "A happy hedgehog dressed in a tiny apron inside a cozy bakery, holding a rolling pin, with warm and inviting atmosphere",
+          "finalImage": "/targets/hedgehog-bakery-bot-doodle-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 12,
+            "style": 13,
+            "color": 13,
+            "composition": 13,
+            "missed": "Hedgehog's facial expression and background details",
+            "tip": "Specify cheerful expression and simpler background elements"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Hedgehog baking in warm bakery",
+          "draftImage": "/targets/hedgehog-bakery-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 12,
+            "style": 16,
+            "color": 15,
+            "composition": 13,
+            "missed": "hedgehog's expression and activity",
+            "tip": "focus on hedgehog smiling and holding rolling pin upright"
+          },
+          "finalPrompt": "A cute hedgehog inside a bakery, wearing an apron and preparing dough, depicted in a warm and cozy setting",
+          "finalImage": "/targets/hedgehog-bakery-bot-smudge-final.webp",
+          "final": {
+            "subject": 16,
+            "details": 14,
+            "style": 15,
+            "color": 14,
+            "composition": 13,
+            "missed": "hedgehog holding rolling pin vs kneading dough",
+            "tip": "depict hedgehog holding rolling pin, smiling, standing"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Hedgehog with apron holding metal spatula",
+        "draftImage": "/targets/hedgehog-bakery-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 16,
+          "details": 10,
+          "style": 14,
+          "color": 8,
+          "composition": 12,
+          "missed": "Hedgehog holds spatula, not rolling pin",
+          "tip": "Specify hedgehog holding a rolling pin, not spatula"
+        },
+        "finalPrompt": "A cheerful hedgehog wearing a tiny apron, holding a metal spatula inside a cozy bakery, illustrated with warm colors and soft textures",
+        "finalImage": "/targets/hedgehog-bakery-bot-imposter-final.webp",
+        "final": {
+          "subject": 15,
+          "details": 12,
+          "style": 14,
+          "color": 14,
+          "composition": 13,
+          "missed": "rolling pin replaced by spatula",
+          "tip": "specify hedgehog holding a rolling pin"
+        }
+      }
+    },
+    "hedgehog-astronomy": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "hedgehog with glasses examines glowing telescope",
+          "draftImage": "/targets/hedgehog-astronomy-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 16,
+            "style": 17,
+            "color": 16,
+            "composition": 15,
+            "missed": "hedgehog's eye color and telescope angle",
+            "tip": "specify blue eyes and telescope pointing slightly upward"
+          },
+          "finalPrompt": "A curious hedgehog wearing small round glasses closely examining a glowing telescope under a star-filled night sky, digital art style",
+          "finalImage": "/targets/hedgehog-astronomy-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 14,
+            "style": 15,
+            "color": 15,
+            "composition": 14,
+            "missed": "hedgehog's glasses and telescope details differ",
+            "tip": "specify round glasses and detailed telescope design"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "hedgehog with glasses looks at glowing telescope",
+          "draftImage": "/targets/hedgehog-astronomy-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 15,
+            "style": 16,
+            "color": 17,
+            "composition": 16,
+            "missed": "hedgehog's eyes and telescope details",
+            "tip": "specify round glasses and detailed telescope parts"
+          },
+          "finalPrompt": "A hedgehog with tiny glasses looking at a glowing telescope at night, with stars in the sky",
+          "finalImage": "/targets/hedgehog-astronomy-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 15,
+            "color": 14,
+            "composition": 13,
+            "missed": "hedgehog's hand position and telescope angle",
+            "tip": "adjust hedgehog's paws and telescope alignment"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "hedgehog looking at telescope under stars",
+          "draftImage": "/targets/hedgehog-astronomy-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 16,
+            "details": 14,
+            "style": 15,
+            "color": 16,
+            "composition": 14,
+            "missed": "hedgehog's glasses and telescope details",
+            "tip": "include round glasses and detailed telescope parts"
+          },
+          "finalPrompt": "A hedgehog gazing at a telescope under a dark night sky filled with stars",
+          "finalImage": "/targets/hedgehog-astronomy-bot-smudge-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 9,
+            "style": 14,
+            "color": 14,
+            "composition": 13,
+            "missed": "hedgehog looking through telescope, not beside it",
+            "tip": "specify hedgehog looking through telescope with glasses"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "hedgehog with glasses examines shining binoculars",
+        "draftImage": "/targets/hedgehog-astronomy-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 15,
+          "details": 10,
+          "style": 16,
+          "color": 12,
+          "composition": 14,
+          "missed": "hedgehog using binoculars, not telescope",
+          "tip": "specify hedgehog looking through a telescope at night"
+        },
+        "finalPrompt": "A curious hedgehog wearing small round glasses examining shining binoculars under a starry night sky, digital illustration",
+        "finalImage": "/targets/hedgehog-astronomy-bot-imposter-final.webp",
+        "final": {
+          "subject": 12,
+          "details": 9,
+          "style": 14,
+          "color": 13,
+          "composition": 10,
+          "missed": "hedgehog using binoculars, not telescope",
+          "tip": "specify hedgehog looking through a telescope"
+        }
+      }
+    },
+    "dinosaur-dance": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Green dinosaur dancing by disco ball",
+          "draftImage": "/targets/dinosaur-dance-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 16,
+            "details": 12,
+            "style": 14,
+            "color": 13,
+            "composition": 14,
+            "missed": "background plants and party hat missing",
+            "tip": "include jungle foliage and party hat on dinosaur"
+          },
+          "finalPrompt": "A cheerful green dinosaur dancing next to a shiny disco ball in a lively jungle, wearing a bright colorful party hat, illustrated in vibrant comic book style",
+          "finalImage": "/targets/dinosaur-dance-bot-pixel-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 10,
+            "style": 12,
+            "color": 11,
+            "composition": 12,
+            "missed": "Dinosaur's pose and facial expression differ",
+            "tip": "Specify dinosaur's exact pose and facial expression"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Dinosaur dancing in jungle with hat",
+          "draftImage": "/targets/dinosaur-dance-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 10,
+            "style": 8,
+            "color": 12,
+            "composition": 15,
+            "missed": "party hat and disco ball missing",
+            "tip": "include party hat and disco ball with cartoon style"
+          },
+          "finalPrompt": "A green dinosaur happily dancing in a jungle beside a disco ball, wearing a colorful party hat, without specifying art style or lighting",
+          "finalImage": "/targets/dinosaur-dance-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 12,
+            "style": 8,
+            "color": 7,
+            "composition": 13,
+            "missed": "dinosaur's pose and disco ball details",
+            "tip": "specify dinosaur's exact pose and disco ball reflections"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Dinosaur dancing in jungle scene",
+          "draftImage": "/targets/dinosaur-dance-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 16,
+            "details": 6,
+            "style": 7,
+            "color": 8,
+            "composition": 15,
+            "missed": "party hat and disco ball missing",
+            "tip": "include party hat and disco ball with bright background"
+          },
+          "finalPrompt": "A green dinosaur dancing in a jungle setting, next to a disco ball, no mention of hat or art style",
+          "finalImage": "/targets/dinosaur-dance-bot-smudge-final.webp",
+          "final": {
+            "subject": 16,
+            "details": 11,
+            "style": 9,
+            "color": 9,
+            "composition": 14,
+            "missed": "party hat and disco ball details",
+            "tip": "include party hat and more detailed disco ball"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Green dinosaur dancing near disco ball",
+        "draftImage": "/targets/dinosaur-dance-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 15,
+          "details": 10,
+          "style": 12,
+          "color": 8,
+          "composition": 10,
+          "missed": "background and party hat details",
+          "tip": "include jungle foliage and striped party hat"
+        },
+        "finalPrompt": "A green dinosaur dancing happily beside a disco ball in the jungle, wearing a shiny crown instead of a party hat",
+        "finalImage": "/targets/dinosaur-dance-bot-imposter-final.webp",
+        "final": {
+          "subject": 10,
+          "details": 9,
+          "style": 12,
+          "color": 7,
+          "composition": 13,
+          "missed": "party hat replaced by crown, disco ball color",
+          "tip": "use party hat and bright disco ball colors"
+        }
+      }
+    },
+    "llama-hiker": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Cheerful llama with colorful scarf hiking mountains",
+          "draftImage": "/targets/llama-hiker-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 16,
+            "details": 12,
+            "style": 14,
+            "color": 14,
+            "composition": 15,
+            "missed": "scarf colors and backpack missing",
+            "tip": "include detailed scarf pattern and add backpack on llama"
+          },
+          "finalPrompt": "A cheerful llama wearing a bright, colorful scarf hiking a vibrant mountain trail while carrying a wooden walking stick, depicted in a gouache painting style.",
+          "finalImage": "/targets/llama-hiker-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 12,
+            "style": 15,
+            "color": 14,
+            "composition": 13,
+            "missed": "scarf color pattern and facial expression",
+            "tip": "match scarf colors exactly and replicate facial features"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Llama with scarf on mountain path",
+          "draftImage": "/targets/llama-hiker-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 10,
+            "style": 7,
+            "color": 13,
+            "composition": 15,
+            "missed": "llama holding a walking stick",
+            "tip": "include a walking stick and more cartoonish style"
+          },
+          "finalPrompt": "A happy llama wearing a colorful scarf on a lively mountain trail, holding a stick as a walking aid, without specific art style mentioned.",
+          "finalImage": "/targets/llama-hiker-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 14,
+            "color": 13,
+            "composition": 13,
+            "missed": "Scarf colors and pattern differ",
+            "tip": "Specify exact scarf color blocks and pattern"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Llama in colorful scarf outdoors",
+          "draftImage": "/targets/llama-hiker-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 10,
+            "style": 8,
+            "color": 12,
+            "composition": 10,
+            "missed": "llama holding a walking stick",
+            "tip": "include a walking stick and animated style"
+          },
+          "finalPrompt": "A llama wearing a colorful scarf standing outdoors in a mountain setting, no mention of walking stick or art style.",
+          "finalImage": "/targets/llama-hiker-bot-smudge-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 9,
+            "style": 5,
+            "color": 7,
+            "composition": 13,
+            "missed": "cartoon style and walking pose",
+            "tip": "use cartoon style and show llama walking with a staff"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Llama with colorful scarf holding hiking pole",
+        "draftImage": "/targets/llama-hiker-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 16,
+          "details": 10,
+          "style": 8,
+          "color": 12,
+          "composition": 10,
+          "missed": "Background and walking pose missing",
+          "tip": "Include detailed background and dynamic walking pose"
+        },
+        "finalPrompt": "A cheerful llama wearing a colorful scarf carrying a metal hiking pole on a vibrant mountain trail, painted in a gouache style.",
+        "finalImage": "/targets/llama-hiker-bot-imposter-final.webp",
+        "final": {
+          "subject": 14,
+          "details": 10,
+          "style": 14,
+          "color": 14,
+          "composition": 13,
+          "missed": "Walking stick is a tripod, not wooden cane",
+          "tip": "Specify a wooden walking cane instead of a tripod"
+        }
+      }
+    },
+    "sloth-circus": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "A sleepy sloth juggling flaming torches",
+          "draftImage": "/targets/sloth-circus-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 10,
+            "style": 8,
+            "color": 7,
+            "composition": 6,
+            "missed": "background tent and torch count",
+            "tip": "include detailed background and exact torch number"
+          },
+          "finalPrompt": "A sleepy sloth inside a colorful circus tent juggling three bright flaming torches, illustrated in a vibrant comic book style with bold lines and vivid colors.",
+          "finalImage": "/targets/sloth-circus-bot-pixel-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 10,
+            "style": 12,
+            "color": 14,
+            "composition": 11,
+            "missed": "sloth's facial expression and torch count",
+            "tip": "specify sloth holding three torches with tired expression"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Sloth juggling torches in circus tent",
+          "draftImage": "/targets/sloth-circus-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 12,
+            "style": 14,
+            "color": 10,
+            "composition": 13,
+            "missed": "sloth's pose and facial expression",
+            "tip": "match sloth's pose and facial expression more closely"
+          },
+          "finalPrompt": "A sloth juggling flaming torches inside a colorful circus tent, focusing on the animal and setting but without specific comic style or detailed lighting.",
+          "finalImage": "/targets/sloth-circus-bot-doodle-final.webp",
+          "final": {
+            "subject": 12,
+            "details": 10,
+            "style": 5,
+            "color": 8,
+            "composition": 13,
+            "missed": "sloth's expression and cartoon style",
+            "tip": "use cartoon style with exaggerated facial features"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Sloth in circus tent juggling",
+          "draftImage": "/targets/sloth-circus-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 10,
+            "style": 14,
+            "color": 13,
+            "composition": 11,
+            "missed": "juggling balls and standing pose",
+            "tip": "include juggling balls and standing on a pedestal"
+          },
+          "finalPrompt": "A sloth inside a circus tent juggling objects, with a vague colorful background but no mention of flaming torches or specific style.",
+          "finalImage": "/targets/sloth-circus-bot-smudge-final.webp",
+          "final": {
+            "subject": 9,
+            "details": 7,
+            "style": 11,
+            "color": 9,
+            "composition": 8,
+            "missed": "sloth juggling balls instead of holding torches",
+            "tip": "include 'sloth holding flaming torches' and 'circus tent background'"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Sloth juggling glowing balls in circus",
+        "draftImage": "/targets/sloth-circus-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 14,
+          "details": 10,
+          "style": 8,
+          "color": 10,
+          "composition": 12,
+          "missed": "Juggling balls instead of torches",
+          "tip": "Specify juggling flaming torches, not balls"
+        },
+        "finalPrompt": "A sloth inside a colorful circus tent juggling three glowing balls instead of torches, illustrated with bright colors but no flames, omitting the key detail of flaming torches.",
+        "finalImage": "/targets/sloth-circus-bot-imposter-final.webp",
+        "final": {
+          "subject": 7,
+          "details": 5,
+          "style": 9,
+          "color": 6,
+          "composition": 7,
+          "missed": "sloth juggling balls, not holding torches",
+          "tip": "include juggling colorful balls and clown costume"
+        }
+      }
+    },
+    "meerkat-magician": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Meerkat with top hat doing magic",
+          "draftImage": "/targets/meerkat-magician-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 16,
+            "details": 12,
+            "style": 7,
+            "color": 8,
+            "composition": 14,
+            "missed": "magic wand and hat props swapped",
+            "tip": "keep wand lit and add top hat on head"
+          },
+          "finalPrompt": "A meerkat wearing a top hat performing a magic trick using a shiny silver wand on a small stage, illustrated in vibrant comic book style",
+          "finalImage": "/targets/meerkat-magician-bot-pixel-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 10,
+            "style": 15,
+            "color": 14,
+            "composition": 13,
+            "missed": "missing tuxedo and bow tie on meerkat",
+            "tip": "include detailed clothing like tuxedo and red bow tie"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Meerkat magician on tiny stage",
+          "draftImage": "/targets/meerkat-magician-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 10,
+            "style": 10,
+            "color": 12,
+            "composition": 14,
+            "missed": "missing rabbit in hat and wand details",
+            "tip": "include rabbit in hat and wand spark effects"
+          },
+          "finalPrompt": "A meerkat in a top hat performing magic on a small stage, holding a sparkling wand, without mention of comic style or lighting",
+          "finalImage": "/targets/meerkat-magician-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 10,
+            "style": 5,
+            "color": 8,
+            "composition": 12,
+            "missed": "cartoon style and detailed costume",
+            "tip": "specify cartoon style with detailed tuxedo and red bow tie"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Animal on stage with hat",
+          "draftImage": "/targets/meerkat-magician-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 10,
+            "details": 6,
+            "style": 8,
+            "color": 7,
+            "composition": 12,
+            "missed": "different animal and missing magic wand",
+            "tip": "specify meerkat with magic wand and detailed suit"
+          },
+          "finalPrompt": "A meerkat standing on stage wearing a hat, performing a trick, no specific mention of wand or artistic style",
+          "finalImage": "/targets/meerkat-magician-bot-smudge-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 9,
+            "style": 7,
+            "color": 11,
+            "composition": 13,
+            "missed": "missing magic wand and bow tie",
+            "tip": "include magic wand and red bow tie on meerkat"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Meerkat with top hat and wooden stick",
+        "draftImage": "/targets/meerkat-magician-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 16,
+          "details": 10,
+          "style": 6,
+          "color": 8,
+          "composition": 12,
+          "missed": "cartoon style and magic wand spark",
+          "tip": "use cartoon style with bright colors and magic wand spark"
+        },
+        "finalPrompt": "A meerkat wearing a top hat performing a magic trick on a small stage, holding a polished wooden stick instead of a silver wand, in a comic book style",
+        "finalImage": "/targets/meerkat-magician-bot-imposter-final.webp",
+        "final": {
+          "subject": 12,
+          "details": 9,
+          "style": 11,
+          "color": 12,
+          "composition": 13,
+          "missed": "Lack of tuxedo and bow tie on meerkat",
+          "tip": "Include formal tuxedo and red bow tie on meerkat"
+        }
+      }
+    },
+    "turtle-library": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "sleepy turtle with glasses reading huge old book",
+          "draftImage": "/targets/turtle-library-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 12,
+            "style": 14,
+            "color": 8,
+            "composition": 13,
+            "missed": "Turtle's nose and mouth shape",
+            "tip": "Make turtle's nose rounder and mouth closed"
+          },
+          "finalPrompt": "A sleepy turtle wearing round glasses reading a giant ancient book inside a cozy wooden library, painted in delicate watercolor style with soft lighting.",
+          "finalImage": "/targets/turtle-library-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 10,
+            "style": 14,
+            "color": 13,
+            "composition": 12,
+            "missed": "Turtle's eyes open, no candle flame",
+            "tip": "Specify turtle's eyes closed and include candle with flame"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "turtle wearing glasses in wooden library reading",
+          "draftImage": "/targets/turtle-library-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 10,
+            "style": 8,
+            "color": 14,
+            "composition": 15,
+            "missed": "Turtle's expression and glasses style",
+            "tip": "Specify turtle's sad expression and round glasses clearly"
+          },
+          "finalPrompt": "Turtle with round glasses reading a very large old book inside a warm, dim wooden library, without focusing on style or lighting details.",
+          "finalImage": "/targets/turtle-library-bot-doodle-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 12,
+            "style": 13,
+            "color": 13,
+            "composition": 13,
+            "missed": "Turtle's eyes open, missing candle",
+            "tip": "Include closed eyes and a lit candle on the left side"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "turtle with glasses in cozy library",
+          "draftImage": "/targets/turtle-library-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 10,
+            "style": 16,
+            "color": 15,
+            "composition": 12,
+            "missed": "Turtle's facial expression and pose differ",
+            "tip": "Specify turtle's sleepy expression and leaning over book"
+          },
+          "finalPrompt": "A turtle wearing glasses sitting inside a cozy wooden library, reading something large on a table, with no particular art style mentioned.",
+          "finalImage": "/targets/turtle-library-bot-smudge-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 11,
+            "style": 13,
+            "color": 12,
+            "composition": 13,
+            "missed": "Turtle's expression and candle missing",
+            "tip": "Include turtle's sleepy expression and lit candle on table"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "sleepy turtle with glasses reading huge dusty scroll",
+        "draftImage": "/targets/turtle-library-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 14,
+          "details": 8,
+          "style": 12,
+          "color": 7,
+          "composition": 10,
+          "missed": "Turtle reading a scroll, not a book",
+          "tip": "Specify turtle reading an open book by candlelight"
+        },
+        "finalPrompt": "A sleepy turtle wearing round glasses reading a huge dusty scroll inside a cozy, dim wooden library, painted in watercolor style.",
+        "finalImage": "/targets/turtle-library-bot-imposter-final.webp",
+        "final": {
+          "subject": 14,
+          "details": 12,
+          "style": 14,
+          "color": 13,
+          "composition": 12,
+          "missed": "Turtle's book is a scroll, not a large book",
+          "tip": "Specify turtle reading a large open book, not a scroll"
+        }
+      }
+    },
+    "porcupine-puppeteer": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "nervous porcupine with wooden puppet stage",
+          "draftImage": "/targets/porcupine-puppeteer-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 8,
+            "details": 6,
+            "style": 12,
+            "color": 10,
+            "composition": 5,
+            "missed": "missing the puppet figure and stage details",
+            "tip": "include a wooden puppet and stage with red curtains"
+          },
+          "finalPrompt": "A nervous porcupine manipulating a wooden marionette puppet on a small stage, illustrated in charming gouache style with soft textures and warm colors.",
+          "finalImage": "/targets/porcupine-puppeteer-bot-pixel-final.webp",
+          "final": {
+            "subject": 12,
+            "details": 10,
+            "style": 14,
+            "color": 13,
+            "composition": 11,
+            "missed": "hedgehog's clothing and puppet's face",
+            "tip": "include hedgehog wearing a red sweater and puppet with facial features"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "porcupine controlling puppet on stage",
+          "draftImage": "/targets/porcupine-puppeteer-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 10,
+            "style": 14,
+            "color": 15,
+            "composition": 13,
+            "missed": "puppet character and hedgehog details differ",
+            "tip": "specify puppet as wooden mannequin and detailed hedgehog"
+          },
+          "finalPrompt": "A nervous porcupine controlling a puppet on a small stage, focusing on the character and scene without specific art style.",
+          "finalImage": "/targets/porcupine-puppeteer-bot-doodle-final.webp",
+          "final": {
+            "subject": 10,
+            "details": 8,
+            "style": 13,
+            "color": 12,
+            "composition": 11,
+            "missed": "puppet and hedgehog details and interaction",
+            "tip": "focus on puppet size and hedgehog holding strings"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "porcupine on stage with puppet",
+          "draftImage": "/targets/porcupine-puppeteer-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 10,
+            "details": 6,
+            "style": 14,
+            "color": 8,
+            "composition": 12,
+            "missed": "puppet type and facial expressions differ",
+            "tip": "specify marionette puppet with neutral expression"
+          },
+          "finalPrompt": "A porcupine standing on a small stage with a puppet, simple setting and minimal details about the puppet.",
+          "finalImage": "/targets/porcupine-puppeteer-bot-smudge-final.webp",
+          "final": {
+            "subject": 9,
+            "details": 5,
+            "style": 14,
+            "color": 13,
+            "composition": 7,
+            "missed": "puppet type and interaction with hedgehog",
+            "tip": "specify marionette puppet with strings and worried expression"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "nervous porcupine with plush puppet on stage",
+        "draftImage": "/targets/porcupine-puppeteer-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 10,
+          "details": 7,
+          "style": 15,
+          "color": 14,
+          "composition": 8,
+          "missed": "Different characters and missing puppet strings",
+          "tip": "Include marionette puppet and worried hedgehog together"
+        },
+        "finalPrompt": "A nervous porcupine controlling a soft plush puppet on a small stage, illustrated with charming gouache style, replacing the wooden puppet with a plush one.",
+        "finalImage": "/targets/porcupine-puppeteer-bot-imposter-final.webp",
+        "final": {
+          "subject": 9,
+          "details": 7,
+          "style": 15,
+          "color": 10,
+          "composition": 9,
+          "missed": "wrong puppet and background color",
+          "tip": "use specific puppet type and background color details"
+        }
+      }
+    },
+    "penguin-pizzaiolo": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Penguin chef tossing pizza dough indoors",
+          "draftImage": "/targets/penguin-pizzaiolo-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 14,
+            "style": 12,
+            "color": 15,
+            "composition": 16,
+            "missed": "Penguin's outfit and facial details differ",
+            "tip": "Specify fluffy chef hat and rustic oven background"
+          },
+          "finalPrompt": "A penguin wearing a chef’s hat skillfully tossing spinning pizza dough high in a cozy wood-fired kitchen, painted in expressive gouache style",
+          "finalImage": "/targets/penguin-pizzaiolo-bot-pixel-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 10,
+            "style": 15,
+            "color": 13,
+            "composition": 12,
+            "missed": "penguin's pose and kitchen details differ",
+            "tip": "specify penguin's exact pose and kitchen props clearly"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Penguin in chef hat flipping dough",
+          "draftImage": "/targets/penguin-pizzaiolo-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 8,
+            "style": 7,
+            "color": 6,
+            "composition": 7,
+            "missed": "Background kitchen and oven missing",
+            "tip": "Add detailed kitchen background with oven and warm lighting"
+          },
+          "finalPrompt": "A penguin wearing a chef’s hat flipping pizza dough in a warm wood-fired kitchen, capturing the moment with vivid colors and lively brushwork",
+          "finalImage": "/targets/penguin-pizzaiolo-bot-doodle-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 10,
+            "style": 13,
+            "color": 12,
+            "composition": 12,
+            "missed": "penguin's beak shape and pizza instead of dough",
+            "tip": "specify penguin with short orange beak and dough only"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Penguin cooking in cozy kitchen",
+          "draftImage": "/targets/penguin-pizzaiolo-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 12,
+            "style": 14,
+            "color": 13,
+            "composition": 10,
+            "missed": "Penguin's pose and chef hat missing",
+            "tip": "Include penguin wearing a chef hat with arms raised"
+          },
+          "finalPrompt": "A penguin dressed as a chef stands in a cozy kitchen, preparing food with a rustic wood-fired oven in the background",
+          "finalImage": "/targets/penguin-pizzaiolo-bot-smudge-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 9,
+            "style": 14,
+            "color": 14,
+            "composition": 11,
+            "missed": "penguin's pose and activity",
+            "tip": "describe penguin stirring in bowl, not tossing dough"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Penguin chef tossing bread dough indoors",
+        "draftImage": "/targets/penguin-pizzaiolo-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 18,
+          "details": 12,
+          "style": 14,
+          "color": 13,
+          "composition": 15,
+          "missed": "fireplace and rolling pin missing",
+          "tip": "include warm kitchen background with fireplace and rolling pin"
+        },
+        "finalPrompt": "A penguin wearing a chef’s hat tossing bread dough high in a cozy wood-fired kitchen, rendered in an expressive gouache painting style",
+        "finalImage": "/targets/penguin-pizzaiolo-bot-imposter-final.webp",
+        "final": {
+          "subject": 15,
+          "details": 12,
+          "style": 14,
+          "color": 14,
+          "composition": 13,
+          "missed": "Penguin's beak and arm positions differ",
+          "tip": "Specify penguin's beak open and arm raised upward"
+        }
+      }
+    },
+    "cactus-barbeque": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Cactus flipping burgers on rusty grill",
+          "draftImage": "/targets/cactus-barbeque-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 10,
+            "style": 12,
+            "color": 8,
+            "composition": 14,
+            "missed": "Missing sunglasses and outdoor background",
+            "tip": "Add sunglasses and desert picnic setting"
+          },
+          "finalPrompt": "A cheerful cactus wearing sunglasses flipping sizzling burgers on a rusty grill at a sunny desert picnic, painted in vibrant gouache style",
+          "finalImage": "/targets/cactus-barbeque-bot-pixel-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 10,
+            "style": 13,
+            "color": 12,
+            "composition": 11,
+            "missed": "spatula shape and grill food details",
+            "tip": "specify spatula shape and detailed grill food"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Cactus flipping burgers in desert picnic",
+          "draftImage": "/targets/cactus-barbeque-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 12,
+            "style": 10,
+            "color": 11,
+            "composition": 13,
+            "missed": "Cactus wearing a hat instead of sunglasses",
+            "tip": "Specify cactus with sunglasses and no hat"
+          },
+          "finalPrompt": "A happy cactus wearing sunglasses flips burgers on a grill at a sunny desert picnic, without mentioning the art style or lighting details",
+          "finalImage": "/targets/cactus-barbeque-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 12,
+            "style": 13,
+            "color": 13,
+            "composition": 13,
+            "missed": "Number of burgers and grill style differ",
+            "tip": "Include exact number of burgers and grill details"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Cactus cooking at picnic",
+          "draftImage": "/targets/cactus-barbeque-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 12,
+            "style": 13,
+            "color": 14,
+            "composition": 13,
+            "missed": "Cactus lacks sunglasses and spatula",
+            "tip": "Add sunglasses and spatula to cactus, emphasize grill details"
+          },
+          "finalPrompt": "A cactus wearing sunglasses cooking burgers outdoors in a desert picnic setting, with minimal details and no mention of grill condition or art style",
+          "finalImage": "/targets/cactus-barbeque-bot-smudge-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 9,
+            "style": 7,
+            "color": 6,
+            "composition": 11,
+            "missed": "grill type and food details",
+            "tip": "use vibrant colors and detailed grill with burgers"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Cactus flipping burgers on shiny grill",
+        "draftImage": "/targets/cactus-barbeque-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 15,
+          "details": 10,
+          "style": 12,
+          "color": 14,
+          "composition": 13,
+          "missed": "cactus expression and grill details",
+          "tip": "add sunglasses and detailed grill with flames"
+        },
+        "finalPrompt": "A cheerful cactus wearing sunglasses flips sizzling burgers on a clean shiny grill at a sunny desert picnic, ignoring the rust and gouache style",
+        "finalImage": "/targets/cactus-barbeque-bot-imposter-final.webp",
+        "final": {
+          "subject": 15,
+          "details": 12,
+          "style": 13,
+          "color": 12,
+          "composition": 14,
+          "missed": "fewer burgers and different spatula design",
+          "tip": "include exact number of burgers and spatula shape"
+        }
+      }
+    },
+    "rhino-astronaut": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Determined rhino with helmet on Mars",
+          "draftImage": "/targets/rhino-astronaut-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 8,
+            "details": 6,
+            "style": 7,
+            "color": 10,
+            "composition": 8,
+            "missed": "rhino realism and rocket presence",
+            "tip": "make rhino more realistic and include rocket with blue flame"
+          },
+          "finalPrompt": "A determined rhino wearing a heavy helmet floats beside a bright blue glowing rocket ship on dusty Martian soil, rendered in claymation style",
+          "finalImage": "/targets/rhino-astronaut-bot-pixel-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 12,
+            "style": 15,
+            "color": 15,
+            "composition": 10,
+            "missed": "rhino's pose and rocket window details",
+            "tip": "specify rhino floating with fists clenched, rocket window glowing"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Rhino with helmet near rocket on Mars",
+          "draftImage": "/targets/rhino-astronaut-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 10,
+            "details": 8,
+            "style": 7,
+            "color": 12,
+            "composition": 9,
+            "missed": "rhino's pose and rocket design",
+            "tip": "describe rhino's stance and rocket shape more precisely"
+          },
+          "finalPrompt": "A rhino wearing a bulky helmet stands beside a glowing rocket on a dusty Martian landscape, missing specific art style and lighting details",
+          "finalImage": "/targets/rhino-astronaut-bot-doodle-final.webp",
+          "final": {
+            "subject": 10,
+            "details": 8,
+            "style": 7,
+            "color": 6,
+            "composition": 8,
+            "missed": "rhino's pose and rocket design",
+            "tip": "specify rhino standing with detailed suit and classic rocket"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Rhino on Mars with helmet",
+          "draftImage": "/targets/rhino-astronaut-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 10,
+            "details": 8,
+            "style": 12,
+            "color": 15,
+            "composition": 10,
+            "missed": "rhino standing, not floating astronaut",
+            "tip": "depict rhino standing on ground with realistic helmet"
+          },
+          "finalPrompt": "A rhino wearing a helmet is on a dusty red planet surface, vague setting without details about the rocket or art style",
+          "finalImage": "/targets/rhino-astronaut-bot-smudge-final.webp",
+          "final": {
+            "subject": 11,
+            "details": 7,
+            "style": 9,
+            "color": 14,
+            "composition": 9,
+            "missed": "rhino is standing, not floating",
+            "tip": "depict rhino floating with clenched fists and rocket nearby"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Rhino with helmet beside red spaceship",
+        "draftImage": "/targets/rhino-astronaut-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 14,
+          "details": 10,
+          "style": 8,
+          "color": 12,
+          "composition": 15,
+          "missed": "rhino's helmet and rocket design",
+          "tip": "focus on detailed helmet and sleek rocket shape"
+        },
+        "finalPrompt": "A rhino wearing a bulky helmet floats beside a glowing red spaceship on a dusty Martian landscape, claymation style but with the rocket’s color detail changed",
+        "finalImage": "/targets/rhino-astronaut-bot-imposter-final.webp",
+        "final": {
+          "subject": 13,
+          "details": 12,
+          "style": 15,
+          "color": 10,
+          "composition": 14,
+          "missed": "rhino and rocket colors and facial expression",
+          "tip": "use specific color descriptions and emphasize facial expression"
+        }
+      }
+    },
+    "dragon-cafe": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "tiny dragon making latte art cafe",
+          "draftImage": "/targets/dragon-cafe-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 14,
+            "style": 10,
+            "color": 15,
+            "composition": 13,
+            "missed": "dragon's smooth texture and apron missing",
+            "tip": "specify smooth skin texture and include apron on dragon"
+          },
+          "finalPrompt": "A tiny dragon barista carefully pouring latte art in a cozy cafe, illuminated by warm lamplight, in a painterly anime-inspired style",
+          "finalImage": "/targets/dragon-cafe-bot-pixel-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 12,
+            "style": 15,
+            "color": 14,
+            "composition": 15,
+            "missed": "green dragon instead of orange",
+            "tip": "specify orange dragon with matching wing colors"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "small dragon pouring coffee warm cafe",
+          "draftImage": "/targets/dragon-cafe-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 10,
+            "style": 17,
+            "color": 14,
+            "composition": 15,
+            "missed": "green dragon pouring coffee, not orange pouring milk",
+            "tip": "match dragon color and beverage being poured exactly"
+          },
+          "finalPrompt": "A small dragon serving coffee in a cozy cafe with warm lighting, focusing on the coffee cup in a friendly setting",
+          "finalImage": "/targets/dragon-cafe-bot-doodle-final.webp",
+          "final": {
+            "subject": 10,
+            "details": 8,
+            "style": 12,
+            "color": 13,
+            "composition": 11,
+            "missed": "dragon pouring milk into coffee cup",
+            "tip": "include action of pouring milk into coffee cup"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "dragon in cafe cozy light",
+          "draftImage": "/targets/dragon-cafe-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 8,
+            "details": 7,
+            "style": 6,
+            "color": 14,
+            "composition": 10,
+            "missed": "young dragon pouring milk absent",
+            "tip": "include a young dragon pouring milk into a cup"
+          },
+          "finalPrompt": "A dragon inside a cozy cafe bathed in warm light, surrounded by cafe furniture and a relaxed atmosphere",
+          "finalImage": "/targets/dragon-cafe-bot-smudge-final.webp",
+          "final": {
+            "subject": 5,
+            "details": 6,
+            "style": 7,
+            "color": 14,
+            "composition": 9,
+            "missed": "young dragon pouring milk into coffee",
+            "tip": "focus on a cute young dragon pouring milk into coffee"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "tiny dragon pouring tea cozy cafe",
+        "draftImage": "/targets/dragon-cafe-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 10,
+          "details": 12,
+          "style": 15,
+          "color": 14,
+          "composition": 13,
+          "missed": "color and species of dragon, background details",
+          "tip": "use orange dragon with coffee cup and lamp background"
+        },
+        "finalPrompt": "A tiny dragon barista pouring tea in a cozy cafe with warm lamplight, anime-style painting, focusing on the tea cup instead of coffee",
+        "finalImage": "/targets/dragon-cafe-bot-imposter-final.webp",
+        "final": {
+          "subject": 14,
+          "details": 12,
+          "style": 13,
+          "color": 14,
+          "composition": 14,
+          "missed": "Different pouring objects and cup details",
+          "tip": "Specify pouring milk from a metal jug into latte art cup"
+        }
+      }
+    },
+    "penguin-ski": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Penguin skiing down snowy mountain",
+          "draftImage": "/targets/penguin-ski-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 14,
+            "style": 10,
+            "color": 14,
+            "composition": 16,
+            "missed": "penguin's scarf replaced by hat",
+            "tip": "include a red scarf instead of a hat on the penguin"
+          },
+          "finalPrompt": "A low-poly 3D style penguin wearing a red scarf skiing swiftly down a snowy mountain slope",
+          "finalImage": "/targets/penguin-ski-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 14,
+            "color": 12,
+            "composition": 15,
+            "missed": "ski poles and skis color and shape",
+            "tip": "specify bright red skis and poles with black handles"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Penguin with scarf on snowy hill",
+          "draftImage": "/targets/penguin-ski-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 8,
+            "style": 7,
+            "color": 10,
+            "composition": 9,
+            "missed": "penguin skiing and mountain background",
+            "tip": "include skiing action and snowy mountain landscape"
+          },
+          "finalPrompt": "A penguin with a red scarf sliding down a snow-covered hill, capturing the chilly winter setting",
+          "finalImage": "/targets/penguin-ski-bot-doodle-final.webp",
+          "final": {
+            "subject": 10,
+            "details": 7,
+            "style": 8,
+            "color": 12,
+            "composition": 8,
+            "missed": "penguin skiing with poles",
+            "tip": "include skiing action and poles explicitly"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Penguin on snow with scarf",
+          "draftImage": "/targets/penguin-ski-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 8,
+            "style": 6,
+            "color": 10,
+            "composition": 7,
+            "missed": "penguin skiing with poles and mountains",
+            "tip": "include skiing action and mountain background"
+          },
+          "finalPrompt": "A penguin wearing a red scarf standing on snowy ground in a cold outdoor environment",
+          "finalImage": "/targets/penguin-ski-bot-smudge-final.webp",
+          "final": {
+            "subject": 7,
+            "details": 5,
+            "style": 4,
+            "color": 6,
+            "composition": 5,
+            "missed": "penguin skiing and holding ski poles",
+            "tip": "include skiing action and ski poles explicitly"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Penguin snowboarding down snowy mountain",
+        "draftImage": "/targets/penguin-ski-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 14,
+          "details": 10,
+          "style": 8,
+          "color": 15,
+          "composition": 12,
+          "missed": "penguin skiing vs snowboarding",
+          "tip": "specify skiing with poles and red scarf"
+        },
+        "finalPrompt": "A penguin wearing a red scarf snowboarding down a snowy mountain in a low-poly 3D style",
+        "finalImage": "/targets/penguin-ski-bot-imposter-final.webp",
+        "final": {
+          "subject": 14,
+          "details": 10,
+          "style": 15,
+          "color": 14,
+          "composition": 13,
+          "missed": "penguin is snowboarding, not skiing",
+          "tip": "specify skiing with red skis and poles"
+        }
+      }
+    },
+    "octopus-barista": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Cheerful octopus with tiny hat underwater",
+          "draftImage": "/targets/octopus-barista-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 5,
+            "style": 7,
+            "color": 14,
+            "composition": 10,
+            "missed": "octopus making coffee with machine",
+            "tip": "include coffee machine and pouring action explicitly"
+          },
+          "finalPrompt": "A cheerful octopus wearing a tiny hat serves coffee using an old-fashioned espresso machine underwater, surrounded by a vibrant coral reef, in a claymation style.",
+          "finalImage": "/targets/octopus-barista-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 12,
+            "style": 14,
+            "color": 13,
+            "composition": 15,
+            "missed": "Octopus pouring coffee with wrong tentacle",
+            "tip": "Specify octopus pouring coffee with correct tentacle"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Octopus serving coffee in coral reef",
+          "draftImage": "/targets/octopus-barista-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 10,
+            "style": 8,
+            "color": 14,
+            "composition": 12,
+            "missed": "Different coffee equipment and cup styles",
+            "tip": "Specify espresso machine and cup details clearly"
+          },
+          "finalPrompt": "An octopus wearing a small hat serves coffee underwater in a colorful coral reef, using a classic coffee machine, no specific art style mentioned.",
+          "finalImage": "/targets/octopus-barista-bot-doodle-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 10,
+            "style": 8,
+            "color": 12,
+            "composition": 11,
+            "missed": "claymation style and cup pouring action",
+            "tip": "specify claymation style and pouring coffee action clearly"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Octopus underwater with coffee",
+          "draftImage": "/targets/octopus-barista-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 8,
+            "style": 10,
+            "color": 14,
+            "composition": 13,
+            "missed": "No coffee machine or pouring action",
+            "tip": "Include coffee machine and pouring coffee details"
+          },
+          "finalPrompt": "Underwater scene with an octopus and a tiny hat, serving coffee surrounded by coral, without mentioning any detailed coffee machine or style.",
+          "finalImage": "/targets/octopus-barista-bot-smudge-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 8,
+            "style": 11,
+            "color": 13,
+            "composition": 12,
+            "missed": "missing espresso machine and pouring action",
+            "tip": "include espresso machine and pouring coffee details"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Octopus serving coffee underwater old drip machine",
+        "draftImage": "/targets/octopus-barista-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 12,
+          "details": 10,
+          "style": 6,
+          "color": 8,
+          "composition": 14,
+          "missed": "cartoonish style and accessories missing",
+          "tip": "Specify playful claymation style with bright colors and accessories"
+        },
+        "finalPrompt": "A cheerful octopus wearing a tiny hat serves coffee underwater using a vintage drip coffee maker, in a colorful coral reef setting, in claymation style.",
+        "finalImage": "/targets/octopus-barista-bot-imposter-final.webp",
+        "final": {
+          "subject": 12,
+          "details": 10,
+          "style": 13,
+          "color": 12,
+          "composition": 11,
+          "missed": "different coffee equipment and cup placement",
+          "tip": "specify espresso machine and pouring coffee into cup"
+        }
+      }
+    },
+    "owl-detective": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Owl detective with magnifying glass rooftop",
+          "draftImage": "/targets/owl-detective-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 12,
+            "style": 14,
+            "color": 8,
+            "composition": 10,
+            "missed": "Different hat style and background lighting",
+            "tip": "Use darker, noir style with fedora and moonlit cityscape"
+          },
+          "finalPrompt": "A solemn owl detective wearing a trench coat carefully examining a magnifying glass on a foggy city rooftop at night, in moody noir comic book style.",
+          "finalImage": "/targets/owl-detective-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 14,
+            "style": 13,
+            "color": 12,
+            "composition": 15,
+            "missed": "less painterly texture and softer edges",
+            "tip": "use more painterly brush strokes and softer shading"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Owl detective on rooftop at night",
+          "draftImage": "/targets/owl-detective-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 16,
+            "style": 15,
+            "color": 14,
+            "composition": 17,
+            "missed": "darker, more noir style and lighting",
+            "tip": "use noir style, darker palette, and more dramatic shadows"
+          },
+          "finalPrompt": "A serious owl detective dressed in a trench coat standing on a foggy city rooftop at night, holding a small investigative tool.",
+          "finalImage": "/targets/owl-detective-bot-doodle-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 10,
+            "style": 8,
+            "color": 12,
+            "composition": 11,
+            "missed": "owl replaced by cat, less defined background",
+            "tip": "specify owl detective with sharp cityscape background"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Owl on rooftop in city fog",
+          "draftImage": "/targets/owl-detective-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 6,
+            "details": 4,
+            "style": 3,
+            "color": 5,
+            "composition": 7,
+            "missed": "owl detective with magnifying glass",
+            "tip": "include detective outfit and magnifying glass on owl"
+          },
+          "finalPrompt": "An owl standing on a foggy rooftop in the city at night, looking around thoughtfully.",
+          "finalImage": "/targets/owl-detective-bot-smudge-final.webp",
+          "final": {
+            "subject": 7,
+            "details": 5,
+            "style": 6,
+            "color": 9,
+            "composition": 7,
+            "missed": "owl detective figure and magnifying glass",
+            "tip": "include detective attire and magnifying glass on owl"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Owl detective with flashlight rooftop",
+        "draftImage": "/targets/owl-detective-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 18,
+          "details": 14,
+          "style": 16,
+          "color": 15,
+          "composition": 17,
+          "missed": "flashlight instead of magnifying glass",
+          "tip": "use magnifying glass instead of flashlight"
+        },
+        "finalPrompt": "A solemn owl detective in a trench coat inspecting a flashlight on a foggy city rooftop at night, painted in moody noir comic book style.",
+        "finalImage": "/targets/owl-detective-bot-imposter-final.webp",
+        "final": {
+          "subject": 14,
+          "details": 12,
+          "style": 14,
+          "color": 14,
+          "composition": 13,
+          "missed": "wrong object held by owl",
+          "tip": "specify owl holding magnifying glass, not flashlight"
+        }
+      }
     }
   }
 }
