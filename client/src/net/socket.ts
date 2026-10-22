@@ -16,7 +16,7 @@ export function useSession() { return useSyncExternalStore((l) => { listeners.ad
 
 type Events = {
   'draw:submit': { strokes: Stroke[]; png: string }; 'vote': { targetId: string }; 'steal:pick': { option: string };
-  'chat:send': { text: string }; 'host:assign': { playerId: string };
+  'chat:send': { text: string }; 'host:assign': { playerId: string }; 'avatar:set': { avatar: string };
   'prompt:draft': { text: string }; 'prompt:final': { text: string }; 'host:mode': { mode: 'prompt' | 'sketch' };
   'host:settings': { pace?: 'quick' | 'classic'; difficulty?: 'easy' | 'normal' | 'hard' };
   'howto:ready': void; 'verdict:ready': void; 'host:start': void; 'host:skip': void; 'host:playAgain': void; 'leave': void;
@@ -28,6 +28,7 @@ function toAction<E extends keyof Events>(e: E, p: any) {
     case 'steal:pick': return { t: 'steal' as const, option: p.option };
     case 'chat:send': return { t: 'chat' as const, text: p.text };
     case 'host:assign': return { t: 'assignHost' as const, playerId: p.playerId };
+    case 'avatar:set': return { t: 'avatar' as const, avatar: p.avatar };
     case 'prompt:draft': return { t: 'draft' as const, text: p.text };
     case 'prompt:final': return { t: 'final' as const, text: p.text };
     case 'host:mode': return { t: 'setMode' as const, mode: p.mode };

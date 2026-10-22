@@ -1,7 +1,7 @@
 import { AvatarArt } from '@/design/components/Illustrations';
 import { useEffect, useRef, useState, type ReactNode } from 'react';
 import type { PublicRoom, MeView, Player } from '@shared/types';
-import { Button, Modal, SoundControl, Timer } from '@/design/components';
+import { Button, LUNA_IMG, Modal, SoundControl, Timer } from '@/design/components';
 import { send } from '@/moments/common';
 import { HowTo } from './HowTo';
 import { Coach } from './Coach';
@@ -63,6 +63,8 @@ function status(room: PublicRoom, p: Player): { text: string; done?: boolean } {
 
 function PlayerList({ room, meId }: { room: PublicRoom; meId?: string }) {
   const players = [...room.players].sort((a, b) => b.score - a.score);
+  const r = room.rounds[room.rounds.length - 1];
+  const lunaAtTable = room.mode === 'prompt' && room.phase !== 'LOBBY' && room.phase !== 'FINAL';
   return (
     <section className="side__card">
       <h3 className="side__title">Players</h3>
@@ -77,6 +79,13 @@ function PlayerList({ room, meId }: { room: PublicRoom; meId?: string }) {
             </li>
           );
         })}
+        {lunaAtTable && (
+          <li className="side__luna">
+            <span className="side__av"><img src={LUNA_IMG} alt="" className="avatar-art" /></span>
+            <span className="side__name">Inspector Luna<small> (AI detective)</small></span>
+            <span className={`side__status ${r?.detectiveIn ? 'side__status--done' : ''}`}>{r?.detectiveIn ? 'Has a suspect' : 'Watching…'}</span>
+          </li>
+        )}
       </ul>
     </section>
   );

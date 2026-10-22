@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
 import type { Drawing } from '@shared/types';
-import { Button, DrawingTile, Timer } from '@/design/components';
+import { Button, DrawingTile, LunaChip, Timer } from '@/design/components';
 import { Rise } from '@/shell/PhaseStage';
 import { childVariants } from '@/design/motion';
 import { useFitGrid } from '@/design/useFitGrid';
@@ -16,7 +16,7 @@ const REVEAL_FIRST_S = 1.6, REVEAL_STEP_S = 0.9; // keep in sync with galleryMin
 function copy(phase: string, drawings: Drawing[], prompt = false) {
   const pending = drawings.filter((d) => d.glowStatus === 'pending').length;
   if (prompt && phase === 'GALLERY') return { title: 'The final images', sub: pending ? 'Generating everyone’s final prompt. Their first draft is in the corner.' : 'All in. Which one doesn’t quite fit?' };
-  if (prompt && phase === 'DISCUSS') return { title: 'Who couldn’t see the whole picture?', sub: 'One player saw the target with a detail blurred out. Compare the final images and the drafts in the corners, and talk it over in the chat.' };
+  if (prompt && phase === 'DISCUSS') return { title: 'Who couldn’t see the whole picture?', sub: 'One player saw the target with a detail erased. Compare the final images and the drafts in the corners, and talk it over in the chat.' };
   if (phase === 'GALLERY') return {
     title: 'Here’s what everyone drew',
     sub: pending ? 'Sketchy is redrawing every sketch as a sticker. The original stays in the corner.' : 'Every sketch, redrawn. Discussion starts in a moment.',
@@ -40,6 +40,7 @@ export function GalleryMain({ view }: MomentProps) {
         <div>
           <h2 className="display-md">{c.title}</h2>
           <p className="gallery-head__sub">{phase === 'VOTE' ? `${r.revote ? 'Tie! Revote between the tied players' : 'Vote on your phone'} · ${votes}/${voters} votes in` : c.sub}</p>
+          <LunaChip round={r} phase={phase} />
         </div>
         <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
           {phase === 'DISCUSS' && view.canHost && <Button variant="ghost" size="sm" onClick={() => send().emit('host:skip')}>Skip to vote</Button>}
@@ -93,6 +94,7 @@ export function GalleryPhone({ view }: MomentProps) {
           <h2 className="display-sm">{title}</h2>
           <p className="gallery-head__sub">{sub}</p>
           {phase === 'DISCUSS' && me.isImposter && <p className="gallery-head__tag">You’re the imposter: blend in!</p>}
+          <LunaChip round={r} phase={phase} />
         </div>
         {phase === 'DISCUSS' && me.isHost && <Button variant="ghost" size="sm" onClick={() => send().emit('host:skip')}>Skip to vote</Button>}
       </Rise>

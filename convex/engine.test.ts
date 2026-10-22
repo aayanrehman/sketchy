@@ -171,3 +171,22 @@ test('a lone player cannot start', () => {
   e.connect(e.addPlayer('Ana') as Seat);
   assert.match(e.start() || '', /Need 2 players/);
 });
+
+test('AI detective: odds land in DISCUSS, stay hidden until the unmask, and a wrong bet pays the imposter', () => {
+  const { e, seats } = draftRoom();
+  for (const s of seats) e.submitPrompt(s.player.id, 'draft', 'a frog playing drums');
+  timeout(e); for (const s of seats) e.submitPrompt(s.player.id, 'final', 'a frog playing drums on a lily pad');
+  e.effects = [];
+  while (e.s.phase !== 'DISCUSS') timeout(e);
+  assert.ok(e.effects.some((x: any) => x.t === 'detect'), 'a detect job is queued');
+  const r = e.s.rounds[0];
+  const innocent = r.participantIds.find((id) => id !== r.imposterId)!;
+  e.applyDetect(1, e.s.gameId, Object.fromEntries(r.participantIds.map((id) => [id, id === innocent ? 0.9 : 0.3])));
+  assert.ok(Math.abs(Object.values(r.detective!).reduce((a, b) => a + b, 0) - 1) < 1e-9, 'normalized');
+  assert.equal(e.build(seats[0], false).room.rounds[0].detective, undefined, 'hidden before the unmask');
+  for (const id of r.participantIds) e.vote(id, id === innocent ? r.imposterId : innocent);
+  while ((e.s.phase as string) !== 'UNMASK') timeout(e);
+  assert.ok(e.build(seats[0], false).room.rounds[0].detective, 'shown at the unmask');
+  while ((e.s.phase as string) !== 'SCORES') timeout(e);
+  assert.ok(r.awards.some((a) => a.reason === 'fooled_ai' && a.playerId === r.imposterId));
+});

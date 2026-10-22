@@ -28,8 +28,8 @@ function line(room: PublicRoom, me: MeView): { text: string; mood: 'happy' | 'th
       : { text: 'Check the drafts in the corners: the imposter couldn’t see the hidden part, so their draft may have guessed wrong. Say who in the chat.', mood: 'sus' };
     case 'GALLERY': return { text: 'Everyone’s final images are coming in. Which one doesn’t quite match the others?', mood: 'sus' };
     case 'STEAL': return r.imposterId === me.playerId
-      ? { text: 'You got caught, but you can still steal points: what was hidden behind the blur?', mood: 'imposter' }
-      : { text: 'The imposter gets one guess at what was hidden behind the blur, to steal points…', mood: 'think' };
+      ? { text: 'You got caught, but you can still steal points: what was erased from your picture?', mood: 'imposter' }
+      : { text: 'The imposter gets one guess at what was erased from their picture, to steal points…', mood: 'think' };
     case 'VOTE': if (!p?.hasVoted && !r.revote) return { text: imp ? 'Click someone else’s image to frame them.' : 'Click the image you think the imposter made.', mood: 'sus' }; break;
   }
   switch (room.phase) {

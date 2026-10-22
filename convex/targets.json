@@ -566,6 +566,239 @@
       "image": "/targets/rhino-astronaut.webp",
       "masked": "/targets/rhino-astronaut-masked.webp",
       "maskFallback": false
+    },
+    {
+      "id": "giraffe-barber",
+      "theme": "barber",
+      "prompt": "A tall giraffe wearing a striped apron cuts a lion's mane with shiny silver scissors in a sunny urban park, gouache style.",
+      "key": "shiny silver scissors",
+      "stealOptions": [
+        "shiny silver scissors",
+        "a striped apron",
+        "a lion's mane",
+        "urban park bench"
+      ],
+      "taboo": [
+        "giraffe",
+        "haircut",
+        "scissors",
+        "barber"
+      ],
+      "image": "/targets/giraffe-barber.webp",
+      "masked": "/targets/giraffe-barber-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "turtle-surf",
+      "theme": "sea surfing",
+      "prompt": "A sea turtle confidently riding a big curling wave on a bright blue surfboard, ocean sunset, in vibrant gouache style",
+      "key": "a bright blue surfboard",
+      "stealOptions": [
+        "a bright blue surfboard",
+        "a colorful beach umbrella",
+        "a shiny surf leash",
+        "a striped beach towel"
+      ],
+      "taboo": [
+        "turtle",
+        "surfboard",
+        "wave",
+        "ocean",
+        "sea"
+      ],
+      "image": "/targets/turtle-surf.webp",
+      "masked": "/targets/turtle-surf-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "raccoon-chef",
+      "theme": "animal cooking",
+      "prompt": "A raccoon chef flipping pancakes on a sizzling griddle in a cozy rustic kitchen, illustrated in charming watercolor style.",
+      "key": "a sizzling griddle",
+      "stealOptions": [
+        "a sizzling griddle",
+        "a wooden spatula",
+        "a stack of pancakes",
+        "a chef's hat"
+      ],
+      "taboo": [
+        "raccoon",
+        "chef",
+        "pancake",
+        "griddle"
+      ],
+      "image": "/targets/raccoon-chef.webp",
+      "masked": "/targets/raccoon-chef-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "polar-angler",
+      "theme": "polar bear ice fishing",
+      "prompt": "A polar bear wearing a knitted scarf anxiously holds a wooden fishing rod over a cracked icy lake, in a colorful gouache style.",
+      "key": "a wooden fishing rod",
+      "stealOptions": [
+        "a wooden fishing rod",
+        "a fishing bucket",
+        "a hole in the ice",
+        "a warm scarf"
+      ],
+      "taboo": [
+        "polar bear",
+        "fishing rod",
+        "ice",
+        "lake"
+      ],
+      "image": "/targets/polar-angler.webp",
+      "masked": "/targets/polar-angler-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "goat-violin",
+      "theme": "mountain music",
+      "prompt": "A joyful goat plays a shining wooden violin atop a snowy mountain peak, under a vibrant sunset in watercolor style.",
+      "key": "a shining wooden violin",
+      "stealOptions": [
+        "a shining wooden violin",
+        "a bright brass trumpet",
+        "a colorful acoustic guitar",
+        "a classic black piano"
+      ],
+      "taboo": [
+        "goat",
+        "violin",
+        "mountain",
+        "music",
+        "instrument"
+      ],
+      "image": "/targets/goat-violin.webp",
+      "masked": "/targets/goat-violin-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "panda-yoga",
+      "theme": "yoga sunrise",
+      "prompt": "A calm panda in a tree pose on a vibrant orange hilltop, holding a bamboo yoga mat, painted in serene watercolor style at sunrise.",
+      "key": "a bamboo yoga mat",
+      "stealOptions": [
+        "a bamboo yoga mat",
+        "a bright orange sunrise",
+        "a peaceful green hilltop",
+        "a large leafy tree"
+      ],
+      "taboo": [
+        "panda",
+        "yoga",
+        "bamboo yoga mat",
+        "sunrise"
+      ],
+      "image": "/targets/panda-yoga.webp",
+      "masked": "/targets/panda-yoga-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "crab-builder",
+      "theme": "beach fun",
+      "prompt": "A cheerful crab wearing a tiny hard hat carefully crafting an elaborate sandcastle using a bright blue bucket on a sunny beach, in colorful gouache style.",
+      "key": "a bright blue bucket",
+      "stealOptions": [
+        "a bright blue bucket",
+        "a shiny metal shovel",
+        "a red plastic rake",
+        "a yellow sand mold"
+      ],
+      "taboo": [
+        "crab",
+        "sandcastle",
+        "bucket",
+        "beach"
+      ],
+      "image": "/targets/crab-builder.webp",
+      "masked": "/targets/crab-builder-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "chameleon-photographer",
+      "theme": "jungle photography",
+      "prompt": "A chameleon wearing a jungle hat snaps a picture with a vintage camera, amidst vibrant tropical plants, in comic book style.",
+      "key": "a vintage camera",
+      "stealOptions": [
+        "a vintage camera",
+        "a colorful leaf",
+        "a jungle hat",
+        "a tropical flower"
+      ],
+      "taboo": [
+        "chameleon",
+        "camera",
+        "photographer",
+        "jungle"
+      ],
+      "image": "/targets/chameleon-photographer.webp",
+      "masked": "/targets/chameleon-photographer-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "hippo-ballet",
+      "theme": "ballet dancer",
+      "prompt": "A joyful hippo in a pink tutu gracefully balances on one toe on a grand theater stage, painted in impressionist style.",
+      "key": "a pink tutu",
+      "stealOptions": [
+        "a pink tutu",
+        "a sparkling tiara",
+        "a wooden ballet barre",
+        "a shiny silver stage light"
+      ],
+      "taboo": [
+        "hippo",
+        "tutu",
+        "ballet",
+        "dancer"
+      ],
+      "image": "/targets/hippo-ballet.webp",
+      "masked": "/targets/hippo-ballet-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "beaver-lumberjack",
+      "theme": "forest",
+      "prompt": "A beaver lumberjack wearing a plaid shirt holding a shiny axe in a dense forest, illustrated in comic book style.",
+      "key": "a shiny axe",
+      "stealOptions": [
+        "a shiny axe",
+        "a wooden log",
+        "a red plaid shirt",
+        "a forest background"
+      ],
+      "taboo": [
+        "beaver",
+        "axe",
+        "lumberjack"
+      ],
+      "image": "/targets/beaver-lumberjack.webp",
+      "masked": "/targets/beaver-lumberjack-masked.webp",
+      "maskFallback": false
+    },
+    {
+      "id": "toucan-postman",
+      "theme": "toucan mail",
+      "prompt": "A cheerful toucan mail carrier wearing a tiny blue cap, holding a leather mailbag overflowing with letters, perched on a vibrant jungle branch, painted in playful cartoon style.",
+      "key": "a leather mailbag overflowing with letters",
+      "stealOptions": [
+        "a leather mailbag overflowing with letters",
+        "a brightly colored birdhouse",
+        "a small wooden mailbox",
+        "a bundle of postcards tied with string"
+      ],
+      "taboo": [
+        "toucan",
+        "mailbag",
+        "letters",
+        "mail",
+        "carrier"
+      ],
+      "image": "/targets/toucan-postman.webp",
+      "masked": "/targets/toucan-postman-masked.webp",
+      "maskFallback": false
     }
   ],
   "demo": {
@@ -3349,6 +3582,1150 @@
           "composition": 13,
           "missed": "wrong object held by owl",
           "tip": "specify owl holding magnifying glass, not flashlight"
+        }
+      }
+    },
+    "turtle-surf": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Sea turtle riding large wave on blue surfboard",
+          "draftImage": "/targets/turtle-surf-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 14,
+            "style": 15,
+            "color": 12,
+            "composition": 16,
+            "missed": "Sunset and warm lighting missing",
+            "tip": "Add sunset lighting and warmer color tones"
+          },
+          "finalPrompt": "A sea turtle confidently riding a large curling wave on a bright blue surfboard during an ocean sunset, painted in vibrant gouache style",
+          "finalImage": "/targets/turtle-surf-bot-pixel-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 12,
+            "style": 15,
+            "color": 15,
+            "composition": 13,
+            "missed": "Turtle's facial expression and limb positioning",
+            "tip": "Make turtle's face and limb poses more relaxed and natural"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Turtle on wave with colorful board at sunset",
+          "draftImage": "/targets/turtle-surf-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 10,
+            "style": 12,
+            "color": 14,
+            "composition": 13,
+            "missed": "turtle's head and flipper positions incorrect",
+            "tip": "describe turtle's pose with head and flippers clearly angled"
+          },
+          "finalPrompt": "A turtle riding a big wave with a colorful board at sunset over the ocean, capturing the scene but no specific art style",
+          "finalImage": "/targets/turtle-surf-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 12,
+            "style": 8,
+            "color": 13,
+            "composition": 14,
+            "missed": "surfboard color and texture",
+            "tip": "specify surfboard color and add painterly texture"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Turtle surfing a wave in ocean sunset",
+          "draftImage": "/targets/turtle-surf-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 15,
+            "style": 14,
+            "color": 17,
+            "composition": 16,
+            "missed": "Turtle's head and shell pattern details",
+            "tip": "Specify detailed turtle shell and head textures"
+          },
+          "finalPrompt": "A turtle surfing a wave in the ocean during sunset, simple depiction without mention of board details or art style",
+          "finalImage": "/targets/turtle-surf-bot-smudge-final.webp",
+          "final": {
+            "subject": 11,
+            "details": 7,
+            "style": 9,
+            "color": 13,
+            "composition": 14,
+            "missed": "Turtle's face and surfboard details",
+            "tip": "Add detailed turtle face and clear surfboard features"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Sea turtle on large wave with green surfboard",
+        "draftImage": "/targets/turtle-surf-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 16,
+          "details": 12,
+          "style": 14,
+          "color": 13,
+          "composition": 15,
+          "missed": "turtle's expression and surfboard color",
+          "tip": "make turtle's expression relaxed and surfboard blue"
+        },
+        "finalPrompt": "A sea turtle riding a large curling wave on a green surfboard during an ocean sunset in vibrant gouache style, replacing the blue surfboard with green",
+        "finalImage": "/targets/turtle-surf-bot-imposter-final.webp",
+        "final": {
+          "subject": 15,
+          "details": 13,
+          "style": 14,
+          "color": 14,
+          "composition": 15,
+          "missed": "surfboard color and turtle shell details",
+          "tip": "specify surfboard color and enhance turtle shell texture"
+        }
+      }
+    },
+    "giraffe-barber": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "giraffe in apron cutting lion's mane",
+          "draftImage": "/targets/giraffe-barber-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 15,
+            "style": 12,
+            "color": 10,
+            "composition": 16,
+            "missed": "Background and apron color differ",
+            "tip": "Specify background scenery and apron color clearly"
+          },
+          "finalPrompt": "A tall giraffe wearing a striped apron carefully cutting a lion's mane with shiny silver scissors in a bright sunny urban park, painted in gouache style.",
+          "finalImage": "/targets/giraffe-barber-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 14,
+            "color": 12,
+            "composition": 15,
+            "missed": "lion's facial expression and giraffe's arm position",
+            "tip": "make lion's expression calm and giraffe's arm holding scissors higher"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "giraffe trimming lion's mane in park",
+          "draftImage": "/targets/giraffe-barber-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 15,
+            "style": 17,
+            "color": 16,
+            "composition": 14,
+            "missed": "lion's sitting posture and giraffe's apron",
+            "tip": "specify lion sitting and giraffe wearing apron"
+          },
+          "finalPrompt": "Giraffe wearing apron trims lion's mane in a sunny city park, focusing on the interaction between the two animals.",
+          "finalImage": "/targets/giraffe-barber-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 12,
+            "color": 13,
+            "composition": 14,
+            "missed": "Giraffe's apron color and scissors detail",
+            "tip": "Specify apron stripes and sharper scissor details"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "giraffe near lion in park",
+          "draftImage": "/targets/giraffe-barber-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 6,
+            "details": 3,
+            "style": 2,
+            "color": 4,
+            "composition": 5,
+            "missed": "giraffe cutting lion's mane with scissors",
+            "tip": "include whimsical action and cartoon style details"
+          },
+          "finalPrompt": "A giraffe and a lion together in an urban park on a sunny day, with the giraffe holding something to the lion's mane.",
+          "finalImage": "/targets/giraffe-barber-bot-smudge-final.webp",
+          "final": {
+            "subject": 11,
+            "details": 5,
+            "style": 4,
+            "color": 13,
+            "composition": 9,
+            "missed": "giraffe cutting lion's mane with scissors",
+            "tip": "include giraffe holding scissors cutting lion's mane"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "giraffe cutting lion's mane with golden scissors",
+        "draftImage": "/targets/giraffe-barber-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 15,
+          "details": 10,
+          "style": 12,
+          "color": 8,
+          "composition": 14,
+          "missed": "giraffe holding scissors, not keys",
+          "tip": "specify giraffe holding large scissors"
+        },
+        "finalPrompt": "Tall giraffe in striped apron cutting lion's mane with golden scissors in a sunny urban park, gouache painting style.",
+        "finalImage": "/targets/giraffe-barber-bot-imposter-final.webp",
+        "final": {
+          "subject": 13,
+          "details": 9,
+          "style": 12,
+          "color": 11,
+          "composition": 10,
+          "missed": "giraffe holding scissors, lion's expression",
+          "tip": "specify giraffe holding scissors, lion with calm smile"
+        }
+      }
+    },
+    "raccoon-chef": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "raccoon chef flipping pancakes on stove",
+          "draftImage": "/targets/raccoon-chef-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 16,
+            "details": 12,
+            "style": 10,
+            "color": 14,
+            "composition": 13,
+            "missed": "racoon's apron and background details missing",
+            "tip": "include apron and detailed kitchen background elements"
+          },
+          "finalPrompt": "a raccoon chef skillfully flipping pancakes on a sizzling griddle inside a cozy rustic kitchen, illustrated in charming watercolor style",
+          "finalImage": "/targets/raccoon-chef-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 15,
+            "color": 14,
+            "composition": 12,
+            "missed": "Raccoon's clothing and background details differ",
+            "tip": "Specify raccoon wearing apron and include kitchen utensils"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "raccoon cooking pancakes in rustic kitchen",
+          "draftImage": "/targets/raccoon-chef-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 16,
+            "details": 14,
+            "style": 18,
+            "color": 15,
+            "composition": 14,
+            "missed": "racoon's chef hat and apron missing",
+            "tip": "include chef hat and apron on raccoon"
+          },
+          "finalPrompt": "a raccoon cooking pancakes in a rustic kitchen, focusing on the action of flipping pancakes on a hot surface",
+          "finalImage": "/targets/raccoon-chef-bot-doodle-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 10,
+            "style": 12,
+            "color": 8,
+            "composition": 11,
+            "missed": "racoon's expression and pancake details",
+            "tip": "make raccoon expression cheerful and add steam on pancakes"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "raccoon making breakfast in kitchen",
+          "draftImage": "/targets/raccoon-chef-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 10,
+            "details": 8,
+            "style": 14,
+            "color": 15,
+            "composition": 12,
+            "missed": "racoon cooking pancakes with flipping action",
+            "tip": "include raccoon flipping pancakes with chef hat and apron"
+          },
+          "finalPrompt": "a raccoon preparing breakfast in a warm, rustic kitchen setting, with pancakes on a cooking surface",
+          "finalImage": "/targets/raccoon-chef-bot-smudge-final.webp",
+          "final": {
+            "subject": 16,
+            "details": 13,
+            "style": 14,
+            "color": 14,
+            "composition": 13,
+            "missed": "missing chef hat and pancake flipping action",
+            "tip": "include chef hat and pancake flipping with pan in prompt"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "raccoon chef flipping pancakes on frying pan",
+        "draftImage": "/targets/raccoon-chef-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 18,
+          "details": 12,
+          "style": 14,
+          "color": 10,
+          "composition": 13,
+          "missed": "pancakes floating vs one flipping",
+          "tip": "include pancakes flipping with steam and kitchen background"
+        },
+        "finalPrompt": "a raccoon chef flipping pancakes on a frying pan in a cozy rustic kitchen, illustrated in charming watercolor style",
+        "finalImage": "/targets/raccoon-chef-bot-imposter-final.webp",
+        "final": {
+          "subject": 15,
+          "details": 10,
+          "style": 14,
+          "color": 14,
+          "composition": 12,
+          "missed": "missing griddle and fewer pancakes",
+          "tip": "include a griddle with pancakes and more kitchen props"
+        }
+      }
+    },
+    "polar-angler": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Polar bear with knitted scarf on icy lake",
+          "draftImage": "/targets/polar-angler-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 10,
+            "details": 6,
+            "style": 8,
+            "color": 12,
+            "composition": 7,
+            "missed": "bear holding fishing rod, sad expression",
+            "tip": "include fishing rod and sad facial expression explicitly"
+          },
+          "finalPrompt": "A polar bear wearing a cozy knitted scarf anxiously holding a wooden fishing rod over a cracked icy lake, painted in vibrant gouache style",
+          "finalImage": "/targets/polar-angler-bot-pixel-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 10,
+            "style": 15,
+            "color": 13,
+            "composition": 12,
+            "missed": "Bear's pose and fishing hole details",
+            "tip": "Specify bear sitting with fishing hole and ice cracks"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Bear on ice with scarf and fishing rod",
+          "draftImage": "/targets/polar-angler-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 10,
+            "style": 14,
+            "color": 10,
+            "composition": 13,
+            "missed": "bear color and expression",
+            "tip": "specify white bear with sad expression on ice"
+          },
+          "finalPrompt": "A polar bear wearing a scarf standing on a cracked icy lake holding a fishing rod, depicted in bright colorful illustration",
+          "finalImage": "/targets/polar-angler-bot-doodle-final.webp",
+          "final": {
+            "subject": 10,
+            "details": 8,
+            "style": 6,
+            "color": 7,
+            "composition": 8,
+            "missed": "Sad expression and fishing hole missing",
+            "tip": "Add a sad facial expression and fishing hole in ice"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Bear with scarf on frozen lake",
+          "draftImage": "/targets/polar-angler-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 10,
+            "details": 8,
+            "style": 6,
+            "color": 10,
+            "composition": 12,
+            "missed": "polar bear with fishing rod and hole",
+            "tip": "include fishing rod and ice hole, specify polar bear"
+          },
+          "finalPrompt": "A bear wearing a scarf standing on a frozen lake, looking anxious, simple colorful style",
+          "finalImage": "/targets/polar-angler-bot-smudge-final.webp",
+          "final": {
+            "subject": 11,
+            "details": 7,
+            "style": 5,
+            "color": 9,
+            "composition": 6,
+            "missed": "Bear's color and fishing action",
+            "tip": "Specify bear color and include fishing rod details"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Polar bear with scarf on ice holding fishing pole",
+        "draftImage": "/targets/polar-angler-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 15,
+          "details": 10,
+          "style": 12,
+          "color": 8,
+          "composition": 14,
+          "missed": "Bear's sad expression and fishing hole details",
+          "tip": "Emphasize sad facial expression and detailed ice fishing hole"
+        },
+        "finalPrompt": "A polar bear wearing a knitted scarf anxiously gripping a metal fishing rod over a cracked icy lake, in a colorful gouache style",
+        "finalImage": "/targets/polar-angler-bot-imposter-final.webp",
+        "final": {
+          "subject": 13,
+          "details": 10,
+          "style": 14,
+          "color": 14,
+          "composition": 12,
+          "missed": "bear's posture and fishing rod details",
+          "tip": "describe bear sitting and holding a simple fishing rod"
+        }
+      }
+    },
+    "goat-violin": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Joyful goat playing wooden violin mountain",
+          "draftImage": "/targets/goat-violin-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 18,
+            "details": 15,
+            "style": 17,
+            "color": 12,
+            "composition": 14,
+            "missed": "sunset sky and mountain colors",
+            "tip": "use warm sunset lighting and vibrant sky colors"
+          },
+          "finalPrompt": "A joyful goat playing a shining wooden violin atop a snowy mountain peak during a vibrant sunset, in a delicate watercolor style.",
+          "finalImage": "/targets/goat-violin-bot-pixel-final.webp",
+          "final": {
+            "subject": 12,
+            "details": 9,
+            "style": 14,
+            "color": 15,
+            "composition": 13,
+            "missed": "Goat's facial expression and violin details",
+            "tip": "Specify joyful expression and detailed violin features"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Goat with violin mountain sunset",
+          "draftImage": "/targets/goat-violin-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 10,
+            "style": 8,
+            "color": 14,
+            "composition": 15,
+            "missed": "goat's expression and fur color",
+            "tip": "use a lighter, cartoonish goat with joyful expression"
+          },
+          "finalPrompt": "A happy goat playing a wooden violin on a snowy mountain peak at sunset, capturing the moment with clear detail.",
+          "finalImage": "/targets/goat-violin-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 12,
+            "color": 14,
+            "composition": 13,
+            "missed": "cartoon style and standing pose",
+            "tip": "use cartoon style and show full standing goat"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Goat playing violin on mountain",
+          "draftImage": "/targets/goat-violin-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 12,
+            "style": 15,
+            "color": 12,
+            "composition": 14,
+            "missed": "Goat's expression and posture differ",
+            "tip": "Specify joyful expression and standing posture"
+          },
+          "finalPrompt": "A goat playing a violin on a snowy mountain with sunset colors, simple and bright.",
+          "finalImage": "/targets/goat-violin-bot-smudge-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 9,
+            "style": 11,
+            "color": 13,
+            "composition": 12,
+            "missed": "Goat's joyful expression and detailed violin",
+            "tip": "Add joyful expression and detailed violin features"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Goat playing golden trumpet mountain",
+        "draftImage": "/targets/goat-violin-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 12,
+          "details": 10,
+          "style": 14,
+          "color": 13,
+          "composition": 11,
+          "missed": "Goat playing trumpet instead of violin",
+          "tip": "Specify goat playing violin on mountain peak at sunset"
+        },
+        "finalPrompt": "A joyful goat playing a shining golden trumpet atop a snowy mountain peak under a vibrant sunset, in watercolor style.",
+        "finalImage": "/targets/goat-violin-bot-imposter-final.webp",
+        "final": {
+          "subject": 9,
+          "details": 7,
+          "style": 15,
+          "color": 14,
+          "composition": 13,
+          "missed": "Goat playing trumpet, not violin",
+          "tip": "Specify the goat playing a violin, not a trumpet"
+        }
+      }
+    },
+    "panda-yoga": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Calm panda yoga pose on orange hill",
+          "draftImage": "/targets/panda-yoga-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 8,
+            "style": 10,
+            "color": 14,
+            "composition": 15,
+            "missed": "panda pose and bamboo missing",
+            "tip": "include panda holding bamboo and standing on one leg"
+          },
+          "finalPrompt": "A serene panda in tree yoga pose on a vibrant orange hilltop, holding a bamboo yoga mat, painted in tranquil watercolor style at sunrise",
+          "finalImage": "/targets/panda-yoga-bot-pixel-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 9,
+            "style": 15,
+            "color": 15,
+            "composition": 14,
+            "missed": "Panda's arms and bamboo position incorrect",
+            "tip": "Specify panda holding bamboo in front with hands together"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Panda doing yoga on colorful hill",
+          "draftImage": "/targets/panda-yoga-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 8,
+            "style": 14,
+            "color": 10,
+            "composition": 13,
+            "missed": "panda's hand position and bamboo missing",
+            "tip": "specify panda holding bamboo with hands together in prayer pose"
+          },
+          "finalPrompt": "A calm panda performing tree yoga pose on a bright orange hilltop, clutching a yoga mat, painted in soft watercolor at early morning",
+          "finalImage": "/targets/panda-yoga-bot-doodle-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 10,
+            "style": 15,
+            "color": 12,
+            "composition": 14,
+            "missed": "panda's facial expression and bamboo color",
+            "tip": "make panda's eyes closed and bamboo bright green"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Panda standing on hill at sunrise",
+          "draftImage": "/targets/panda-yoga-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 10,
+            "details": 6,
+            "style": 5,
+            "color": 18,
+            "composition": 12,
+            "missed": "panda's pose and bamboo missing",
+            "tip": "include panda standing on one leg holding bamboo"
+          },
+          "finalPrompt": "A panda standing calmly on an orange hill at sunrise, depicted in watercolor style",
+          "finalImage": "/targets/panda-yoga-bot-smudge-final.webp",
+          "final": {
+            "subject": 7,
+            "details": 5,
+            "style": 14,
+            "color": 16,
+            "composition": 11,
+            "missed": "panda pose and bamboo missing",
+            "tip": "specify panda standing on one leg holding bamboo"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Panda yoga on hill holding wooden staff",
+        "draftImage": "/targets/panda-yoga-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 12,
+          "details": 8,
+          "style": 14,
+          "color": 10,
+          "composition": 12,
+          "missed": "panda pose and bamboo stick shape",
+          "tip": "describe exact panda pose and bamboo orientation clearly"
+        },
+        "finalPrompt": "A calm panda in tree pose on a vibrant orange hilltop, holding a wooden staff, painted in serene watercolor style at sunrise",
+        "finalImage": "/targets/panda-yoga-bot-imposter-final.webp",
+        "final": {
+          "subject": 13,
+          "details": 9,
+          "style": 14,
+          "color": 14,
+          "composition": 12,
+          "missed": "Panda holds bamboo, has different eyes",
+          "tip": "Specify panda holding green bamboo with closed eyes"
+        }
+      }
+    },
+    "crab-builder": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Cheerful crab with tiny hard hat",
+          "draftImage": "/targets/crab-builder-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 6,
+            "style": 7,
+            "color": 10,
+            "composition": 8,
+            "missed": "missing sandcastle and beach background",
+            "tip": "include detailed background elements like sandcastle and ocean"
+          },
+          "finalPrompt": "A joyful crab wearing a small hard hat building an intricate sandcastle with a vibrant blue bucket on a sunny beach, painted in colorful gouache style",
+          "finalImage": "/targets/crab-builder-bot-pixel-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 11,
+            "style": 14,
+            "color": 12,
+            "composition": 10,
+            "missed": "crab's claw and bucket position",
+            "tip": "match crab's claw and bucket orientation more closely"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Crab building sandcastle on beach",
+          "draftImage": "/targets/crab-builder-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 10,
+            "style": 12,
+            "color": 13,
+            "composition": 15,
+            "missed": "crab's hard hat and bucket missing",
+            "tip": "include crab wearing a yellow hard hat and holding a blue bucket"
+          },
+          "finalPrompt": "A happy crab wearing a tiny hard hat making a detailed sandcastle using a blue bucket on a sunny beach",
+          "finalImage": "/targets/crab-builder-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 12,
+            "color": 11,
+            "composition": 13,
+            "missed": "Crab's claw and sandcastle details differ",
+            "tip": "Specify more detailed sandcastle and claw shapes"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Crab on beach with bucket",
+          "draftImage": "/targets/crab-builder-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 6,
+            "details": 5,
+            "style": 4,
+            "color": 7,
+            "composition": 6,
+            "missed": "cartoon crab with sandcastle and helmet",
+            "tip": "add cartoon style crab with helmet and sandcastle"
+          },
+          "finalPrompt": "A crab on a sunny beach near a sandcastle holding a bucket",
+          "finalImage": "/targets/crab-builder-bot-smudge-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 11,
+            "style": 9,
+            "color": 13,
+            "composition": 12,
+            "missed": "crab's eyes and helmet missing",
+            "tip": "include crab with helmet and expressive eyes"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Crab with hard hat and red bucket",
+        "draftImage": "/targets/crab-builder-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 15,
+          "details": 8,
+          "style": 10,
+          "color": 12,
+          "composition": 10,
+          "missed": "Background and sandcastle missing",
+          "tip": "Include detailed beach background and sandcastle elements"
+        },
+        "finalPrompt": "A cheerful crab wearing a tiny hard hat carefully building an elaborate sandcastle using a bright red bucket on a sunny beach, in colorful gouache style",
+        "finalImage": "/targets/crab-builder-bot-imposter-final.webp",
+        "final": {
+          "subject": 15,
+          "details": 13,
+          "style": 14,
+          "color": 14,
+          "composition": 12,
+          "missed": "bucket color and crab claw position",
+          "tip": "use blue bucket and match crab claw holding it"
+        }
+      }
+    },
+    "chameleon-photographer": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Chameleon with jungle hat takes photo",
+          "draftImage": "/targets/chameleon-photographer-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 16,
+            "details": 12,
+            "style": 8,
+            "color": 6,
+            "composition": 14,
+            "missed": "Camera shape and background details",
+            "tip": "Specify vintage camera with detailed jungle background"
+          },
+          "finalPrompt": "A chameleon wearing a jungle hat taking a photo with an old-fashioned vintage camera, surrounded by bright tropical plants, depicted in comic book style.",
+          "finalImage": "/targets/chameleon-photographer-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 14,
+            "color": 12,
+            "composition": 15,
+            "missed": "background color and camera details",
+            "tip": "use warmer background and simpler camera design"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Chameleon in jungle hat photographing plants",
+          "draftImage": "/targets/chameleon-photographer-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 10,
+            "style": 8,
+            "color": 7,
+            "composition": 12,
+            "missed": "camera style and background foliage colors",
+            "tip": "use vivid colors and detailed camera with orange flowers"
+          },
+          "finalPrompt": "Chameleon wearing a jungle hat snapping pictures amidst vibrant tropical foliage, focusing on the camera and jungle setting without specifying art style.",
+          "finalImage": "/targets/chameleon-photographer-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 12,
+            "style": 8,
+            "color": 10,
+            "composition": 13,
+            "missed": "camera shape and hat style details",
+            "tip": "specify vintage camera with rectangular shape and detailed hat"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Chameleon holding camera in jungle",
+          "draftImage": "/targets/chameleon-photographer-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 10,
+            "style": 6,
+            "color": 12,
+            "composition": 13,
+            "missed": "cartoon style and flower missing",
+            "tip": "use cartoon style with bold outlines and include flower"
+          },
+          "finalPrompt": "A chameleon with a hat standing among jungle plants holding a camera, general tropical environment, no specific details on the camera or style.",
+          "finalImage": "/targets/chameleon-photographer-bot-smudge-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 9,
+            "style": 7,
+            "color": 6,
+            "composition": 11,
+            "missed": "hat style and camera details",
+            "tip": "use detailed descriptions for hat and camera style"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Chameleon with jungle hat takes photo",
+        "draftImage": "/targets/chameleon-photographer-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 15,
+          "details": 12,
+          "style": 10,
+          "color": 8,
+          "composition": 14,
+          "missed": "Background plants and vibrant colors missing",
+          "tip": "Add lush jungle foliage and bright orange flowers"
+        },
+        "finalPrompt": "A chameleon wearing a jungle hat snapping a picture using a modern digital camera, surrounded by lush tropical plants, comic book style.",
+        "finalImage": "/targets/chameleon-photographer-bot-imposter-final.webp",
+        "final": {
+          "subject": 14,
+          "details": 12,
+          "style": 14,
+          "color": 13,
+          "composition": 14,
+          "missed": "camera shape and chameleon's eye detail",
+          "tip": "use a vintage camera with rectangular lens and round eye"
+        }
+      }
+    },
+    "hippo-ballet": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "joyful hippo balancing on one toe",
+          "draftImage": "/targets/hippo-ballet-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 6,
+            "style": 5,
+            "color": 7,
+            "composition": 14,
+            "missed": "ballet tutu and detailed background missing",
+            "tip": "include detailed tutu and textured background in prompt"
+          },
+          "finalPrompt": "A joyful hippo gracefully balancing on one toe wearing a pink tutu on a grand theater stage, painted in impressionist style.",
+          "finalImage": "/targets/hippo-ballet-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 12,
+            "style": 15,
+            "color": 14,
+            "composition": 13,
+            "missed": "hippo's facial expression and arm positions",
+            "tip": "specify joyful expression and arms raised outward"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "hippo on stage in tutu",
+          "draftImage": "/targets/hippo-ballet-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 10,
+            "style": 12,
+            "color": 8,
+            "composition": 14,
+            "missed": "hippo's expression and background details",
+            "tip": "focus on hippo's joyful expression and detailed autumn background"
+          },
+          "finalPrompt": "A happy hippo standing on one toe on a theater stage, wearing a pink tutu, without specific artistic style or lighting details.",
+          "finalImage": "/targets/hippo-ballet-bot-doodle-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 12,
+            "style": 5,
+            "color": 10,
+            "composition": 13,
+            "missed": "Impressionist style and detailed background",
+            "tip": "Use impressionist painting style with textured brush strokes"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "hippo on stage dancing",
+          "draftImage": "/targets/hippo-ballet-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 8,
+            "style": 6,
+            "color": 7,
+            "composition": 10,
+            "missed": "hippo's pose and tutu missing",
+            "tip": "include ballet tutu and dancing pose with one leg raised"
+          },
+          "finalPrompt": "A hippo dancing on a stage, looking happy, without mentioning tutu or art style.",
+          "finalImage": "/targets/hippo-ballet-bot-smudge-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 9,
+            "style": 5,
+            "color": 7,
+            "composition": 11,
+            "missed": "oil painting style and tutu missing",
+            "tip": "specify oil painting style and include tutu details"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "hippo balancing on one toe",
+        "draftImage": "/targets/hippo-ballet-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 18,
+          "details": 6,
+          "style": 5,
+          "color": 4,
+          "composition": 15,
+          "missed": "color and painterly style",
+          "tip": "use vibrant colors and oil painting style"
+        },
+        "finalPrompt": "A joyful hippo gracefully balancing on one toe wearing a blue scarf on a grand theater stage, painted in impressionist style.",
+        "finalImage": "/targets/hippo-ballet-bot-imposter-final.webp",
+        "final": {
+          "subject": 12,
+          "details": 9,
+          "style": 13,
+          "color": 10,
+          "composition": 14,
+          "missed": "pink tutu and arm pose",
+          "tip": "specify pink tutu and arms raised symmetrically"
+        }
+      }
+    },
+    "beaver-lumberjack": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Beaver lumberjack with shiny axe in forest",
+          "draftImage": "/targets/beaver-lumberjack-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 12,
+            "style": 10,
+            "color": 13,
+            "composition": 15,
+            "missed": "Bear's expression and axe style differ",
+            "tip": "Make bear's expression angry and axe shiny metal"
+          },
+          "finalPrompt": "A beaver lumberjack wearing a red plaid shirt holding a gleaming axe standing in a dense forest, comic book illustration style",
+          "finalImage": "/targets/beaver-lumberjack-bot-pixel-final.webp",
+          "final": {
+            "subject": 15,
+            "details": 13,
+            "style": 14,
+            "color": 12,
+            "composition": 11,
+            "missed": "axe blade shape and face expression",
+            "tip": "make axe blade wider and sharpen facial expression"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Beaver in plaid shirt with axe in woods",
+          "draftImage": "/targets/beaver-lumberjack-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 12,
+            "style": 10,
+            "color": 14,
+            "composition": 13,
+            "missed": "expression and axe blade details",
+            "tip": "emphasize cartoon style and detailed axe blade"
+          },
+          "finalPrompt": "A beaver dressed in a plaid shirt holding an axe amidst thick forest trees, detailed natural setting",
+          "finalImage": "/targets/beaver-lumberjack-bot-doodle-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 12,
+            "style": 7,
+            "color": 13,
+            "composition": 11,
+            "missed": "cartoon style and facial expression",
+            "tip": "use cartoon style with exaggerated facial features and bold lines"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Beaver holding an axe in forest",
+          "draftImage": "/targets/beaver-lumberjack-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 10,
+            "style": 8,
+            "color": 10,
+            "composition": 14,
+            "missed": "Beaver's anthropomorphic lumberjack look",
+            "tip": "Add anthropomorphic features and plaid shirt"
+          },
+          "finalPrompt": "A cartoon beaver standing in a forest holding an axe, simple background with trees",
+          "finalImage": "/targets/beaver-lumberjack-bot-smudge-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 9,
+            "style": 5,
+            "color": 11,
+            "composition": 9,
+            "missed": "angry expression and detailed fur texture",
+            "tip": "add angry expression and detailed fur texture"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Beaver lumberjack with dull axe in forest",
+        "draftImage": "/targets/beaver-lumberjack-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 18,
+          "details": 14,
+          "style": 12,
+          "color": 14,
+          "composition": 16,
+          "missed": "beaver's facial expression and hat missing",
+          "tip": "add a beanie hat and angrier facial expression"
+        },
+        "finalPrompt": "A beaver lumberjack wearing a plaid shirt holding a worn axe standing in a dense forest, illustrated in comic book style",
+        "finalImage": "/targets/beaver-lumberjack-bot-imposter-final.webp",
+        "final": {
+          "subject": 15,
+          "details": 13,
+          "style": 14,
+          "color": 14,
+          "composition": 15,
+          "missed": "Axe blade texture and bear's facial expression",
+          "tip": "Make axe blade cleaner and sharpen bear's expression"
+        }
+      }
+    },
+    "toucan-postman": {
+      "artists": [
+        {
+          "name": "Pixel",
+          "draftPrompt": "Cheerful toucan with mailbag in jungle",
+          "draftImage": "/targets/toucan-postman-bot-pixel-draft.webp",
+          "draft": {
+            "subject": 15,
+            "details": 13,
+            "style": 14,
+            "color": 14,
+            "composition": 12,
+            "missed": "beak shape and eye color",
+            "tip": "make beak larger and eye blue, adjust bag style"
+          },
+          "finalPrompt": "A cheerful toucan mail carrier perched on a vibrant jungle branch, wearing a tiny blue cap and holding a leather mailbag overflowing with letters, painted in playful cartoon style",
+          "finalImage": "/targets/toucan-postman-bot-pixel-final.webp",
+          "final": {
+            "subject": 14,
+            "details": 10,
+            "style": 12,
+            "color": 11,
+            "composition": 13,
+            "missed": "envelopes replaced by crumpled paper",
+            "tip": "specify crisp, clean envelopes in bag"
+          }
+        },
+        {
+          "name": "Doodle",
+          "draftPrompt": "Toucan with blue cap on jungle branch",
+          "draftImage": "/targets/toucan-postman-bot-doodle-draft.webp",
+          "draft": {
+            "subject": 12,
+            "details": 6,
+            "style": 7,
+            "color": 10,
+            "composition": 8,
+            "missed": "cartoon style and mailbag missing",
+            "tip": "add cartoon style and include mailbag with letters"
+          },
+          "finalPrompt": "A toucan wearing a small blue cap sitting on a bright jungle branch, carrying a bag filled with mail, in a colorful setting",
+          "finalImage": "/targets/toucan-postman-bot-doodle-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 10,
+            "style": 12,
+            "color": 11,
+            "composition": 8,
+            "missed": "beak shape and eye color details",
+            "tip": "focus on beak shape and eye color accuracy"
+          }
+        },
+        {
+          "name": "Smudge",
+          "draftPrompt": "Happy toucan in jungle",
+          "draftImage": "/targets/toucan-postman-bot-smudge-draft.webp",
+          "draft": {
+            "subject": 14,
+            "details": 8,
+            "style": 15,
+            "color": 16,
+            "composition": 14,
+            "missed": "missing mailbag and hat on toucan",
+            "tip": "include a mailbag and a blue hat on the toucan"
+          },
+          "finalPrompt": "A happy toucan perched on a jungle branch, wearing a little cap, in a bright and fun scene",
+          "finalImage": "/targets/toucan-postman-bot-smudge-final.webp",
+          "final": {
+            "subject": 13,
+            "details": 9,
+            "style": 14,
+            "color": 11,
+            "composition": 14,
+            "missed": "missing mailbag and hat style",
+            "tip": "include mailbag and specific hat style on toucan"
+          }
+        }
+      ],
+      "imposter": {
+        "name": "Imp",
+        "draftPrompt": "Cheerful toucan with satchel on branch",
+        "draftImage": "/targets/toucan-postman-bot-imposter-draft.webp",
+        "draft": {
+          "subject": 15,
+          "details": 12,
+          "style": 14,
+          "color": 13,
+          "composition": 14,
+          "missed": "envelope-filled bag and hat missing",
+          "tip": "include a mailbag with envelopes and a blue cap"
+        },
+        "finalPrompt": "A cheerful toucan mail carrier perched on a vibrant jungle branch, wearing a tiny blue cap and holding a cloth satchel filled with letters, painted in playful cartoon style",
+        "finalImage": "/targets/toucan-postman-bot-imposter-final.webp",
+        "final": {
+          "subject": 14,
+          "details": 11,
+          "style": 13,
+          "color": 12,
+          "composition": 12,
+          "missed": "bag strap across body, fewer letters",
+          "tip": "include bag strap and more letters in the bag"
         }
       }
     }

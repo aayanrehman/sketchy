@@ -4,6 +4,7 @@
  * effects (timers -> ctx.scheduler, AI jobs -> actions, sketch strokes -> the sketches table).
  * Timers are cancelled by forgetting their token: a fired timer whose token no longer matches is a no-op.
  */
+import { CAST } from '../shared/cast';
 import type {
   Phase, Player, Round, Drawing, PublicRoom, MeView, Stroke, PromptPair, FinalAward, ToastKind, GameMode, Modifier, Breakdown, RoomSettings, ChallengeInfo,
 } from '../shared/types';
@@ -49,7 +50,7 @@ const pick = <T>(arr: T[]): T => arr[Math.floor(Math.random() * arr.length)];
 const CODE_ALPHABET = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
 export const randomCode = () => Array.from({ length: 4 }, () => CODE_ALPHABET[Math.floor(Math.random() * CODE_ALPHABET.length)]).join('');
 const PLAYER_COLORS = ['#FF6B6B', '#FFA94D', '#FFE066', '#63E6BE', '#4DABF7', '#B197FC', '#F783AC', '#F8F9FA'];
-const PLAYER_AVATARS = ['🦊', '🐸', '🦄', '🐙', '🐼', '🦁', '🐧', '🐲'];
+const PLAYER_AVATARS = CAST.map((c) => c.id);
 
 // ---------- demo content ----------
 interface BotDrawing { strokes: Stroke[]; glowUrl?: string; golden?: boolean; match: number; sees: string; roast: string }
@@ -98,6 +99,7 @@ export type Effect =
   | { t: 'glow'; round: number; playerId: string; gameId: string }
   | { t: 'judge'; round: number; playerId: string; gameId: string; prompt: string }
   | { t: 'hint'; round: number; gameId: string }
+  | { t: 'detect'; round: number; gameId: string }
   | { t: 'gen'; round: number; playerId: string; gameId: string; pass: 'draft' | 'final'; prompt: string }
   | { t: 'compare'; round: number; playerId: string; gameId: string; pass: 'draft' | 'final'; attemptUrl: string; targetPath: string; styleRound: boolean }
   | { t: 'attempt'; round: number; playerId: string; deviceId: string; name: string; targetId: string; score: number; prompt: string; imageUrl?: string; breakdown?: Breakdown };
@@ -183,6 +185,13 @@ export class Engine {
     if (this.s.isDemo && !this.s.hostId && !isBot) this.s.hostId = player.id;
     this.touch();
     return seat;
+  }
+
+  /** Character select: lobby (or between games) only, one character per table. */
+  setAvatar(playerId: string, avatar: string) {
+    const p = this.seat(playerId)?.player;
+    if (!p || !['LOBBY', 'FINAL'].includes(this.s.phase) || !PLAYER_AVATARS.includes(avatar) || this.players.some((x) => x.avatar === avatar && x.id !== playerId)) return;
+    p.avatar = avatar; this.touch();
   }
 
   /** A client for this seat checked in (join, rejoin or heartbeat after being marked away). */
@@ -395,6 +404,7 @@ export class Engine {
     if (phase === 'DISCUSS' && r) {
       this.s.frozen[String(r.index)] = r.drawings.map((d) => ({ ...d, glowStatus: d.glowStatus === 'pending' ? 'fallback' : d.glowStatus }));
       this.effects.push({ t: 'hint', round: r.index, gameId: this.s.gameId });
+      if (r.mode === 'prompt') this.effects.push({ t: 'detect', round: r.index, gameId: this.s.gameId });
     }
     if (['UNMASK', 'VERDICT', 'SCORES', 'FINAL'].includes(phase)) this.cancel('imposterGrace');
     if (phase === 'VERDICT') {
@@ -809,6 +819,16 @@ export class Engine {
     this.pushChat(SKETCHY_ID, text.slice(0, 160));
   }
 
+  /** The AI detective's odds landed (only counts if it beat the unmask). */
+  applyDetect(round: number, gameId: string, odds: Record<string, number>) {
+    const r = this.s.rounds[round - 1];
+    if (gameId !== this.s.gameId || !r || r.detective || !['DISCUSS', 'VOTE'].includes(this.s.phase) || round !== this.s.round) return;
+    const ids = r.participantIds.filter((id) => Number.isFinite(odds[id]));
+    const sum = ids.reduce((t, id) => t + Math.max(0, odds[id]), 0);
+    if (ids.length < 2 || sum <= 0) return;
+    r.detective = Object.fromEntries(ids.map((id) => [id, Math.max(0, odds[id]) / sum]));
+  }
+
   readyVerdict(playerId: string) {
     if (this.s.phase !== 'VERDICT' || !this.currentRound()?.participantIds.includes(playerId)) return;
     if (!this.s.verdictReady.includes(playerId)) this.s.verdictReady.push(playerId);
@@ -852,7 +872,7 @@ export class Engine {
       imposterId: imp ? round.imposterId : '',
       participantIds: [...round.participantIds],
       revealedId: imp ? round.revealedId : null, caught: imp ? round.caught : null,
-      escapeReason: imp ? round.escapeReason : null, fled: imp && round.fled, revote: round.revote ? [...round.revote] : undefined,
+      escapeReason: imp ? round.escapeReason : null, fled: imp && round.fled, revote: round.revote ? [...round.revote] : undefined, detective: imp && round.detective ? { ...round.detective } : undefined, detectiveIn: !!round.detective || undefined,
       mode: round.mode, modifier: round.modifier, targetId: imp ? round.targetId : undefined,
       targetUrl: imp ? round.targetUrl : undefined, targetPrompt: jud ? round.targetPrompt : undefined,
       stealOptions: imp ? [...round.stealOptions] : [],

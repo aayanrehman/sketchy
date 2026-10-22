@@ -7,6 +7,41 @@ import { Avatar, Button, Card } from '@/design/components';
 import { Rise } from '@/shell/PhaseStage';
 import { childVariants } from '@/design/motion';
 import { send, type MomentProps } from './common';
+import { CAST, DETECTIVE } from '@shared/cast';
+import { AvatarArt } from '@/design/components/Illustrations';
+import { LUNA_IMG } from '@/design/components';
+
+const CAST_KEY = 'sketchy.cast';
+const savedCast = () => { try { return localStorage.getItem(CAST_KEY); } catch { return null; } };
+
+/** Character select: tap a suspect. Taken ones are greyed out; the pick is remembered on this device. */
+function CastPicker({ view }: MomentProps) {
+  const room = view.room!; const me = view.me!;
+  const mine = view.byId.get(me.playerId)?.avatar;
+  const takenBy = new Map(room.players.filter((p) => p.id !== me.playerId).map((p) => [p.avatar, p.name]));
+  const pick = (id: string) => { if (takenBy.has(id)) return; try { localStorage.setItem(CAST_KEY, id); } catch { /* private mode */ } send().emit('avatar:set', { avatar: id }); };
+  // Rejoin as your usual character when it's free.
+  useEffect(() => { const s = savedCast(); if (s && s !== mine && !takenBy.has(s) && CAST.some((c) => c.id === s)) send().emit('avatar:set', { avatar: s }); /* eslint-disable-next-line */ }, []);
+  const me2 = CAST.find((c) => c.id === mine);
+  return (
+    <div className="cast-pick">
+      <p className="cast-pick__title">Choose your suspect{me2 && <>: <b>{me2.name}</b>, {me2.role}</>}</p>
+      <div className="cast-pick__grid" role="radiogroup" aria-label="Choose your character">
+        {CAST.map((c) => (
+          <button key={c.id} type="button" role="radio" aria-checked={mine === c.id} aria-label={`${c.name}, ${c.role}${takenBy.has(c.id) ? `, taken by ${takenBy.get(c.id)}` : ''}`}
+            disabled={takenBy.has(c.id)} className={`cast-pick__opt ${mine === c.id ? 'is-on' : ''}`} onClick={() => pick(c.id)}>
+            <AvatarArt avatar={c.id} /><span>{takenBy.has(c.id) ? takenBy.get(c.id) : c.name}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/** Inspector Luna joins every Prompt-mode table as the AI detective. */
+function LunaSeat() {
+  return <div className="lobby__luna"><img src={LUNA_IMG} alt="" /><div><b>{DETECTIVE.name}</b><small>AI detective · also hunts the imposter</small></div></div>;
+}
 
 function JoinQr({ url }: { url: string }) {
   const ref = useRef<HTMLCanvasElement>(null);
@@ -35,6 +70,7 @@ export function LobbyMain({ view }: MomentProps) {
         {room.players.map((p) => <motion.div key={p.id} variants={childVariants(rm)}><Avatar player={p} isHost={p.id === room.hostId} />{view.canHost && p.id !== room.hostId && <Button size="sm" variant="ghost" onClick={() => send().emit('host:assign', { playerId: p.id })}>Make host</Button>}</motion.div>)}
         {Array.from({ length: Math.max(0, FULL_TABLE - room.players.length) }, (_, i) => <div key={i} className="lobby__slot" aria-hidden title="Bot seat">🤖</div>)}
       </Rise>
+      {room.mode !== 'sketch' && <Rise><LunaSeat /></Rise>}
       <Rise>
         {n < MIN_PLAYERS ? <p className="phase__sub">Need {MIN_PLAYERS} players (or try solo mode) · {n}/{MAX_PLAYERS}</p> : view.canHost ? <Button size="lg" onClick={() => send().emit('host:start')}>{n < FULL_TABLE ? `Start with ${FULL_TABLE - n} bot${FULL_TABLE - n === 1 ? '' : 's'}` : 'Start the show'}</Button> : <p className="phase__sub">Watching · Waiting for the host</p>}
         {n === 2 && <p className="mute" style={{ fontWeight: 700 }}>Two players: a head-to-head. A bot plays the imposter; you both hunt it and compete on score.</p>}
@@ -53,7 +89,9 @@ export function LobbyPhone({ view }: MomentProps) {
       <Rise><h2 className="display-md">Room {room.code}</h2></Rise>
       <Rise><Card style={{ width: '100%' }}>
         <div className="lobby__cast">{room.players.map((p) => <Avatar key={p.id} player={p} isHost={p.id === room.hostId} isYou={p.id === me.playerId} />)}</div>
+        {room.mode !== 'sketch' && <LunaSeat />}
       </Card></Rise>
+      <Rise style={{ width: '100%' }}><Card style={{ width: '100%' }}><CastPicker view={view} /></Card></Rise>
       <Rise style={{ width: '100%' }}><ModePicker view={view} canPick={isHost} /></Rise>
       <Rise style={{ width: '100%' }}><SettingsPicker view={view} canPick={isHost} /></Rise>
       <Rise style={{ width: '100%' }}>
@@ -106,7 +144,7 @@ export function SettingsPicker({ view, canPick }: MomentProps & { canPick: boole
 export function ModePicker({ view, canPick }: MomentProps & { canPick: boolean }) {
   const mode = view.room?.mode || 'prompt';
   const opts = [
-    { id: 'prompt' as const, title: 'Prompt mode', text: 'Recreate a picture by writing AI prompts. One imposter sees part of it blurred.' },
+    { id: 'prompt' as const, title: 'Prompt mode', text: 'Recreate a picture by writing AI prompts. One imposter has part of it erased.' },
     { id: 'sketch' as const, title: 'Sketch mode', text: 'Draw a secret prompt. One imposter got a slightly different one.' },
   ];
   return (

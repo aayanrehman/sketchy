@@ -2,7 +2,7 @@
 
 **One of you can’t see the whole picture.**
 
-A party game for 2–8 people on phones or laptops (bots fill empty seats below four), no login, no install. Everyone sees a target image and recreates it by writing AI prompts: a quick 8-word draft, then a final prompt of up to 30 words. One imposter sees the same image with the key detail blurred and has to bluff. Compare the images, chat, vote, then an AI judge scores every final image against the target.
+A party game for 2–8 people on phones or laptops (bots fill empty seats below four), no login, no install. Everyone sees a target image and recreates it by writing AI prompts: a quick 8-word draft, then a final prompt of up to 30 words. One imposter sees the same image with the key detail erased and has to bluff. Compare the images, chat, vote, then an AI judge scores every final image against the target.
 
 **Play:** https://sketchy-blue.vercel.app · **Solo practice:** `/demo` · **Host screen (TV):** `/host`
 
@@ -12,7 +12,7 @@ Also included: **Sketch mode**, the original drawing game (draw a secret prompt,
 
 | Step | What happens | Time |
 | --- | --- | --- |
-| Study | Everyone studies the target. The imposter’s copy has a detail blurred out. | 12 s |
+| Study | Everyone studies the target. The imposter’s copy has a detail erased. | 12 s |
 | Draft | Write a quick prompt, max 8 words. Every draft is generated as an image. | 35 s |
 | Refine | See your draft’s score, what it missed and a tip, plus everyone’s draft images. Expand to a final prompt of up to 30 words. Only the final is scored. | 40 s |
 | Reveal | Final images paint in; the draft sits in the corner. | ~20 s |

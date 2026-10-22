@@ -2,7 +2,7 @@ import { AwardArt } from '@/design/components/Illustrations';
 import { go } from '@/nav';
 import { useEffect, useMemo, useState } from 'react';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Avatar, Button, Card, Confetti } from '@/design/components';
+import { Avatar, Button, Card, Confetti, LUNA_IMG } from '@/design/components';
 import { Rise } from '@/shell/PhaseStage';
 import { dur, durRM, ease, stagger } from '@/design/motion';
 import { useSfx } from '@/sound/useSfx';
@@ -83,6 +83,10 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
   const rivalDrawing = rivalPlayer ? room.rounds.flatMap((r) => r.drawings).filter((d) => d.playerId === rivalPlayer.id && typeof d.match === 'number' && d.match >= 0).sort((a, b) => (b.match ?? -1) - (a.match ?? -1))[0] : undefined;
   const rival = rivalPlayer ? { name: rivalPlayer.name, score: rivalDrawing?.match ?? 0, imageUrl: rivalDrawing?.glowUrl, prompt: rivalDrawing?.finalPrompt } : undefined;
 
+  // Inspector Luna's record: rounds where the AI detective placed a bet, and how many it got right.
+  const cases = room.rounds.filter((r) => r.detective && Object.keys(r.detective).length);
+  const solved = cases.filter((r) => Object.entries(r.detective!).sort((a, b) => b[1] - a[1])[0][0] === r.imposterId).length;
+
   return (
     <div className="phase" style={{ justifyItems: 'center' }}>
       <Confetti burst={confetti} />
@@ -106,6 +110,13 @@ export function FinalMoment({ view, phone }: MomentProps & { phone?: boolean }) 
             </motion.div>
           ); })}
         </Rise>
+      )}
+      {cases.length > 0 && (
+        <Rise><div className="luna-record">
+          <img src={LUNA_IMG} alt="" />
+          <div><b>Inspector Luna, the AI detective, solved {solved} of {cases.length} case{cases.length === 1 ? '' : 's'}.</b>
+            <span>{solved === cases.length ? 'The table never fooled the machine. Next time, bluff harder.' : solved === 0 ? 'Every imposter fooled the AI. Humans win this one.' : 'Some imposters slipped past the AI.'}</span></div>
+        </div></Rise>
       )}
       {room.challenge && <Rise style={{ width: '100%', display: 'grid', justifyItems: 'center' }}><ChallengeDuel room={room} mine={myDrawing} /></Rise>}
       {!room.challenge && room.duel && me && rival && <Rise style={{ width: '100%', display: 'grid', justifyItems: 'center' }}><Duel mine={myDrawing} rival={rival} title="Head-to-head" /></Rise>}

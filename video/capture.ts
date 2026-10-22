@@ -71,13 +71,26 @@ async function clickText(page: Page, re: RegExp) {
 }
 
 async function launch() { return chromium.launch({ args: ['--autoplay-policy=no-user-gesture-required'] }); }
-function desktopCtx(b: any): Promise<BrowserContext> { return b.newContext({ viewport: { width: 1920, height: 1080 }, deviceScaleFactor: 2 }); }
+// 1440×810 CSS px reads like a real laptop (the UI is laid out for ~1366–1536); 2.667× gives 3840×2160 source pixels.
+function desktopCtx(b: any): Promise<BrowserContext> { return b.newContext({ viewport: { width: 1440, height: 810 }, deviceScaleFactor: 2.667 }); }
 function phoneCtx(b: any): Promise<BrowserContext> { return b.newContext({ viewport: { width: 432, height: 768 }, deviceScaleFactor: 2.5, isMobile: true, hasTouch: true }); }
 
-const PROMPTS = {
-  1: { draft: 'frog drumming on a lily pad, sunset', final: ', cheerful green frog with a bright red drum kit and gold cymbals, soft watercolor illustration' },
-  2: { draft: 'orange kitty spinning music decks', final: ', chubby with purple ear muffs, glowing neon decks, pastel sticker art, thick outlines' },
-} as const;
+import LIB from '../convex/targets.json' with { type: 'json' };
+/** The round's target id, read from the target image on screen (artists see <id>.webp, the imposter <id>-masked.webp). */
+async function targetOnScreen(page: Page) {
+  for (let i = 0; i < 40; i++) {
+    const src = await page.evaluate(() => [...document.querySelectorAll('img')].map((i) => i.getAttribute('src') || '').find((s) => /\/targets\/[a-z0-9-]+?(-masked)?\.webp$/.test(s) && !s.includes('-bot-')));
+    const m = src && /\/targets\/([a-z0-9-]+?)(-masked)?\.webp$/.exec(src); if (m) return m[1];
+    await sleep(250);
+  }
+  return null;
+}
+/** Real prompts for the capture: the recorded strong artist (round 1) and the recorded imposter (round 2). */
+function promptsFor(id: string | null, imposter: boolean) {
+  const d: any = id && (LIB as any).demo[id];
+  const a = d && (imposter ? d.imposter : d.artists[0]);
+  return a ? { draft: a.draftPrompt as string, final: a.finalPrompt as string } : { draft: 'a cute animal in a sunny meadow', final: 'a cute cartoon animal smiling in a sunny meadow, soft watercolor illustration, warm colors' };
+}
 
 async function demo(kind: 'desktop' | 'phone') {
   const b = await launch(); const ctx = kind === 'desktop' ? await desktopCtx(b) : await phoneCtx(b);
@@ -92,7 +105,7 @@ async function demo(kind: 'desktop' | 'phone') {
   for (let i = 0; i < 60 && !sess; i++) { await sleep(500); sess = await page.evaluate(() => sessionStorage.getItem('sketchy.demo')).then((s) => s && JSON.parse(s)); }
   const { code, token } = sess;
   const done = new Set<string>(); let last = '';
-  let shotAt = 0;
+  let shotAt = 0; const targets: Record<number, string | null> = {};
   for (let t = 0; t < 1500; t++) {
     const s: any = await convex.query(api.game.state, { code, token });
     const room = s.room; const k = `${room.round}:${room.phase}`;
@@ -102,26 +115,32 @@ async function demo(kind: 'desktop' | 'phone') {
     const r = room.rounds[room.round - 1];
     const once = async (fn: () => Promise<any>) => { if (!done.has(k)) { done.add(k); await fn(); } };
     if (room.phase === 'HOW_TO') { await clickText(page, /next|let.?s play|got it/i); }
-    if (room.phase === 'DRAFT') await once(async () => { await sleep(1500); await typeSlow(page, '#prompt', PROMPTS[room.round as 1 | 2].draft); await sleep(600); await clickText(page, /lock in draft/i); });
+    if ((room.phase === 'PROMPT' || room.phase === 'DRAFT') && !(room.round in targets)) { targets[room.round] = await targetOnScreen(page); console.log(`round ${room.round} target: ${targets[room.round]}`); }
+    const P = promptsFor(targets[room.round] ?? null, room.round === 2);
+    if (room.phase === 'DRAFT') await once(async () => { await sleep(1200); await typeSlow(page, '#prompt', P.draft); await sleep(600); await clickText(page, /lock in draft/i); });
     if (room.phase === 'REFINE') await once(async () => {
       for (let i = 0; i < 40; i++) { if (await page.locator('.feedback__score').isVisible().catch(() => false)) break; await sleep(500); }
       await mark(page, rec, 'feedback-visible'); await sleep(4500);
-      await page.locator('#prompt').click(); await page.locator('#prompt').press('End'); await page.keyboard.type(PROMPTS[room.round as 1 | 2].final, { delay: 55 }); await sleep(600); await clickText(page, /lock in final/i);
+      // Keep the draft that is pre-filled and add the rest of the recorded final prompt (or replace it when they differ).
+      const box = page.locator('#prompt'); await box.click(); const cur = (await box.inputValue()).trim();
+      if (cur && P.final.toLowerCase().startsWith(cur.toLowerCase())) { await box.press('End'); await page.keyboard.type(P.final.slice(cur.length), { delay: 40 }); }
+      else { await box.press('ControlOrMeta+a'); await page.keyboard.type(P.final, { delay: 40 }); }
+      await sleep(600); await clickText(page, /lock in final/i);
     });
     if (room.phase === 'DISCUSS') await once(async () => {
       for (let i = 0; i < 30; i++) { if (await page.locator('.side__hint').first().isVisible().catch(() => false)) break; await sleep(500); }
       await mark(page, rec, 'hint-visible'); await sleep(3000);
-      if (room.round === 1 && kind === 'desktop') { await page.locator('#chat-input').click(); await page.keyboard.type('whose drums look different? 👀', { delay: 55 }); await page.keyboard.press('Enter'); }
+      if (room.round === 1 && kind === 'desktop') { await page.locator('#chat-input').click(); await page.keyboard.type('one of these is missing something 👀', { delay: 45 }); await page.keyboard.press('Enter'); }
     });
     if (room.phase === 'VOTE' && room.round === 1) await once(async () => {
       await sleep(2500);
-      const imp = (await import('../convex/targets.json', { with: { type: 'json' } })).default.demo['frog-band'].imposter;
-      const d = r.drawings.find((x: any) => JSON.stringify(x).includes(imp.finalImage) || JSON.stringify(x).includes(imp.finalPrompt));
+      const imp = (LIB as any).demo[targets[1] || '']?.imposter || {};
+      const d = r.drawings.find((x: any) => (imp.finalImage && JSON.stringify(x).includes(imp.finalImage)) || (imp.finalPrompt && JSON.stringify(x).includes(imp.finalPrompt)));
       const name = room.players.find((p: any) => p.id === d?.playerId)?.name;
       console.log('voting for', name);
       if (name) await page.getByLabel(`${name}'s drawing`).first().click();
     });
-    if (room.phase === 'STEAL' && room.round === 2) await once(async () => { await sleep(3000); await page.getByRole('button', { name: /neon turntable/i }).click().catch(() => {}); });
+    if (room.phase === 'STEAL' && room.round === 2) await once(async () => { await sleep(3000); const key = (LIB as any).targets.find((x: any) => x.id === targets[2])?.key; if (key) await page.getByRole('button', { name: new RegExp(key.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), 'i') }).first().click().catch(() => {}); });
     if (room.phase === 'VERDICT') await once(async () => {
       await sleep(5000);
       if (kind === 'desktop') { await page.mouse.move(960, 600); for (let i = 0; i < 6; i++) { await page.mouse.wheel(0, 250); await sleep(900); } await mark(page, rec, 'verdict-scrolled'); for (let i = 0; i < 6; i++) { await page.mouse.wheel(0, -250); await sleep(300); } }

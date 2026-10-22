@@ -277,3 +277,8 @@
 @media (max-width: 720px) { .softcloud--near { display: none; } .lhills { height: 150px; } }
 
 .modal--wide { width: min(100%, 860px); }
+
+/* Inspector Luna, the AI detective */
+.luna-chip { display: inline-flex; align-items: center; gap: var(--s-1); padding: 4px 12px 4px 4px; background: var(--c-surface); border: 2px solid var(--c-ink); border-radius: var(--r-pill); font-size: var(--t-body-xs); font-weight: 700; color: var(--c-text); max-width: 100%; margin-top: var(--s-1); }
+.luna-chip img { width: 32px; height: 32px; flex: none; }
+.luna-chip b { font-weight: 900; }

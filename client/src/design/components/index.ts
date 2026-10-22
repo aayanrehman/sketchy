@@ -13,3 +13,4 @@ export { Confetti } from './Confetti';
 export { Scenery } from './Scenery';
 export { Mascot } from './Mascot';
 export { SoundControl } from './SoundControl';
+export { LunaChip, LUNA_IMG } from './Luna';

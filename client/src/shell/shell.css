@@ -49,7 +49,9 @@
 .lobby__code { font-family: var(--f-display); font-weight: 700; font-size: var(--t-display-xl); letter-spacing: 0.16em; line-height: 1; color: var(--c-ink); }
 .lobby__url { font-weight: 900; color: var(--c-text-dim); font-size: var(--t-body-lg); }
 .lobby__url b { color: var(--c-ink); }
-.lobby__cast { display: flex; gap: var(--s-4); flex-wrap: wrap; justify-content: center; min-height: 100px; }
+.lobby__cast { display: flex; gap: var(--s-4); flex-wrap: wrap; justify-content: center; align-items: flex-start; min-height: 100px; }
+.lobby__cast > div { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.lobby__cast > div > button { font-size: 13px; min-height: 30px; padding: 2px 12px; }
 .lobby__slot { width: 68px; height: 54px; border-radius: var(--r-pill); border: 3px dashed var(--c-line); display: grid; place-items: center; font-size: 22px; opacity: .55; }
 .lobby__join { display: grid; grid-template-columns: auto 1fr; gap: var(--s-4); align-items: center; text-align: left; }
 .lobby__qr { width: 132px; height: 132px; border-radius: var(--r-md); border: var(--ol); background: var(--c-surface); padding: 6px; display: block; }
@@ -71,7 +73,7 @@
 /* ---- Unmask / spotlight ---- */
 .spotlight { position: absolute; inset: 0; pointer-events: none; z-index: var(--z-overlay); }
 .spotlight__beam { position: absolute; left: 0; top: 0; width: 42vmin; height: 42vmin; border-radius: var(--r-pill); background: var(--g-spot); opacity: 0; will-change: transform, opacity; mix-blend-mode: screen; }
-.unmask-wrap { position: relative; width: 100%; display: grid; gap: var(--s-4); }
+.unmask-wrap { position: relative; width: 100%; display: grid; grid-template-columns: minmax(0, 1fr); gap: var(--s-4); }
 .unmask-wrap--shake { animation: sk-shake var(--d-base) var(--e-snap) 2; }
 @keyframes sk-shake { 0%, 100% { transform: translateX(0); } 25% { transform: translateX(-6px) rotate(-0.5deg); } 75% { transform: translateX(6px) rotate(0.5deg); } }
 
@@ -449,4 +451,31 @@
   .phone-shell__me { flex: 1 1 0; }
   .phone-shell__ctl { gap: 4px; }
   .phone-shell__ctl .btn { width: 40px; height: 40px; min-width: 40px; padding: 0; }
+}
+
+/* Character select + Inspector Luna's seat */
+.cast-pick__title { margin: 0 0 var(--s-1); font-weight: 700; font-size: var(--t-body-sm); }
+.cast-pick__grid { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-1); }
+.cast-pick__opt { display: grid; justify-items: center; gap: 2px; padding: 6px 4px; background: var(--c-surface-2); border: 2px solid transparent; border-radius: 14px; font: inherit; font-size: var(--t-body-xs); font-weight: 900; color: var(--c-text); cursor: pointer; min-width: 0; transition: transform 120ms var(--e-smooth), border-color 120ms; }
+.cast-pick__opt .avatar-art { width: 100%; max-width: 72px; aspect-ratio: 1; height: auto; }
+.cast-pick__opt span { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cast-pick__opt:hover:not(:disabled) { transform: translateY(-2px); }
+.cast-pick__opt.is-on { border-color: var(--c-ink); background: var(--c-yellow); }
+.cast-pick__opt:disabled { opacity: 0.4; filter: grayscale(1); cursor: not-allowed; }
+.lobby__luna { display: flex; align-items: center; gap: var(--s-1); margin-top: var(--s-1); padding: 4px 12px 4px 4px; border: 2px dashed var(--c-ink-soft); border-radius: var(--r-pill); background: var(--c-surface); }
+.lobby__luna img { width: 44px; height: 44px; }
+.lobby__luna b { display: block; font-size: var(--t-body-sm); }
+.lobby__luna small { color: var(--c-text-dim); font-weight: 700; }
+
+/* Landing hero: the cast lineup */
+.landing__right { gap: var(--s-3); }
+.hero { margin: 0; width: min(100%, 560px); border: var(--ol); border-radius: 22px; overflow: hidden; background: var(--c-surface); box-shadow: 0 6px 0 rgba(43,37,64,0.18); transform: rotate(-0.6deg); }
+.hero > img { display: block; width: 100%; height: auto; max-height: 40vh; object-fit: cover; object-position: 50% 40%; }
+.hero figcaption { display: flex; align-items: center; gap: var(--s-1); padding: 6px 12px 6px 6px; font-size: var(--t-body-xs); font-weight: 700; color: var(--c-text); border-top: 2px solid var(--c-ink); }
+.hero figcaption img { width: 34px; height: 34px; flex: none; }
+@media (prefers-reduced-motion: reduce) { .hero { transform: none; } }
+@media (min-width: 900px) {
+  .hero { width: min(100%, 500px); }
+  .hero > img { max-height: 32vh; }
+  .landing__right .livedemo { width: min(100%, 460px); }
 }

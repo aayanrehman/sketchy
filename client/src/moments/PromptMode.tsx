@@ -47,7 +47,7 @@ export function StudyPhone({ view }: MomentProps) {
     <div className="phase study">
       <Rise className="study__head">
         <h2 className="display-sm">{me.isImposter ? 'You’re the imposter' : 'Study your target'}</h2>
-        <p className="gallery-head__sub">{me.isImposter ? 'Part of your image is blurred out. Everyone else can see it. Guess what’s there and blend in.' : 'Soon you’ll write a prompt to recreate this image as closely as you can.'}</p>
+        <p className="gallery-head__sub">{me.isImposter ? 'Part of your image was erased. Everyone else can see it. Guess what’s there and blend in.' : 'Soon you’ll write a prompt to recreate this image as closely as you can.'}</p>
       </Rise>
       <div className="study__body">
         <Rise><TargetCard url={me.targetUrl} imposter={me.isImposter} /></Rise>

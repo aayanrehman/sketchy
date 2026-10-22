@@ -1,0 +1,513 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Sketchy marketing kit</title>
+<!-- One template for every asset. render.ts serves the project root, injects window.KIT (targets, recorded bot rounds, QR)
+     and opens kit.html?a=<asset id>. Images and fonts are the game's own files. -->
+<style>
+@font-face { font-family: Fredoka; font-weight: 500; src: url(/node_modules/@fontsource/fredoka/files/fredoka-latin-500-normal.woff2) format('woff2'); }
+@font-face { font-family: Fredoka; font-weight: 600; src: url(/node_modules/@fontsource/fredoka/files/fredoka-latin-600-normal.woff2) format('woff2'); }
+@font-face { font-family: Fredoka; font-weight: 700; src: url(/node_modules/@fontsource/fredoka/files/fredoka-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: Nunito; font-weight: 700; src: url(/node_modules/@fontsource/nunito/files/nunito-latin-700-normal.woff2) format('woff2'); }
+@font-face { font-family: Nunito; font-weight: 800; src: url(/node_modules/@fontsource/nunito/files/nunito-latin-800-normal.woff2) format('woff2'); }
+@font-face { font-family: Nunito; font-weight: 900; src: url(/node_modules/@fontsource/nunito/files/nunito-latin-900-normal.woff2) format('woff2'); }
+:root {
+  --ink: #2B2540; --dim: #5A5478; --sky: #BDE4FF; --sky2: #E3F5FF; --hill: #B9F09A; --grass: #A9EC84; --grass2: #7ED35C;
+  --yellow: #FFD84D; --pink: #FF7AB0; --blue: #6CC1FF; --lime: #BDF26E; --purple: #B48BFF; --red: #FF5C5C; --orange: #FFB15C;
+  --lav: #F3F0FF; --danger: #A52336; --green: #176C3B;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; background: transparent; }
+body { font-family: Nunito, system-ui, sans-serif; color: var(--ink); -webkit-font-smoothing: antialiased; }
+.fd { font-family: Fredoka, Nunito, sans-serif; }
+.stage { position: relative; overflow: hidden; background: linear-gradient(180deg, var(--sky) 0%, var(--sky2) 78%); }
+.abs { position: absolute; }
+/* scenery (same shapes as the home page sky) */
+.sun { position: absolute; border-radius: 50%; background: radial-gradient(closest-side, rgba(255,241,184,.95), rgba(255,216,77,.28) 55%, rgba(255,216,77,0)); pointer-events: none; }
+.cloud { position: absolute; fill: #fff; filter: drop-shadow(0 8px 0 rgba(43,37,64,.07)); }
+.spark { position: absolute; color: #fff; text-shadow: 0 0 12px rgba(255,216,77,.95), 0 0 3px #FFC83D; line-height: 1; }
+.hills { position: absolute; left: 0; bottom: 0; width: 100%; }
+.hills svg { position: absolute; left: 0; bottom: 0; width: 100%; height: 100%; display: block; }
+/* type */
+.logo { font-family: Fredoka; font-weight: 700; color: var(--yellow); line-height: .95; letter-spacing: .015em; white-space: nowrap; }
+.h { font-family: Fredoka; font-weight: 700; line-height: 1.02; letter-spacing: -.012em; margin: 0; color: var(--ink); }
+.mk { background: linear-gradient(transparent 60%, var(--yellow) 60%, var(--yellow) 90%, transparent 90%); padding: 0 .06em; }
+.mk-pink { background: linear-gradient(transparent 60%, #FFB3D1 60%, #FFB3D1 90%, transparent 90%); padding: 0 .06em; }
+.mk-blue { background: linear-gradient(transparent 60%, #B5E0FF 60%, #B5E0FF 90%, transparent 90%); padding: 0 .06em; }
+.lede { font-weight: 900; line-height: 1.28; margin: 0; }
+.eyebrow { display: inline-block; font-family: Fredoka; font-weight: 600; letter-spacing: .14em; text-transform: uppercase; background: var(--ink); color: #fff; border-radius: 999px; }
+.kicker { font-weight: 900; letter-spacing: .16em; color: var(--dim); text-transform: uppercase; }
+/* stickers */
+.card { position: absolute; margin: 0; background: #fff; border: 5px solid var(--ink); border-radius: 26px; box-shadow: 0 10px 0 var(--ink); padding: 10px 10px 0; }
+.card img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 16px; border: 4px solid var(--ink); display: block; background: var(--lav); }
+.card figcaption { text-align: center; font-family: Fredoka; font-weight: 600; padding: 10px 6px 12px; line-height: 1.1; }
+.card.imp img { box-shadow: 0 0 0 5px var(--red); }
+.card.imp figcaption { color: var(--danger); }
+.badge { position: absolute; background: var(--yellow); border: 4px solid var(--ink); border-radius: 999px; font-family: Fredoka; font-weight: 700; box-shadow: 0 5px 0 var(--ink); white-space: nowrap; line-height: 1; }
+.badge.white { background: #fff; }
+.badge.pink { background: var(--pink); }
+.badge.lime { background: var(--lime); }
+.erased { position: absolute; left: 50%; background: var(--red); border: 4px solid var(--ink); border-radius: 12px; font-family: Fredoka; font-weight: 700; letter-spacing: .08em; box-shadow: 0 5px 0 var(--ink); line-height: 1; white-space: nowrap; }
+.pill { display: inline-flex; align-items: center; gap: .4em; background: #fff; border: 4px solid var(--ink); border-radius: 999px; font-weight: 900; box-shadow: 0 5px 0 var(--ink); white-space: nowrap; line-height: 1; }
+.pill.lime { background: var(--lime); } .pill.yellow { background: var(--yellow); } .pill.blue { background: var(--blue); } .pill.pink { background: var(--pink); } .pill.ink { background: var(--ink); color: #fff; }
+.box { background: #fff; border: 5px solid var(--ink); border-radius: 28px; box-shadow: 0 10px 0 var(--ink); }
+.prompt { position: relative; background: #fff; border: 4px solid var(--ink); border-radius: 22px; box-shadow: 0 6px 0 var(--ink); }
+.prompt .lab { display: inline-block; background: var(--ink); color: #fff; font-family: Fredoka; font-weight: 600; letter-spacing: .1em; border-radius: 999px; text-transform: uppercase; line-height: 1; }
+.prompt .txt { font-weight: 900; line-height: 1.3; }
+.num { display: grid; place-items: center; border-radius: 50%; border: 5px solid var(--ink); font-family: Fredoka; font-weight: 700; box-shadow: 0 6px 0 var(--ink); flex: none; }
+.mascot { position: absolute; object-fit: contain; }
+.arrow { font-family: Fredoka; font-weight: 700; line-height: 1; }
+.url { font-family: Fredoka; font-weight: 600; }
+/* bars */
+.bar { height: 30px; border: 4px solid var(--ink); border-radius: 999px; background: #fff; overflow: hidden; }
+.bar i { display: block; height: 100%; border-right: 4px solid var(--ink); }
+/* devices */
+.laptop { position: absolute; }
+.laptop .scr { background: var(--ink); border-radius: 30px; padding: 20px; box-shadow: 0 14px 0 rgba(43,37,64,.18), 0 40px 60px rgba(43,37,64,.18); }
+.laptop .scr img { display: block; border-radius: 10px; width: 100%; }
+.laptop .base { height: 30px; margin: 0 -70px; background: linear-gradient(#ECEAF5, #CFCBE0); border: 4px solid var(--ink); border-radius: 0 0 26px 26px; position: relative; }
+.laptop .base::after { content: ''; position: absolute; left: 50%; top: -4px; width: 180px; height: 12px; transform: translateX(-50%); background: #BDB8D2; border: 4px solid var(--ink); border-top: 0; border-radius: 0 0 12px 12px; }
+.phone { position: absolute; background: var(--ink); border-radius: 58px; padding: 14px; box-shadow: 0 14px 0 rgba(43,37,64,.2), 0 40px 60px rgba(43,37,64,.22); }
+.phone img { display: block; width: 100%; border-radius: 44px; }
+.phone::before { content: ''; position: absolute; left: 50%; top: 24px; width: 92px; height: 26px; transform: translateX(-50%); background: var(--ink); border-radius: 999px; z-index: 2; opacity: .0; }
+.blur img { filter: blur(14px) saturate(1.2); transform: scale(1.1); }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const K = window.KIT;
+const pub = (p) => '/client/public' + p;
+const T = Object.fromEntries(K.targets.map((t) => [t.id, t]));
+const AREAS = ['subject', 'details', 'style', 'color', 'composition'];
+const match = (b) => AREAS.reduce((n, k) => n + Math.max(0, Math.min(20, b[k])), 0); // matchOf without the style-round weights
+const TIERS = [{ min: 85, label: 'Gold', medal: '🥇' }, { min: 75, label: 'Silver', medal: '🥈' }, { min: 60, label: 'Bronze', medal: '🥉' }];
+const tier = (s) => TIERS.find((t) => s >= t.min);
+const words = (s) => s.trim().split(/\s+/).length;
+const URL_ = 'sketchy-blue.vercel.app';
+
+// The hero round: frog-band, recorded by the bot Pixel (draft 36 -> final 82) and the bot imposter.
+const FROG = T['frog-band'];
+const FB = K.demo['frog-band'];
+const PIX = FB.artists.find((a) => a.name === 'Pixel');
+const DOO = FB.artists.find((a) => a.name === 'Doodle');
+const IMP = FB.imposter;
+const S = { draft: match(PIX.draft), final: match(PIX.final), doodle: match(DOO.final), impDraft: match(IMP.draft), impFinal: match(IMP.final) };
+const img = { target: pub(FROG.image), masked: pub(FROG.masked), draft: pub(PIX.draftImage), final: pub(PIX.finalImage), doodle: pub(DOO.finalImage), impDraft: pub(IMP.draftImage) };
+const M = (pose) => pub(`/mascot/${pose}.webp`);
+
+// ---------- building blocks ----------
+function outline(r, drop, color = '#2B2540') {
+  const out = [];
+  for (let i = 0; i < 24; i++) {
+    const a = (i / 24) * Math.PI * 2, x = (Math.cos(a) * r).toFixed(1), y = Math.sin(a) * r;
+    for (const d of [0, drop / 2, drop]) out.push(`${x}px ${(y + d).toFixed(1)}px 0 ${color}`);
+  }
+  return out.join(',');
+}
+const logo = (size, extra = '') => `<span class="logo" style="font-size:${size}px;text-shadow:${outline(size * 0.045, size * 0.07)};${extra}">SKETCHY</span>`;
+const st = (o) => Object.entries(o).map(([k, v]) => `${k.replace(/[A-Z]/g, (m) => '-' + m.toLowerCase())}:${typeof v === 'number' && !/opacity|z-?index|flex|lineHeight|fontWeight/i.test(k) ? v + 'px' : v}`).join(';');
+
+const CLOUD = '<path d="M30 70 Q8 70 10 52 Q12 36 32 38 Q34 14 62 16 Q80 2 104 14 Q126 4 142 24 Q170 20 174 44 Q194 46 190 62 Q188 72 170 70 Z"/>';
+const cloud = (x, y, w, o = 0.95) => `<svg class="cloud" viewBox="0 0 200 80" style="left:${x}px;top:${y}px;width:${w}px;opacity:${o}">${CLOUD}</svg>`;
+const spark = (x, y, s) => `<span class="spark" style="left:${x}px;top:${y}px;font-size:${s}px">✦</span>`;
+function hills(h, flowers = true) {
+  const fl = flowers ? [[170, 214, '#FFFFFF'], [340, 222, '#FF9EC4'], [520, 216, '#FFE066'], [760, 222, '#FFFFFF'], [960, 216, '#FF9EC4'], [1100, 224, '#FFE066']]
+    .map(([x, y, c]) => `<g transform="translate(${x} ${y})"><circle r="4.5" fill="${c}"/><circle r="1.8" fill="#FFC83D"/></g>`).join('') : '';
+  return `<div class="hills" style="height:${h}px">
+  <svg viewBox="0 0 1200 240" preserveAspectRatio="none" style="bottom:${h * 0.16}px;height:85%"><defs><linearGradient id="hf" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#D6F3C2"/><stop offset="1" stop-color="#BCE9A2"/></linearGradient></defs>
+    <path d="M-40 120 C 150 70, 330 72, 480 104 S 780 150, 960 96 S 1160 64, 1240 84 L1240 260 L-40 260 Z" fill="url(#hf)"/><path d="M-40 120 C 150 70, 330 72, 480 104 S 780 150, 960 96 S 1160 64, 1240 84" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="3"/></svg>
+  <svg viewBox="0 0 1200 240" preserveAspectRatio="none" style="bottom:${h * 0.04}px"><defs><linearGradient id="hm" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#BDEFA0"/><stop offset=".6" stop-color="#A2E27F"/><stop offset="1" stop-color="#8FD66B"/></linearGradient></defs>
+    <path d="M-40 160 C 160 112, 380 118, 580 150 S 960 182, 1240 128 L1240 260 L-40 260 Z" fill="url(#hm)"/><path d="M-40 160 C 160 112, 380 118, 580 150 S 960 182, 1240 128" fill="none" stroke="rgba(255,255,255,.6)" stroke-width="3"/></svg>
+  <svg viewBox="0 0 1200 240" preserveAspectRatio="none"><defs><linearGradient id="hn" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ACEB86"/><stop offset=".55" stop-color="#8EDB65"/><stop offset="1" stop-color="#74C952"/></linearGradient></defs>
+    <path d="M-40 196 C 220 168, 470 172, 720 192 S 1080 204, 1240 182 L1240 260 L-40 260 Z" fill="url(#hn)"/><path d="M-40 196 C 220 168, 470 172, 720 192 S 1080 204, 1240 182" fill="none" stroke="rgba(255,255,255,.65)" stroke-width="3"/>${fl}</svg>
+</div>`;
+}
+const sun = (x, y, d) => `<div class="sun" style="left:${x}px;top:${y}px;width:${d}px;height:${d}px"></div>`;
+
+/** Sticker card. o: {x,y,w,rot,src,cap,capSize,imp,blur,z} */
+function card(o) {
+  const cs = o.capSize ?? Math.round(o.w * 0.075 + 4);
+  return `<figure class="card ${o.imp ? 'imp' : ''} ${o.blur ? 'blur' : ''}" style="left:${o.x}px;top:${o.y}px;width:${o.w}px;transform:rotate(${o.rot || 0}deg);z-index:${o.z || 1};${o.bw ? `border-width:${o.bw}px;` : ''}${o.pad != null ? `padding:${o.pad}px ${o.pad}px 0;` : ''}${o.style || ''}">
+    <div style="position:relative;overflow:hidden;border-radius:16px"><img src="${o.src}" alt=""></div>
+    ${o.cap ? `<figcaption style="font-size:${cs}px">${o.cap}</figcaption>` : `<div style="height:${o.pad ?? 10}px"></div>`}
+    ${o.inner || ''}</figure>`;
+}
+const scoreBadge = (s, size, pos) => { const t = tier(s); return `<span class="badge" style="font-size:${size}px;padding:${size * 0.32}px ${size * 0.55}px;${pos}">${s}/100${t ? ` <span style="font-size:.92em">${t.medal}</span> ${t.label}` : ''}</span>`; };
+const erased = (size, pos) => `<span class="erased" style="font-size:${size}px;padding:${size * 0.22}px ${size * 0.6}px;${pos}">ERASED</span>`;
+const eyebrow = (text, size = 26, extra = '') => `<span class="eyebrow" style="font-size:${size}px;padding:${size * 0.45}px ${size * 0.95}px;${extra}">${text}</span>`;
+const promptBox = (o) => `<div class="prompt" style="left:${o.x ?? 0}px;top:${o.y ?? 0}px;width:${o.w}px;padding:${o.pad ?? 22}px;${o.abs === false ? 'position:relative;' : 'position:absolute;'}${o.style || ''}">
+  <span class="lab" style="font-size:${o.ls ?? 20}px;padding:${(o.ls ?? 20) * 0.4}px ${(o.ls ?? 20) * 0.8}px">${o.label}</span>
+  <div class="txt" style="font-size:${o.size}px;margin-top:${(o.size) * 0.4}px">${o.text}</div></div>`;
+const urlPill = (size, pos, cls = '') => `<span class="pill ${cls}" style="font-size:${size}px;padding:${size * 0.5}px ${size * 0.9}px;position:absolute;${pos}"><span class="url">${URL_}</span></span>`;
+const mascot = (pose, x, y, w, extra = '') => `<img class="mascot" src="${M(pose)}" style="left:${x}px;top:${y}px;width:${w}px;height:${w}px;${extra}" alt="">`;
+const q = (s) => `“${s}”`;
+
+/** Standard explainer/carousel frame: sky, sun, clouds, hills, top brand row, footer URL. */
+function frame(W, H, inner, o = {}) {
+  const hh = o.hills ?? 230;
+  return `<div class="stage" style="width:${W}px;height:${H}px">
+    ${sun(W - 520, -260, 820)}
+    ${(o.clouds ?? [[-60, 120, 300, .9], [W - 260, 300, 240, .75], [60, H * 0.55, 200, .55]]).map((c) => cloud(...c)).join('')}
+    ${(o.sparks ?? [[W * 0.08, H * 0.3, 26], [W * 0.92, H * 0.18, 20], [W * 0.86, H * 0.62, 18]]).map((s) => spark(...s)).join('')}
+    ${o.noHills ? '' : hills(hh)}
+    ${inner}
+  </div>`;
+}
+/** Header used by the 1080x1350 explainers: brand chip, eyebrow, headline. */
+function head(eb, title, o = {}) {
+  return `<div class="abs" style="left:72px;top:64px;right:72px;display:flex;align-items:center;justify-content:space-between">
+      <div style="display:flex;align-items:center;gap:12px"><img src="${M(o.pose || 'happy')}" style="width:76px;height:76px" alt="">${logo(54)}</div>
+      ${o.page ? `<span class="pill" style="font-size:26px;padding:12px 22px">${o.page}</span>` : eyebrow(eb, 24)}
+    </div>
+    ${o.page ? `<div class="abs" style="left:72px;top:178px">${eyebrow(eb, 24)}</div>` : ''}
+    <h1 class="h abs" style="left:72px;right:72px;top:${o.page ? 246 : 186}px;font-size:${o.size || 84}px">${title}</h1>`;
+}
+const footer = (W, H, o = {}) => `<div class="abs" style="left:72px;right:72px;bottom:${o.bottom ?? 54}px;display:flex;justify-content:space-between;align-items:center">
+    <span class="pill" style="font-size:30px;padding:16px 28px"><span class="url">${URL_}</span></span>
+    <span class="pill ${o.cls || 'lime'}" style="font-size:28px;padding:16px 26px">${o.right || 'Free · no login · phone or laptop'}</span></div>`;
+
+// ---------- banners ----------
+const A = {};
+const add = (id, w, h, group, title, fn, extra = {}) => (A[id] = { id, w, h, group, title, fn, ...extra });
+
+add('banner-square-1080x1080', 1080, 1080, 'Banners & covers', 'Square post', () => frame(1080, 1080, `
+  <div class="abs" style="left:0;right:0;top:58px;text-align:center"><span class="kicker" style="font-size:24px">A little prompting. A lot of accusations.</span></div>
+  <div class="abs" style="left:0;right:0;top:104px;display:flex;justify-content:center;align-items:center;gap:14px">
+    <img src="${M('happy')}" style="width:150px;height:150px" alt="">${logo(150)}</div>
+  ${card({ x: 70, y: 330, w: 330, rot: -6, src: img.target, cap: 'Everyone saw', capSize: 30 })}
+  ${card({ x: 375, y: 410, w: 330, rot: 3, src: img.masked, cap: 'The imposter saw', capSize: 30, imp: true, z: 3, inner: erased(30, 'top:-6px;transform:translateX(-50%) rotate(-7deg)') })}
+  ${card({ x: 682, y: 330, w: 330, rot: 5, src: img.final, cap: 'A player’s prompt', capSize: 30, z: 2, inner: scoreBadge(S.final, 30, 'right:-26px;top:-28px;transform:rotate(6deg)') })}
+  <div class="abs" style="left:0;right:0;top:870px;text-align:center"><p class="lede" style="font-size:38px">Recreate the picture with an AI prompt.<br>One of you can’t see all of it. <span class="mk">Find them.</span></p></div>
+  ${urlPill(28, 'left:50%;bottom:34px;transform:translateX(-50%)')}
+`, { hills: 150, clouds: [[-70, 140, 280, .9], [860, 200, 240, .8], [930, 640, 160, .6]] }));
+
+add('banner-portrait-1080x1350', 1080, 1350, 'Banners & covers', 'Portrait post', () => frame(1080, 1350, `
+  <div class="abs" style="left:76px;top:70px"><span class="kicker" style="font-size:24px">A little prompting. A lot of accusations.</span></div>
+  <div class="abs" style="left:58px;top:110px;display:flex;align-items:center;gap:10px"><img src="${M('happy')}" style="width:150px;height:150px" alt="">${logo(146)}</div>
+  <p class="lede abs" style="left:76px;top:292px;font-size:42px">Recreate the picture with an AI prompt.<br>One of you can’t see all of it. <span class="mk">Find them.</span></p>
+  ${card({ x: 300, y: 450, w: 480, rot: -3, src: img.target, cap: 'The target', capSize: 34, z: 1 })}
+  ${card({ x: 46, y: 760, w: 330, rot: -7, src: img.masked, cap: 'The imposter saw', capSize: 29, imp: true, z: 3, inner: erased(30, 'top:-8px;transform:translateX(-50%) rotate(-8deg)') })}
+  ${card({ x: 700, y: 740, w: 330, rot: 6, src: img.final, cap: 'Prompt → AI image', capSize: 29, z: 2, inner: scoreBadge(S.final, 30, 'left:-30px;top:-30px;transform:rotate(-6deg)') })}
+  <div class="abs" style="left:0;right:0;bottom:118px;display:flex;justify-content:center;gap:16px">
+    <span class="pill" style="font-size:28px;padding:15px 24px">2–8 players · bots fill empty seats</span></div>
+  ${urlPill(30, 'left:50%;bottom:34px;transform:translateX(-50%)', 'lime')}
+`, { hills: 220, clouds: [[700, 120, 300, .85], [-80, 520, 220, .7], [880, 420, 180, .6]] }));
+
+add('banner-story-1080x1920', 1080, 1920, 'Banners & covers', 'Story (9:16)', () => frame(1080, 1920, `
+  <div class="abs" style="left:0;right:0;top:250px;display:flex;flex-direction:column;align-items:center;gap:6px">
+    <span class="kicker" style="font-size:26px">A little prompting. A lot of accusations.</span>
+    <div style="display:flex;align-items:center;gap:12px;margin-top:10px"><img src="${M('happy')}" style="width:160px;height:160px" alt="">${logo(160)}</div></div>
+  ${card({ x: 70, y: 560, w: 470, rot: -5, src: img.target, cap: 'Everyone sees this', capSize: 34, z: 1 })}
+  ${card({ x: 540, y: 620, w: 470, rot: 5, src: img.masked, cap: 'One of you sees this', capSize: 34, imp: true, z: 2, inner: erased(36, 'top:-10px;transform:translateX(-50%) rotate(-7deg)') })}
+  ${mascot('sus', 70, 1190, 270, 'transform:rotate(-4deg)')}
+  <h2 class="h abs" style="left:360px;top:1240px;font-size:78px">Write the prompt.<br><span class="mk">Find the imposter.</span></h2>
+  ${urlPill(34, 'left:50%;top:1500px;transform:translateX(-50%)', 'lime')}
+`, { hills: 300, clouds: [[-60, 120, 320, .85], [760, 180, 260, .75], [880, 1130, 200, .6], [-40, 1060, 180, .5]] }));
+
+add('header-x-1500x500', 1500, 500, 'Banners & covers', 'X / Twitter header', () => frame(1500, 500, `
+  <div class="abs" style="left:300px;top:96px">
+    <span class="kicker" style="font-size:19px">A little prompting. A lot of accusations.</span>
+    <div style="display:flex;align-items:center;gap:8px;margin-top:8px"><img src="${M('happy')}" style="width:112px;height:112px" alt="">${logo(108)}</div>
+    <p class="lede" style="font-size:27px;margin-top:16px">Recreate the picture with an AI prompt.<br>One of you can’t see all of it. Find them.</p>
+  </div>
+  ${card({ x: 930, y: 70, w: 220, rot: -6, src: img.target, cap: 'Target', capSize: 22, pad: 8 })}
+  ${card({ x: 1170, y: 64, w: 220, rot: 5, src: img.final, cap: 'A player’s prompt', capSize: 21, pad: 8, z: 2, inner: scoreBadge(S.final, 21, 'right:-20px;top:-22px;transform:rotate(6deg)') })}
+`, { hills: 120, clouds: [[-60, 40, 240, .8], [760, 330, 160, .6]], sparks: [[860, 60, 20], [1440, 330, 16]] }));
+
+add('banner-linkedin-1584x396', 1584, 396, 'Banners & covers', 'LinkedIn banner', () => frame(1584, 396, `
+  <div class="abs" style="left:560px;top:62px">
+    <div style="display:flex;align-items:center;gap:8px"><img src="${M('happy')}" style="width:100px;height:100px" alt="">${logo(96)}</div>
+    <p class="lede" style="font-size:25px;margin-top:14px">Recreate a picture with AI prompts.<br>One player can’t see all of it. Find them.</p>
+    <div style="margin-top:18px;display:flex;gap:10px"><span class="pill lime" style="font-size:19px;padding:9px 16px">2–8 players · no login</span><span class="pill" style="font-size:19px;padding:9px 16px"><span class="url">${URL_}</span></span></div>
+  </div>
+  ${card({ x: 1150, y: 56, w: 180, rot: -5, src: img.target, cap: 'Target', capSize: 19, pad: 7, bw: 4 })}
+  ${card({ x: 1360, y: 50, w: 180, rot: 5, src: img.masked, cap: 'The imposter saw', capSize: 17, pad: 7, bw: 4, imp: true, z: 2, inner: erased(19, 'top:-4px;transform:translateX(-50%) rotate(-7deg)') })}
+`, { hills: 96, clouds: [[60, 30, 220, .85], [880, 300, 140, .55]], sparks: [[1060, 40, 18], [500, 300, 14]] }));
+
+add('thumb-youtube-1280x720', 1280, 720, 'Banners & covers', 'YouTube thumbnail', () => frame(1280, 720, `
+  <div class="abs" style="left:60px;top:52px;display:flex;align-items:center;gap:8px"><img src="${M('happy')}" style="width:84px;height:84px" alt="">${logo(72)}</div>
+  <h1 class="h abs" style="left:64px;top:168px;width:640px;font-size:112px;line-height:.96">Who can’t see the <span class="mk-pink">picture?</span></h1>
+  <div class="abs" style="left:66px;top:540px;display:flex;gap:12px"><span class="pill yellow" style="font-size:30px;padding:14px 24px">AI prompting party game</span></div>
+  ${card({ x: 660, y: 40, w: 290, rot: -6, src: img.target, cap: 'Everyone', capSize: 28, z: 1 })}
+  ${card({ x: 880, y: 196, w: 340, rot: 5, src: img.masked, cap: 'The imposter', capSize: 30, imp: true, z: 2, inner: erased(34, 'top:-8px;transform:translateX(-50%) rotate(-8deg)') })}
+  ${mascot('sus', 600, 440, 270, 'z-index:3;transform:rotate(-6deg)')}
+`, { hills: 130, clouds: [[-60, 300, 200, .6], [1060, 20, 200, .8]], sparks: [[640, 60, 22], [1220, 560, 16]] }));
+
+add('cover-twist-1200x630', 1200, 630, 'Banners & covers', 'Handshake cover: the twist', () => frame(1200, 630, `
+  <div class="abs" style="left:56px;top:50px;display:flex;align-items:center;gap:8px"><img src="${M('imposter')}" style="width:92px;height:92px" alt="">${logo(78)}</div>
+  <h1 class="h abs" style="left:58px;top:172px;font-size:52px">One of you can’t see<br>the <span class="mk-pink">whole picture.</span></h1>
+  <p class="lede abs" style="left:60px;top:308px;width:500px;font-size:24px">Everyone recreates the target with AI prompts. The imposter’s copy has the key detail erased, so they bluff.</p>
+  <div class="abs" style="left:58px;top:430px;display:flex;gap:10px"><span class="pill" style="font-size:20px;padding:10px 18px">2–8 players · no login</span><span class="pill lime" style="font-size:20px;padding:10px 18px">Phone or laptop</span></div>
+  ${card({ x: 600, y: 52, w: 270, rot: -5, src: img.target, cap: 'Everyone saw', capSize: 25, z: 1 })}
+  ${card({ x: 895, y: 40, w: 270, rot: 4, src: img.masked, cap: 'The imposter saw', capSize: 24, imp: true, z: 2, inner: erased(26, 'top:-6px;transform:translateX(-50%) rotate(-7deg)') })}
+  ${promptBox({ x: 640, y: 412, w: 510, size: 26, label: 'The imposter’s draft', ls: 16, pad: 18, text: `${q(IMP.draftPrompt)}<div style="font-size:19px;color:var(--danger);margin-top:6px">Hidden: ${FROG.key}. They guessed a guitar.</div>`, style: 'transform:rotate(-1.5deg);z-index:3' })}
+`, { hills: 110, clouds: [[-60, 520, 200, .5], [460, 40, 160, .55]], sparks: [[560, 60, 18], [1150, 380, 16]] }));
+
+add('cover-draft-final-1200x630', 1200, 630, 'Banners & covers', 'Handshake cover: draft to final', () => frame(1200, 630, `
+  <div class="abs" style="left:56px;top:50px;display:flex;align-items:center;gap:8px"><img src="${M('think')}" style="width:92px;height:92px" alt="">${logo(78)}</div>
+  <h1 class="h abs" style="left:58px;top:172px;font-size:50px;line-height:1.08">Draft it.<br>See what you missed.<br><span class="mk">Fix it.</span></h1>
+  <p class="lede abs" style="left:60px;top:378px;width:440px;font-size:23px">An 8-word draft, then a final prompt of up to 30 words. An AI judge scores every picture against the target.</p>
+  ${card({ x: 566, y: 66, w: 240, rot: -5, src: img.draft, cap: `Draft · ${words(PIX.draftPrompt)} words`, capSize: 22, z: 1, inner: scoreBadge(S.draft, 24, 'left:-18px;top:-20px;transform:rotate(-6deg);background:#fff') })}
+  <span class="arrow abs" style="left:800px;top:150px;font-size:60px;z-index:4">→</span>
+  ${card({ x: 870, y: 50, w: 290, rot: 4, src: img.final, cap: `Final · ${words(PIX.finalPrompt)} words`, capSize: 24, z: 2, inner: scoreBadge(S.final, 26, 'right:-22px;top:-24px;transform:rotate(6deg)') })}
+  <div class="abs" style="left:556px;top:418px;width:600px;display:grid;gap:10px;z-index:3">
+    <div class="prompt" style="padding:12px 16px;font-size:19px;font-weight:900;line-height:1.3"><span class="lab" style="font-size:14px;padding:5px 10px;margin-right:8px">Draft missed</span>${PIX.draft.missed}</div>
+    <div class="prompt" style="padding:12px 16px;font-size:19px;font-weight:900;line-height:1.3;background:#FFF6CF"><span class="lab" style="font-size:14px;padding:5px 10px;margin-right:8px">Tip</span>${PIX.draft.tip}</div>
+  </div>
+`, { hills: 100, clouds: [[-60, 520, 200, .5], [440, 40, 160, .55]], sparks: [[520, 70, 18], [1160, 400, 16]] }));
+
+// ---------- explainers (1080x1350) ----------
+const W = 1080, H = 1350;
+add('explainer-1-how-to-play', W, H, 'Explainers', 'How to play in 3 steps', () => {
+  const step = (n, color, title, body, art, y) => `<div class="abs box" style="left:60px;right:60px;top:${y}px;height:268px;display:flex;align-items:center;gap:26px;padding:0 30px">
+      <span class="num" style="width:92px;height:92px;font-size:52px;background:${color}">${n}</span>
+      <div style="flex:1"><div class="fd" style="font-size:46px;font-weight:700;line-height:1.05">${title}</div><p class="lede" style="font-size:28px;color:var(--dim);margin-top:10px;font-weight:800">${body}</p></div>
+      <div style="position:relative;width:${art.w}px;height:220px;flex:none">${art.html}</div></div>`;
+  const mini = (src, x, rot, extra = '', w = 196) => `<div style="position:absolute;left:${x}px;top:${(220 - w) / 2}px;width:${w}px;height:${w}px;border:4px solid var(--ink);border-radius:18px;overflow:hidden;transform:rotate(${rot}deg);box-shadow:0 6px 0 var(--ink);background:#fff"><img src="${src}" style="width:100%;height:100%;object-fit:cover;display:block" alt="">${extra}</div>`;
+  return frame(W, H, head('How to play', 'Three steps. <span class="mk">One liar.</span>', { pose: 'happy' }) + `
+    ${step(1, 'var(--yellow)', 'Study the picture', 'Everyone gets the same target.', { w: 220, html: mini(img.target, 10, 3) }, 330)}
+    ${step(2, 'var(--blue)', 'Prompt it back', 'An 8-word draft first. The AI draws it, scores it, says what you missed. Then up to 30 words.', { w: 300, html: mini(img.draft, 0, -4, '', 160) + mini(img.final, 130, 4, `<span class="badge" style="font-size:20px;padding:6px 10px;right:6px;top:6px;border-width:3px;box-shadow:0 3px 0 var(--ink)">${S.final}</span>`, 170) }, 630)}
+    ${step(3, 'var(--pink)', 'Find the imposter', 'One player saw it with a detail erased. Compare, chat, vote.', { w: 220, html: mini(img.masked, 10, -3, `<span class="erased" style="font-size:20px;padding:5px 10px;top:10px;transform:translateX(-50%) rotate(-7deg);border-width:3px">ERASED</span>`) }, 930)}
+  ` + footer(W, H, { bottom: 40 }), { hills: 200, clouds: [[780, 210, 240, .7], [-80, 600, 180, .5]] });
+});
+
+add('explainer-2-the-twist', W, H, 'Explainers', 'The twist', () => frame(W, H, head('The twist', 'One of you is<br><span class="mk-pink">prompting blind.</span>', { pose: 'imposter' }) + `
+  ${card({ x: 70, y: 410, w: 420, rot: -3, src: img.target, cap: 'Everyone saw', capSize: 36 })}
+  ${card({ x: 590, y: 410, w: 420, rot: 3, src: img.masked, cap: 'The imposter saw', capSize: 36, imp: true, z: 2, inner: erased(38, 'top:-10px;transform:translateX(-50%) rotate(-7deg)') })}
+  ${card({ x: 70, y: 965, w: 230, rot: -5, src: img.impDraft, cap: 'Their draft', capSize: 26, z: 3, inner: scoreBadge(S.impDraft, 22, 'right:-18px;top:-20px;transform:rotate(6deg);background:#fff') })}
+  ${promptBox({ x: 340, y: 972, w: 670, size: 36, label: 'The imposter’s draft prompt', ls: 18, text: q(IMP.draftPrompt) + `<div style="font-size:26px;color:var(--danger);margin-top:12px">Hidden: ${FROG.key}. They guessed a guitar.</div>` })}
+`, { hills: 110, clouds: [[780, 200, 240, .7], [-80, 820, 180, .5]] }));
+
+add('explainer-3-draft-to-final', W, H, 'Explainers', 'Draft → Final', () => frame(W, H, head('Draft → Final', `Same player. <span class="mk">${S.draft} → ${S.final}.</span>`, { pose: 'think' }) + `
+  ${card({ x: 66, y: 330, w: 400, rot: -4, src: img.draft, cap: `Draft · ${words(PIX.draftPrompt)} words`, capSize: 32, inner: scoreBadge(S.draft, 32, 'left:-22px;top:-26px;transform:rotate(-6deg);background:#fff') })}
+  <span class="arrow abs" style="left:492px;top:470px;font-size:96px">→</span>
+  ${card({ x: 606, y: 318, w: 410, rot: 4, src: img.final, cap: `Final · ${words(PIX.finalPrompt)} words`, capSize: 32, z: 2, inner: scoreBadge(S.final, 32, 'right:-24px;top:-28px;transform:rotate(6deg)') })}
+  <div class="abs" style="left:66px;right:66px;top:850px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+    ${promptBox({ abs: false, w: 'auto', size: 27, label: 'Draft prompt', ls: 17, pad: 20, text: q(PIX.draftPrompt) + `<div style="margin-top:12px;font-size:22px;color:var(--dim)"><b style="color:var(--ink)">Missed:</b> ${PIX.draft.missed}<br><b style="color:var(--ink)">Tip:</b> ${PIX.draft.tip}</div>` })}
+    ${promptBox({ abs: false, w: 'auto', size: 25, label: 'Final prompt', ls: 17, pad: 20, text: q(PIX.finalPrompt), style: 'background:#FFF6CF' })}
+  </div>
+  <p class="abs" style="left:66px;right:66px;top:1160px;margin:0;font-weight:800;font-size:21px;color:var(--dim);text-align:center">A recorded round by Pixel, one of the game’s bots, on the frog-band target.</p>
+` + footer(W, H, { bottom: 40, right: 'Draft 8 words · final 30', cls: 'yellow' }), { hills: 150, clouds: [[780, 200, 240, .7], [-80, 760, 160, .5]] }) );
+
+add('explainer-4-scoring-tiers', W, H, 'Explainers', 'Scoring + tiers', () => {
+  const colors = { subject: 'var(--yellow)', details: 'var(--blue)', style: 'var(--pink)', color: 'var(--lime)', composition: 'var(--purple)' };
+  const rows = AREAS.map((k) => `<div style="display:grid;grid-template-columns:210px 1fr 86px;align-items:center;gap:16px">
+      <span class="fd" style="font-size:34px;font-weight:600;text-transform:capitalize">${k}</span>
+      <div class="bar"><i style="width:${PIX.final[k] * 5}%;background:${colors[k]}"></i></div>
+      <span class="fd" style="font-size:34px;font-weight:700;text-align:right">${PIX.final[k]}<span style="font-size:22px;color:var(--dim)">/20</span></span></div>`).join('');
+  const tierCard = (t, bg) => `<div class="box" style="padding:16px 10px 16px;text-align:center;background:${bg}"><div style="font-size:52px;line-height:1">${t.medal}</div><div class="fd" style="font-size:40px;font-weight:700;margin-top:4px">${t.label}</div><div style="font-size:28px;font-weight:900">${t.min}+</div></div>`;
+  return frame(W, H, head('The AI judge', 'Five areas.<br><span class="mk">One score out of 100.</span>', { pose: 'judge', size: 84 }) + `
+    ${card({ x: 66, y: 412, w: 300, rot: -4, src: img.final, cap: 'A final image', capSize: 26 })}
+    ${scoreBadge(S.final, 32, 'left:120px;top:770px;transform:rotate(-3deg);z-index:3')}
+    <div class="abs box" style="left:410px;right:60px;top:402px;padding:24px 30px;display:grid;gap:13px">${rows}
+      <div style="border-top:4px dashed rgba(43,37,64,.25);padding-top:14px;display:flex;justify-content:space-between;align-items:baseline"><span class="fd" style="font-size:34px;font-weight:700">Match</span><span class="fd" style="font-size:52px;font-weight:700">${S.final}<span style="font-size:28px;color:var(--dim)">/100</span></span></div></div>
+    <p class="abs lede" style="left:66px;right:66px;top:868px;font-size:28px;font-weight:800">Every image also gets what it missed and one tip. Style rounds count style and color double.</p>
+    <div class="abs" style="left:66px;right:66px;top:968px;display:grid;grid-template-columns:repeat(3,1fr);gap:24px">
+      ${tierCard(TIERS[0], '#FFE785')}${tierCard(TIERS[1], '#F1EEF8')}${tierCard(TIERS[2], '#FFD9B8')}</div>
+  ` + footer(W, H, { bottom: 40, right: 'Tiers on every score', cls: 'yellow' }), { hills: 150, clouds: [[780, 200, 240, .7]] });
+});
+
+add('explainer-5-daily-duel-crews', W, H, 'Explainers', 'Daily target, streaks, challenge duels, crews', () => {
+  const t = tier(S.final), t2 = tier(S.doodle);
+  return frame(W, H, head('Come back tomorrow', 'A new picture<br><span class="mk">every day.</span>', { pose: 'catch' }) + `
+    <div class="abs box" style="left:60px;top:400px;width:470px;height:360px;padding:26px">
+      <div class="fd" style="font-size:40px;font-weight:700">Today’s target</div>
+      <div style="display:flex;gap:18px;margin-top:16px;align-items:center">
+        <div style="width:140px;height:140px;border:4px solid var(--ink);border-radius:18px;overflow:hidden;flex:none"><img src="${img.target}" style="width:100%;height:100%;object-fit:cover;filter:blur(10px) saturate(1.2);transform:scale(1.15)" alt=""></div>
+        <p class="lede" style="font-size:25px;font-weight:800">One picture a day, the same for everyone. Your first score counts.</p></div>
+      <div style="margin-top:22px;display:flex;align-items:center;gap:12px"><span class="pill pink" style="font-size:26px;padding:12px 18px">🔥 Streak</span><span style="font-size:23px;font-weight:800;color:var(--dim)">kept at Bronze (60) or better</span></div>
+    </div>
+    <div class="abs box" style="left:560px;top:400px;width:460px;height:360px;padding:26px;background:#F7F4FF">
+      <div class="fd" style="font-size:40px;font-weight:700">Challenge a friend</div>
+      <div style="margin-top:18px;background:var(--blue);border:4px solid var(--ink);border-radius:26px 26px 26px 8px;padding:18px 20px;font-size:25px;font-weight:900;line-height:1.3;box-shadow:0 5px 0 var(--ink)">I scored ${S.final}/100 (${t.label}) on this Sketchy picture. Beat me:<div style="font-size:21px;white-space:nowrap;text-decoration:underline;margin-top:4px">${URL_}/daily?c=…</div></div>
+      <p class="lede" style="font-size:24px;font-weight:800;color:var(--dim);margin-top:18px">They play the same picture. It ends in a duel.</p>
+    </div>
+    <div class="abs box" style="left:60px;top:792px;width:960px;height:396px;padding:22px 30px;display:grid;grid-template-columns:auto 1fr 1fr;gap:26px;align-items:center">
+      <div style="width:240px"><span class="kicker" style="font-size:20px">Head-to-head</span><div class="fd" style="font-size:44px;font-weight:700;line-height:1.05;margin-top:8px">Side by side, scored.</div>
+        <p class="lede" style="font-size:22px;color:var(--dim);font-weight:800;margin-top:12px">Two recorded rounds on the same target.</p></div>
+      ${['Pixel', 'Doodle'].map((n, i) => `<div style="text-align:center"><div style="position:relative;border:5px solid var(--ink);border-radius:20px;overflow:hidden;${i === 0 ? 'box-shadow:0 0 0 6px var(--yellow),0 8px 0 6px var(--ink)' : 'box-shadow:0 8px 0 var(--ink)'}"><img src="${i === 0 ? img.final : img.doodle}" style="width:100%;aspect-ratio:1;object-fit:cover;display:block" alt=""></div>
+        <div class="fd" style="font-size:30px;font-weight:700;margin-top:14px">${n} · ${i === 0 ? S.final : S.doodle} ${(i === 0 ? t : t2).medal}</div></div>`).join('')}
+    </div>
+    <div class="abs" style="left:60px;right:60px;top:1222px;display:flex;align-items:center;gap:16px">
+      <span class="pill yellow" style="font-size:28px;padding:14px 22px">Crews</span><span style="font-size:27px;font-weight:900">Everyone’s daily scores on one board, all week.</span></div>
+  `, { hills: 110, clouds: [[780, 200, 240, .7]] });
+});
+
+add('explainer-6-multiplayer', W, H, 'Explainers', 'Multiplayer', () => frame(W, H, head('Play together', '2–8 players.<br><span class="mk">One room code.</span>', { pose: 'happy' }) + `
+  <div class="abs box" style="left:60px;right:60px;top:400px;padding:26px 30px;display:flex;gap:34px;align-items:center;background:#F7F4FF">
+    <div style="width:236px;height:236px;background:#fff;border:5px solid var(--ink);border-radius:24px;padding:14px;flex:none">${K.qrPlay}</div>
+    <div><div style="font-size:27px;font-weight:900;color:var(--dim)">Scan, or go to</div><div class="fd" style="font-size:38px;font-weight:700">${URL_}/play</div>
+      <div style="font-size:27px;font-weight:900;color:var(--dim);margin-top:6px">and enter the room code</div>
+      <div class="fd" style="font-size:100px;font-weight:700;letter-spacing:.14em;line-height:1;margin-top:6px">T4FB</div></div>
+  </div>
+  <div class="abs" style="left:60px;right:60px;top:738px;display:grid;grid-template-columns:1fr 1fr;gap:22px">
+    ${[['var(--lime)', 'No login, no install', 'Open the link and type a name.'], ['var(--blue)', 'Any phone or laptop', 'One screen hosts, everyone plays on their own.'], ['var(--yellow)', 'Bots fill empty seats', 'Fewer than 4? Pixel, Doodle and Smudge sit in.'], ['var(--pink)', 'Two of you?', 'Head-to-head, with a bot as the imposter.']]
+      .map(([c, t, b]) => `<div class="box" style="padding:20px 26px;height:168px;border-top-width:16px;border-top-color:${c}"><div class="fd" style="font-size:36px;font-weight:700;line-height:1.05">${t}</div><p class="lede" style="font-size:24px;font-weight:800;color:var(--dim);margin-top:8px">${b}</p></div>`).join('')}
+  </div>
+  <div class="abs" style="left:60px;right:60px;top:1128px;display:flex;justify-content:center;gap:16px">
+    <span class="pill" style="font-size:26px;padding:14px 22px">Quick: 2 rounds · ~5 min</span><span class="pill" style="font-size:26px;padding:14px 22px">Classic: 3 rounds · ~12 min</span></div>
+` + footer(W, H, { bottom: 36, right: 'Room code + QR', cls: 'yellow' }), { hills: 150, clouds: [[780, 200, 240, .7]] }));
+
+// ---------- carousel (1080x1350, 7 slides) ----------
+const slide = (n, eb, title, body, o = {}) => frame(W, H, head(eb, title, { page: `${n}/7 →`, pose: o.pose, size: o.size }) + body, { hills: o.hills ?? 140, clouds: o.clouds ?? [[780, 230, 240, .7], [-80, 800, 170, .5]] });
+
+add('carousel-1-hook', W, H, 'Carousel', '1 · Hook', () => frame(W, H, `
+  <div class="abs" style="left:72px;top:64px;right:72px;display:flex;align-items:center;justify-content:space-between">
+    <div style="display:flex;align-items:center;gap:12px"><img src="${M('happy')}" style="width:76px;height:76px" alt="">${logo(54)}</div><span class="pill" style="font-size:26px;padding:12px 22px">1/7</span></div>
+  <h1 class="h abs" style="left:72px;right:72px;top:190px;font-size:110px;line-height:.98">One of you can’t see the <span class="mk-pink">whole picture.</span></h1>
+  ${card({ x: 80, y: 600, w: 430, rot: -5, src: img.target, cap: 'What everyone saw', capSize: 34 })}
+  ${card({ x: 560, y: 640, w: 430, rot: 4, src: img.masked, cap: 'What the imposter saw', capSize: 32, imp: true, z: 2, inner: erased(38, 'top:-10px;transform:translateX(-50%) rotate(-7deg)') })}
+  <span class="pill ink abs" style="right:60px;bottom:44px;font-size:28px;padding:16px 26px">Swipe →</span>
+  <span class="kicker abs" style="left:76px;bottom:62px;font-size:22px">A little prompting. A lot of accusations.</span>
+`, { hills: 140, clouds: [[780, 120, 240, .7], [-80, 520, 170, .5]] }));
+
+add('carousel-2-how-it-works', W, H, 'Carousel', '2 · How it works', () => {
+  const rows = [
+    ['var(--yellow)', 'Study', 'Everyone gets the same target picture.', img.target, ''],
+    ['var(--blue)', 'Draft · 8 words', 'The AI draws it and scores it out of 100.', img.draft, `${S.draft}`],
+    ['var(--lime)', 'Final · up to 30 words', 'Fix what the draft missed. Only this one counts.', img.final, `${S.final}`],
+    ['var(--pink)', 'Vote', 'Compare the pictures, chat, catch the imposter.', img.impDraft, ''],
+  ];
+  return slide(2, 'How it works', 'Write it.<br><span class="mk">Watch it get drawn.</span>', `
+    <div class="abs" style="left:70px;right:70px;top:490px;display:grid;gap:24px">
+      ${rows.map(([c, t, b, s, sc], i) => `<div class="box" style="display:flex;align-items:center;gap:24px;padding:14px 22px 14px 14px;height:170px">
+        <div style="position:relative;width:136px;height:136px;border:4px solid var(--ink);border-radius:18px;overflow:hidden;flex:none"><img src="${s}" style="width:100%;height:100%;object-fit:cover" alt="">${sc ? `<span class="badge" style="font-size:20px;padding:5px 9px;right:4px;top:4px;border-width:3px;box-shadow:0 3px 0 var(--ink)">${sc}</span>` : ''}</div>
+        <div style="flex:1"><div class="fd" style="font-size:40px;font-weight:700;line-height:1.05">${t}</div><p class="lede" style="font-size:26px;font-weight:800;color:var(--dim);margin-top:6px">${b}</p></div>
+        <span class="num" style="width:70px;height:70px;font-size:36px;background:${c};border-width:4px;box-shadow:0 4px 0 var(--ink)">${i + 1}</span></div>`).join('')}
+    </div>`, { pose: 'think', hills: 100, clouds: [[780, 230, 240, .7]] });
+});
+
+add('carousel-3-twist', W, H, 'Carousel', '3 · The twist', () => slide(3, 'The twist', 'The imposter sees a <span class="mk-pink">hole</span> in the picture.', `
+  ${card({ x: 70, y: 470, w: 400, rot: -4, src: img.masked, cap: 'The imposter saw', capSize: 32, imp: true, inner: erased(34, 'top:-10px;transform:translateX(-50%) rotate(-7deg)') })}
+  ${card({ x: 620, y: 470, w: 320, rot: 5, src: img.impDraft, cap: 'So their draft drew…', capSize: 26, z: 2, inner: scoreBadge(S.impDraft, 24, 'right:-18px;top:-20px;transform:rotate(6deg);background:#fff') })}
+  ${promptBox({ x: 540, y: 880, w: 470, size: 30, label: 'Imposter’s draft', ls: 17, pad: 20, text: q(IMP.draftPrompt), style: 'z-index:3;transform:rotate(-1deg)' })}
+  <div class="abs" style="left:76px;top:1000px;width:420px;font-size:32px;font-weight:900;line-height:1.25">Hidden: <span class="mk">${FROG.key}</span>.</div>
+  <div class="abs" style="left:70px;right:70px;top:1090px"><div style="font-size:27px;font-weight:900">Caught? Guess what was hidden to <span class="mk-blue">steal the round:</span></div>
+    <div style="display:flex;gap:12px;margin-top:16px;flex-wrap:wrap">${FROG.stealOptions.map((o) => `<span class="pill ${o === FROG.key ? 'lime' : ''}" style="font-size:24px;padding:11px 16px;box-shadow:0 4px 0 var(--ink)">${o === FROG.key ? '✓ ' : ''}${o}</span>`).join('')}</div></div>
+`, { pose: 'imposter', size: 86, hills: 70, noSwipe: true }));
+
+add('carousel-4-ai-judge', W, H, 'Carousel', '4 · The AI judge', () => {
+  const colors = { subject: 'var(--yellow)', details: 'var(--blue)', style: 'var(--pink)', color: 'var(--lime)', composition: 'var(--purple)' };
+  return slide(4, 'The AI judge', 'Every picture gets <span class="mk">scored.</span>', `
+    <div class="abs box" style="left:70px;right:70px;top:450px;padding:26px 30px;display:grid;gap:14px">
+      ${AREAS.map((k) => `<div style="display:grid;grid-template-columns:220px 1fr 70px;align-items:center;gap:16px"><span class="fd" style="font-size:36px;font-weight:600;text-transform:capitalize">${k}</span><div class="bar" style="height:34px"><i style="width:${PIX.final[k] * 5}%;background:${colors[k]}"></i></div><span class="fd" style="font-size:36px;font-weight:700;text-align:right">${PIX.final[k]}</span></div>`).join('')}
+      <div style="border-top:4px dashed rgba(43,37,64,.25);padding-top:16px;display:flex;justify-content:space-between;align-items:center"><span class="fd" style="font-size:36px;font-weight:700">Match</span>${scoreBadge(S.final, 34, 'position:relative;display:inline-block;transform:rotate(-2deg)')}</div>
+    </div>
+    <div class="abs" style="left:70px;right:70px;top:950px;display:grid;grid-template-columns:repeat(3,1fr);gap:20px">
+      ${TIERS.map((t, i) => `<div class="pill" style="justify-content:center;font-size:30px;padding:18px 10px;background:${['#FFE785', '#F1EEF8', '#FFD9B8'][i]}">${t.medal} ${t.label} ${t.min}+</div>`).join('')}</div>
+    <div class="abs" style="left:70px;right:70px;top:1070px;display:grid;gap:12px">
+      <div class="prompt" style="padding:14px 18px;font-size:25px;font-weight:900"><span class="lab" style="font-size:16px;padding:6px 12px;margin-right:10px">Missed</span>${PIX.final.missed}</div>
+      <div class="prompt" style="padding:14px 18px;font-size:25px;font-weight:900;background:#FFF6CF"><span class="lab" style="font-size:16px;padding:6px 12px;margin-right:10px">Tip</span>${PIX.final.tip}</div></div>`, { pose: 'judge', hills: 60, noSwipe: true });
+});
+
+add('carousel-5-modes', W, H, 'Carousel', '5 · Ways to play', () => slide(5, 'Ways to play', 'Party night, or<br><span class="mk">a few minutes alone.</span>', `
+  <div class="abs" style="left:70px;right:70px;top:470px;display:grid;grid-template-columns:1fr 1fr;gap:22px">
+    ${[['var(--yellow)', 'Party', '2–8 players, room code + QR. Bots fill empty seats.', 'happy'], ['var(--blue)', 'Solo vs bots', 'Two rounds against Pixel, Doodle and Smudge.', 'think'], ['var(--pink)', 'Daily target', 'One picture for everyone. Keep your streak.', 'catch'], ['var(--lime)', 'Challenge link', '“Beat me” opens the same picture and ends in a duel.', 'sus']]
+      .map(([c, t, b, p]) => `<div class="box" style="position:relative;padding:26px 24px;height:272px;background:#fff;overflow:hidden"><div style="position:absolute;left:0;top:0;right:0;height:14px;background:${c};border-bottom:4px solid var(--ink)"></div>
+        <img src="${M(p)}" style="position:absolute;right:-6px;bottom:-8px;width:120px;height:120px" alt=""><div class="fd" style="font-size:40px;font-weight:700;margin-top:10px">${t}</div><p class="lede" style="font-size:27px;font-weight:800;color:var(--dim);margin-top:10px;padding-right:70px">${b}</p></div>`).join('')}
+  </div>
+  <div class="abs box" style="left:70px;right:70px;top:1090px;padding:20px 26px;display:flex;align-items:center;gap:18px"><span class="pill yellow" style="font-size:28px;padding:12px 20px">Crews</span><span style="font-size:26px;font-weight:900">Friends board: everyone’s daily scores, all week.</span></div>
+`, { pose: 'happy', hills: 80 }));
+
+add('carousel-6-why-it-teaches', W, H, 'Carousel', '6 · Why it teaches prompting', () => slide(6, 'Why it works', 'You get better by<br><span class="mk">fixing your own prompt.</span>', `
+  ${card({ x: 76, y: 480, w: 290, rot: -4, src: img.draft, cap: 'Draft', capSize: 28, inner: scoreBadge(S.draft, 28, 'left:-18px;top:-22px;transform:rotate(-6deg);background:#fff') })}
+  <span class="arrow abs" style="left:396px;top:580px;font-size:80px">→</span>
+  ${card({ x: 500, y: 470, w: 300, rot: 4, src: img.final, cap: 'Final', capSize: 28, z: 2, inner: scoreBadge(S.final, 28, 'right:-20px;top:-24px;transform:rotate(6deg)') })}
+  <div class="abs" style="left:840px;top:530px;width:180px;text-align:center"><div class="fd" style="font-size:82px;font-weight:700;color:var(--green);line-height:1">+${S.final - S.draft}</div><div style="font-size:24px;font-weight:900;color:var(--dim)">points from one rewrite</div></div>
+  <div class="abs" style="left:70px;right:70px;top:900px;display:grid;gap:14px">
+    ${[['1', 'See what your words actually draw.'], ['2', 'Read what the judge says you missed.'], ['3', 'Compare with the real prompt behind the target.']].map(([n, t]) => `<div style="display:flex;align-items:center;gap:18px"><span class="num" style="width:58px;height:58px;font-size:30px;background:var(--yellow);border-width:4px;box-shadow:0 4px 0 var(--ink)">${n}</span><span style="font-size:32px;font-weight:900">${t}</span></div>`).join('')}
+  </div>
+  <p class="abs" style="left:70px;right:70px;top:1176px;margin:0;font-weight:800;font-size:21px;color:var(--dim)">Draft and final by Pixel, one of the game’s bots, on the frog-band target, exactly as the game shows it.</p>`, { pose: 'think', size: 84, hills: 80 }));
+
+add('carousel-7-cta', W, H, 'Carousel', '7 · Play now', () => frame(W, H, `
+  <div class="abs" style="left:72px;top:64px;right:72px;display:flex;justify-content:flex-end"><span class="pill" style="font-size:26px;padding:12px 22px">7/7</span></div>
+  <div class="abs" style="left:0;right:0;top:140px;display:flex;flex-direction:column;align-items:center">
+    <img src="${M('wow')}" style="width:250px;height:250px" alt="">
+    ${logo(170, 'margin-top:-6px')}
+    <p class="lede" style="font-size:40px;text-align:center;margin-top:28px">Recreate the picture with an AI prompt.<br>One of you can’t see all of it. <span class="mk">Find them.</span></p>
+  </div>
+  <div class="abs box" style="left:110px;right:110px;top:760px;padding:30px;display:flex;align-items:center;gap:30px">
+    <div style="width:220px;height:220px;border:5px solid var(--ink);border-radius:22px;padding:12px;background:#fff;flex:none">${K.qrHome}</div>
+    <div><div style="font-size:28px;font-weight:900;color:var(--dim)">Play free in your browser</div><div class="fd" style="font-size:44px;font-weight:700;line-height:1.1;margin-top:6px">${URL_}</div>
+      <div style="font-size:25px;font-weight:900;margin-top:14px">No login · no install · phone or laptop</div></div>
+  </div>
+  <div class="abs" style="left:0;right:0;top:1090px;display:flex;justify-content:center"><span class="pill lime" style="font-size:30px;padding:18px 30px">Tap “Play solo vs. bots” to try it now</span></div>
+`, { hills: 160, clouds: [[-60, 120, 300, .85], [800, 260, 240, .7]] }));
+
+// ---------- targets poster ----------
+function poster(Wp, Hp, o) {
+  const list = K.targets; const n = list.length;
+  const top = o.top, side = o.side, bottom = o.bottom, gap = o.gap;
+  const aw = Wp - side * 2, ah = Hp - top - bottom;
+  let best = null; // pick the column count that gives the biggest tiles
+  for (let c = 3; c <= 14; c++) { const r = Math.ceil(n / c); const s = Math.min((aw - gap * (c - 1)) / c, (ah - gap * (r - 1)) / r); if (!best || s > best.s) best = { c, r, s }; }
+  const s = Math.floor(best.s);
+  const gw = best.c * s + gap * (best.c - 1), gh = best.r * s + gap * (best.r - 1);
+  const x0 = (Wp - gw) / 2, y0 = top + (ah - gh) / 2;
+  const last = n % best.c, lastRow = Math.floor((n - 1) / best.c);
+  const tiles = list.map((t, i) => { const r = Math.floor(i / best.c); const c = (i % best.c) + (last && r === lastRow ? (best.c - last) / 2 : 0); const rot = [-3, 2, -1.5, 3, -2.5, 1.5][(i * 7) % 6];
+    return `<div style="position:absolute;left:${x0 + c * (s + gap)}px;top:${y0 + r * (s + gap)}px;width:${s}px;height:${s}px;transform:rotate(${rot}deg);background:#fff;border:${o.bw}px solid var(--ink);border-radius:${s * 0.12}px;padding:${o.pad}px;box-shadow:0 ${o.bw + 2}px 0 var(--ink)"><img src="${pub(t.image)}" style="width:100%;height:100%;object-fit:cover;border-radius:${s * 0.08}px;display:block" alt=""></div>`; }).join('');
+  return frame(Wp, Hp, o.header(n) + tiles, { noHills: true, clouds: o.clouds, sparks: [] });
+}
+add('poster-targets-1920x1080', 1920, 1080, 'Targets poster', 'Every target (landscape)', () => poster(1920, 1080, {
+  top: 200, side: 70, bottom: 60, gap: 22, bw: 4, pad: 6, clouds: [[-60, 60, 260, .8], [1640, 40, 260, .8]],
+  header: (n) => `<div class="abs" style="left:70px;top:46px;display:flex;align-items:center;gap:10px"><img src="${M('sus')}" style="width:96px;height:96px" alt="">${logo(78)}</div>
+    <h1 class="h abs" style="left:540px;top:62px;font-size:54px;white-space:nowrap">${n} pictures. <span class="mk">Prompt them back.</span></h1>
+    <span class="pill abs" style="right:70px;top:66px;font-size:26px;padding:14px 22px"><span class="url">${URL_}</span></span>`,
+}), { dynamic: true });
+add('poster-targets-1080x1350', 1080, 1350, 'Targets poster', 'Every target (portrait)', () => poster(1080, 1350, {
+  top: 300, side: 56, bottom: 120, gap: 16, bw: 4, pad: 5, clouds: [[760, 40, 260, .8], [-80, 160, 200, .6]],
+  header: (n) => `<div class="abs" style="left:60px;top:56px;display:flex;align-items:center;gap:10px"><img src="${M('sus')}" style="width:84px;height:84px" alt="">${logo(66)}</div>
+    <h1 class="h abs" style="left:62px;right:60px;top:166px;font-size:62px">${n} pictures. <span class="mk">Prompt them back.</span></h1>
+    <div class="abs" style="left:56px;right:56px;bottom:44px;display:flex;justify-content:space-between"><span class="pill" style="font-size:26px;padding:14px 22px"><span class="url">${URL_}</span></span><span class="pill lime" style="font-size:26px;padding:14px 22px">A new one every day</span></div>`,
+}), { dynamic: true });
+
+// ---------- gallery (1920x1080, real screenshots) ----------
+const shot = (f) => `/artifacts/live/${f}`;
+function gallery(title, sub, laptopShot, phoneShot, pose) {
+  const lw = 1160, pw = 340; // laptop screen width, phone screen width
+  return frame(1920, 1080, `
+    <div class="abs" style="left:110px;top:70px;display:flex;align-items:center;gap:22px">
+      <img src="${M(pose)}" style="width:110px;height:110px" alt="">
+      <div><h1 class="h" style="font-size:62px;white-space:nowrap">${title}</h1><p class="lede" style="font-size:30px;color:var(--dim);font-weight:800;margin-top:8px">${sub}</p></div></div>
+    <span class="abs" style="right:100px;top:96px">${logo(56)}</span>
+    <div class="laptop" style="left:150px;top:268px;width:${lw + 40}px"><div class="scr"><img src="${shot(laptopShot)}" alt=""></div><div class="base"></div></div>
+    <div class="phone" style="left:1440px;top:250px;width:${pw + 28}px;transform:rotate(3deg)"><img src="${shot(phoneShot)}" alt=""></div>
+  `, { hills: 200, clouds: [[-80, 300, 240, .6], [1660, 680, 200, .5]], sparks: [[1380, 160, 22], [90, 900, 18]] });
+}
+const G = [
+  ['gallery-1-home', 'Recreate the picture. Find the imposter.', 'Host, join with a code, or play solo against bots.', 'g-b-crew-board-1366x820.png', 'h-landing-390x844.png', 'happy'],
+  ['gallery-2-lobby', 'One room code. Everyone on their phone.', '2–8 players; bots fill the empty seats.', 'h-lobby-tv-1366x820.png', 'h-lobby-390x844.png', 'catch'],
+  ['gallery-3-draft-feedback', 'Draft first. The AI says what you missed.', 'Then expand it into a final prompt of up to 30 words.', 'c-demo-r1-refine-1366x820.png', 'g-a-daily-r1-refine-390x844.png', 'think'],
+  ['gallery-4-imposter-view', 'The imposter’s picture has a hole in it.', 'Something was erased. Everyone else can see it.', 'c-demo-r2-study-1366x820.png', 'e-r1-imposter-phone-390x844.png', 'imposter'],
+  ['gallery-5-vote', 'Compare the pictures. Vote them out.', 'Each tile shows the final image with the draft in the corner.', 'c-demo-r1-vote-1366x820.png', 'g-a-daily-r1-vote-390x844.png', 'sus'],
+  ['gallery-6-results', 'See the prompt behind every picture.', 'Draft and final scores for everyone, then tiers and streaks.', 'b-daily2-r1-results-1366x820.png', 'g-a-daily-final-390x844.png', 'judge'],
+];
+for (const [id, t, s, l, p, pose] of G) add(id + '-1920x1080', 1920, 1080, 'Gallery screenshots', t, () => gallery(t, s, l, p, pose));
+
+// ---------- stickers (512x512, transparent) ----------
+const TILE = { 'howto-1': 296 / 334, 'howto-2': 302 / 338, 'howto-3': 280 / 346 }; // height / width of the how-to tiles
+const POSES = ['happy', 'sus', 'imposter', 'judge', 'think', 'wow', 'catch', 'howto-1', 'howto-2', 'howto-3'];
+for (const p of POSES) add(`sticker-${p}-512`, 512, 512, 'Stickers', p, () => {
+  const sz = 436, off = (512 - sz) / 2;
+  return `<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg" style="display:block">
+    <defs><filter id="die" x="-20%" y="-20%" width="140%" height="140%">
+      <feMorphology in="SourceAlpha" operator="dilate" radius="14" result="d"/>
+      <feGaussianBlur in="d" stdDeviation="1.2" result="db"/><feComponentTransfer in="db" result="dm"><feFuncA type="linear" slope="3" intercept="-0.6"/></feComponentTransfer>
+      <feOffset in="dm" dy="7" result="so"/><feFlood flood-color="#2B2540" flood-opacity=".22"/><feComposite in2="so" operator="in" result="shadow"/>
+      <feMorphology in="dm" operator="dilate" radius="1.5" result="dm2"/><feFlood flood-color="#2B2540" flood-opacity=".18"/><feComposite in2="dm2" operator="in" result="rim"/>
+      <feFlood flood-color="#FFFFFF"/><feComposite in2="dm" operator="in" result="white"/>
+      <feMerge><feMergeNode in="shadow"/><feMergeNode in="rim"/><feMergeNode in="white"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs>
+    ${TILE[p] ? (() => { const h = Math.round(sz * TILE[p]), y = (512 - h) / 2 - 6, i = 7; // how-to art is a rounded tile: clip off its square corners
+      return `<clipPath id="rc"><rect x="${off + i}" y="${y + i}" width="${sz - 2 * i}" height="${h - 2 * i}" rx="54"/></clipPath><g filter="url(#die)"><g clip-path="url(#rc)"><image href="${M(p)}" x="${off}" y="${y}" width="${sz}" height="${h}" preserveAspectRatio="none"/></g></g>`; })()
+      : `<image filter="url(#die)" href="${M(p)}" x="${off}" y="${off - 6}" width="${sz}" height="${sz}" preserveAspectRatio="xMidYMid meet"/>`}</svg>`;
+}, { transparent: true });
+
+window.ASSETS = Object.values(A).map(({ fn, ...a }) => a);
+const id = new URLSearchParams(location.search).get('a');
+if (id && A[id]) { document.getElementById('root').innerHTML = A[id].fn(); document.body.style.width = A[id].w + 'px'; }
+</script>
+</body>
+</html>

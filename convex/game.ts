@@ -80,6 +80,10 @@ async function commit(ctx: MutationCtx, roomId: Id<'rooms'>, eng: Engine) {
         // Give the judge a moment to finish rating late submissions before hinting.
         await ctx.scheduler.runAfter(2_500, internal.ai.hint, { roomId, round: fx.round, gameId: fx.gameId, mode: AI_MODE });
         break;
+      case 'detect':
+        // Same pause as the hint so late final images are in.
+        await ctx.scheduler.runAfter(2_500, internal.ai.detect, { roomId, round: fx.round, gameId: fx.gameId, mode: AI_MODE });
+        break;
     }
   }
   // JSON round-trip drops `undefined` fields, which Convex documents can't hold.
@@ -169,6 +173,7 @@ const actionV = v.union(
   v.object({ t: v.literal('playAgain') }),
   v.object({ t: v.literal('assignHost'), playerId: v.string() }),
   v.object({ t: v.literal('leave') }),
+  v.object({ t: v.literal('avatar'), avatar: v.string() }),
   v.object({ t: v.literal('draft'), text: v.string() }),
   v.object({ t: v.literal('final'), text: v.string() }),
   v.object({ t: v.literal('setMode'), mode: v.union(v.literal('prompt'), v.literal('sketch')) }),
@@ -204,6 +209,7 @@ export const act = mutation({
       case 'playAgain': if (isHost) eng.playAgain(); break;
       case 'assignHost': if (screenHost) eng.assignHost(a.playerId); break;
       case 'leave': if (id) eng.removePlayer(id); break;
+      case 'avatar': if (id) eng.setAvatar(id, a.avatar); break;
       case 'draft': if (id) error = eng.submitPrompt(id, 'draft', a.text.slice(0, 400)); break;
       case 'final': if (id) error = eng.submitPrompt(id, 'final', a.text.slice(0, 400)); break;
       case 'setMode': if (isHost) eng.setMode(a.mode); break;
@@ -329,6 +335,29 @@ export const compareDone = internalMutation({
     const room = await ctx.db.get('rooms', roomId); if (!room) return;
     const eng = engineFor(room);
     eng.applyCompare(round, playerId, gameId, pass, res);
+    await commit(ctx, roomId, eng);
+  },
+});
+
+/** What the AI detective sees: the target, the hidden detail, and each player's final prompt + image (by id, no names). */
+export const detectInput = internalQuery({
+  args: { roomId: v.id('rooms'), round: v.number(), gameId: v.string() },
+  handler: async (ctx, { roomId, round, gameId }) => {
+    const room = await ctx.db.get('rooms', roomId); if (!room) return null;
+    const s = room.state as EngineState;
+    const r = s.rounds[round - 1];
+    if (!r || s.gameId !== gameId || r.mode !== 'prompt' || !r.targetUrl) return null;
+    return { targetPath: r.targetUrl, key: r.realPrompt, imposterId: r.imposterId,
+      players: r.participantIds.map((id) => { const d = r.drawings.find((x) => x.playerId === id); return { id, prompt: d?.finalPrompt || d?.draftPrompt || '', imageUrl: d?.glowUrl || d?.draftUrl }; }) };
+  },
+});
+
+export const detectDone = internalMutation({
+  args: { roomId: v.id('rooms'), round: v.number(), gameId: v.string(), odds: v.record(v.string(), v.number()) },
+  handler: async (ctx, { roomId, round, gameId, odds }) => {
+    const room = await ctx.db.get('rooms', roomId); if (!room) return;
+    const eng = engineFor(room);
+    eng.applyDetect(round, gameId, odds);
     await commit(ctx, roomId, eng);
   },
 });

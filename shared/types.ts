@@ -104,7 +104,7 @@ export interface PromptPair {
 export interface Award { playerId: string; points: number; reason: AwardReason }
 export type AwardReason =
   | 'caught_vote' | 'caught_vote_streak' | 'escape' | 'steal'
-  | 'perfect_disguise' | 'judges_favorite' | 'imposter_fled' | 'prompt_match' | 'best_prompt' | 'improved';
+  | 'perfect_disguise' | 'judges_favorite' | 'imposter_fled' | 'prompt_match' | 'best_prompt' | 'improved' | 'fooled_ai';
 
 export interface Round {
   index: number;
@@ -131,6 +131,10 @@ export interface Round {
   modifier?: Modifier;
   /** Players in a tie-break revote (only when the imposter was one of the tied). */
   revote?: string[];
+  /** Prompt mode: the AI detective's imposter odds per player (sums to 1), revealed at the unmask. */
+  detective?: Record<string, number>;
+  /** Public before the unmask: the detective has placed a bet (odds stay hidden). */
+  detectiveIn?: boolean;
   awards: Award[];
 }
 

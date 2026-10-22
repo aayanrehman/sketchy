@@ -2,7 +2,7 @@ import { SoundControl } from '@/design/components';
 import { useState } from 'react';
 import { go } from '@/nav';
 import { motion, useReducedMotion } from 'framer-motion';
-import { Button, Card, Modal, Mascot, Scenery } from '@/design/components';
+import { Button, Card, Modal, Mascot, Scenery, LUNA_IMG } from '@/design/components';
 import { load, level, levelTitle, levelProgress, todayKey, dailyPlayed, dailyStreak } from '@/progression/store';
 import { dailyTarget } from '../../../convex/targets';
 import { childVariants, phaseVariants } from '@/design/motion';
@@ -58,7 +58,13 @@ export function Landing() {
         )}
         </div>
         </div>
-        <motion.div className="landing__right" variants={childVariants(rm)}><LiveDemo /></motion.div>
+        <motion.div className="landing__right" variants={childVariants(rm)}>
+          <figure className="hero">
+            <img src="/hero.webp" alt="The Sketchy suspects in a police lineup holding paintings; one painting is just a question mark. Inspector Luna, an owl detective, inspects them." width={1200} height={800} />
+            <figcaption><img src={LUNA_IMG} alt="" /><span>Meet the suspects. <b>Inspector Luna</b>, the AI detective, plays every round too.</span></figcaption>
+          </figure>
+          <LiveDemo />
+        </motion.div>
       </motion.div>
       <Modal open={help} onClose={() => setHelp(false)} label="How to play"><HowTo onDone={() => setHelp(false)} cta="Close" /></Modal>
       <Modal open={gallery} onClose={() => setGallery(false)} label="Your gallery">

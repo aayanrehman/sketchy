@@ -185,10 +185,18 @@ export const hint = internalAction({
   },
 });
 
-const HINT_SYSTEM_PROMPT = 'You are Sketchy, the playful host of a prompt-writing party game. Players recreate a target image by writing prompts; one secret imposter saw the image with a key detail blurred out and had to guess it. You see everyone\'s anonymous first-draft prompts and the hidden detail. Write ONE short, playful, cryptic hint (max 16 words) that points players toward a telling pattern in the drafts (e.g. someone vague about the main prop, a guess that changed) WITHOUT naming the hidden detail, quoting a draft, or identifying anyone. Output JSON: {"hint": string}.';
+const HINT_SYSTEM_PROMPT = 'You are Sketchy, the playful host of a prompt-writing party game. Players recreate a target image by writing prompts; one secret imposter saw the image with a key detail erased and had to guess it. You see everyone\'s anonymous first-draft prompts and the hidden detail. Write ONE short, playful, cryptic hint (max 16 words) that points players toward a telling pattern in the drafts (e.g. someone vague about the main prop, a guess that changed) WITHOUT naming the hidden detail, quoting a draft, or identifying anyone. Output JSON: {"hint": string}.';
 
 /** The live game's judge: image 1 is the target, image 2 the attempt. */
 export const COMPARE_SYSTEM = "You compare a player's AI-generated image (image 2) against a target image (image 1) in a prompt-recreation game. Score how closely the attempt recreates the target in five areas, each an integer 0-20: subject (main characters and objects), details (props, actions, secondary elements), style (art medium, rendering, line work), color (palette and lighting), composition (framing, layout, viewpoint). Be strict and consistent: 20 means essentially identical in that area. Output only JSON: {\"subject\":n,\"details\":n,\"style\":n,\"color\":n,\"composition\":n,\"missed\":\"the most important thing the attempt got wrong, under 8 words\",\"tip\":\"one concrete prompting tip to get closer, under 14 words, without quoting the target's exact wording\"}";
+
+const abs = (u: string) => (u.startsWith('http') ? u : `${SITE_URL}${u}`);
+async function dataUrl(url: string) {
+  const r = await fetch(url); if (!r.ok) throw new Error(`image ${r.status}`);
+  const bytes = new Uint8Array(await r.arrayBuffer()); let bin = '';
+  for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
+  return `data:${r.headers.get('content-type') || 'image/webp'};base64,${btoa(bin)}`;
+}
 
 const passV = v.union(v.literal('draft'), v.literal('final'));
 
@@ -245,14 +253,10 @@ export const compare = internalAction({
         const n = () => 6 + Math.floor(Math.random() * 13);
         res = { status: 'done', breakdown: { subject: n(), details: n(), style: n(), color: n(), composition: n() }, missed: 'the lighting', tip: 'Name the art style and the time of day.' };
       } else {
-        const abs = (u: string) => (u.startsWith('http') ? u : `${SITE_URL}${u}`);
         const schema = { type: 'object', additionalProperties: false, required: ['subject', 'details', 'style', 'color', 'composition', 'missed', 'tip'],
           properties: { subject: { type: 'integer' }, details: { type: 'integer' }, style: { type: 'integer' }, color: { type: 'integer' }, composition: { type: 'integer' }, missed: { type: 'string' }, tip: { type: 'string' } } };
         // Send the target as data so the judge never depends on the provider fetching our static site.
-        const tr = await fetch(abs(a.targetPath)); if (!tr.ok) throw new Error(`target ${tr.status}`);
-        const bytes = new Uint8Array(await tr.arrayBuffer()); let bin = '';
-        for (let i = 0; i < bytes.length; i += 0x8000) bin += String.fromCharCode(...bytes.subarray(i, i + 0x8000));
-        const targetData = `data:image/webp;base64,${btoa(bin)}`;
+        const targetData = await dataUrl(abs(a.targetPath));
         const p = await llmJson(a.mode, COMPARE_SYSTEM, 'Score image 2 against image 1.', [targetData, abs(a.attemptUrl)], JUDGE_TIMEOUT_MS, schema);
         const keys = ['subject', 'details', 'style', 'color', 'composition'] as const;
         if (!keys.every((k) => Number.isFinite(p[k]))) throw new Error('bad json');
@@ -262,5 +266,52 @@ export const compare = internalAction({
       }
     } catch (e: any) { if (e?.message !== 'disabled') warn('compare', e?.name === 'AbortError' ? 'timeout' : String(e?.message || 'request_failed').slice(0, 60)); }
     await ctx.runMutation(internal.game.compareDone, { roomId: a.roomId, round: a.round, playerId: a.playerId, gameId: a.gameId, pass: a.pass, styleRound: a.styleRound, ...res });
+  },
+});
+
+const DETECT_TIMEOUT_MS = 10_000;
+
+/**
+ * The AI detective: one OpenAI Decisions API call (gpt-6-luna) bets on the imposter. The shared input is the
+ * full target; each player is a predicate question carrying their final prompt + image, so the model returns a
+ * calibrated probability per player in a single fast request. Free-ish ($0.10 / 1M input tokens), so it isn't
+ * counted against the daily image/judge budget. No answer = no detective that round.
+ */
+export const detect = internalAction({
+  args: { roomId: v.id('rooms'), round: v.number(), gameId: v.string(), mode: modeV },
+  handler: async (ctx, a) => {
+    const input = await ctx.runQuery(internal.game.detectInput, { roomId: a.roomId, round: a.round, gameId: a.gameId });
+    if (!input || input.players.length < 2 || a.mode === 'off') return;
+    const started = Date.now();
+    let odds: Record<string, number> | null = null;
+    try {
+      if (a.mode === 'mock') {
+        await sleep(400);
+        odds = Object.fromEntries(input.players.map((p) => [p.id, Math.random() + (p.id === input.imposterId ? 0.8 : 0)]));
+      } else {
+        if (!OPENAI_KEY) throw new Error('missing_key');
+        const questions = await Promise.all(input.players.map(async (p, i) => {
+          const parts: any[] = [{ type: 'input_text', text: `Player ${i + 1} wrote this prompt: ${JSON.stringify(p.prompt || '(nothing)')}. ${p.imageUrl ? 'It produced this image:' : 'Their image failed to generate.'}` }];
+          if (p.imageUrl) parts.push({ type: 'input_image', image_url: p.imageUrl.startsWith('http') ? p.imageUrl : await dataUrl(abs(p.imageUrl)) });
+          parts.push({ type: 'input_text', text: `Is this player the imposter who could not see the ${input.key}? Their prompt and image miss, dodge or get the ${input.key} wrong, or stay vague exactly where it should be, while still matching the rest of the target.` });
+          return { type: 'predicate', name: `p${i}`, instructions: parts };
+        }));
+        const json: any = await withTimeout(DETECT_TIMEOUT_MS, async (signal) => {
+          const r = await fetch('https://api.openai.com/v1/decisions', {
+            method: 'POST', signal, headers: { Authorization: `Bearer ${OPENAI_KEY}`, 'Content-Type': 'application/json' },
+            body: JSON.stringify({ model: 'gpt-6-luna', questions, input: [{ role: 'user', content: [
+              { type: 'input_text', text: `A party game: players recreate this target image by writing prompts. Exactly one player is an imposter who saw it with the ${input.key} erased and had to guess.` },
+              { type: 'input_image', image_url: await dataUrl(abs(input.targetPath)) },
+            ] }] }),
+          });
+          if (!r.ok) throw new Error(`http ${r.status}`);
+          return r.json();
+        });
+        const byName = new Map<string, number>((json?.answers || []).map((x: any) => [x.name, Number(x.probability)]));
+        odds = Object.fromEntries(input.players.map((p, i) => [p.id, byName.get(`p${i}`) ?? NaN]).filter(([, x]) => Number.isFinite(x as number)));
+      }
+    } catch (e: any) { warn('detect', e?.name === 'AbortError' ? 'timeout' : String(e?.message || 'request_failed').slice(0, 60)); }
+    console.info(JSON.stringify({ ai: { kind: 'detect', mode: a.mode, elapsedMs: Date.now() - started, status: odds ? 'done' : 'fallback' } }));
+    if (odds) await ctx.runMutation(internal.game.detectDone, { roomId: a.roomId, round: a.round, gameId: a.gameId, odds });
   },
 });

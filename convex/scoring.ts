@@ -47,6 +47,9 @@ export function scoreRound(round: Round, players: Map<string, Player>): Award[] 
       }
     }
     if (round.mode === 'prompt') {
+      // The AI detective bet on someone else: the imposter fooled the machine too.
+      const odds = round.detective ? Object.entries(round.detective).sort((a, b) => b[1] - a[1]) : [];
+      if (odds.length && odds[0][0] !== imposter.id) { imposter.score += 100; awards.push({ playerId: imposter.id, points: 100, reason: 'fooled_ai' }); }
       // Prompt skill pays for everyone: half your final match, plus +50 for the closest artist.
       for (const id of round.participantIds) {
         const d = byId.get(id); const p = players.get(id);

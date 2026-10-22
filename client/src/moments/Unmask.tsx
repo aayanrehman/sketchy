@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
-import { DrawingTile, Stamp } from '@/design/components';
+import { DrawingTile, Stamp, LUNA_IMG } from '@/design/components';
+import { AvatarArt } from '@/design/components/Illustrations';
 import { Rise } from '@/shell/PhaseStage';
 import { ease, dur, durRM } from '@/design/motion';
 import { useSfx } from '@/sound/useSfx';
@@ -27,7 +28,10 @@ export function UnmaskMoment({ view, phone }: MomentProps & { phone?: boolean })
   for (const t of Object.values(r.votes)) counts.set(t, (counts.get(t) || 0) + 1);
   const target = r.revealedId;
   const D = rm ? durRM : dur;
-  const grid = useFitGrid(tiles.length, { gap: 12, reserve: 64 });
+  // OpenAI Decisions API: calibrated imposter odds per player, highest first.
+  const odds = Object.entries(r.detective || {}).sort((a, b) => b[1] - a[1]);
+  // Leave room under the tiles for Inspector Luna's bet.
+  const grid = useFitGrid(tiles.length, { gap: 12, reserve: odds.length ? 96 + 26 * odds.length + 40 : 64 });
 
   useEffect(() => {
     const el = phaseElapsed(view);
@@ -63,6 +67,8 @@ export function UnmaskMoment({ view, phone }: MomentProps & { phone?: boolean })
   }, []);
 
   const stamped = step === 'stamped' || step === 'outcome';
+  const aiRight = odds[0]?.[0] === r.imposterId;
+  const pct = (p: number) => `${Math.round(p * 100)}%`;
   const kind = r.caught ? 'imposter' : target ? 'innocent' : 'escaped';
   const imposterName = view.byId.get(r.imposterId)?.name;
   const outcome = r.caught ? `${view.byId.get(target!)?.name} was the imposter! One chance to steal…`
@@ -74,7 +80,7 @@ export function UnmaskMoment({ view, phone }: MomentProps & { phone?: boolean })
   // so mirror its rule: +100, or +150 when this extends a correct-vote streak.
   const myVote = view.me && view.me.playerId !== r.imposterId ? r.votes[view.me.playerId] : undefined;
   const myStreak = view.me ? view.byId.get(view.me.playerId)?.streak || 0 : 0;
-  const bubble = !myVote ? null : myVote === r.imposterId ? { win: true, text: `+${myStreak >= 1 ? 150 : 100} nice catch!` } : { win: false, text: 'Fooled!' };
+  const bubble = !myVote ? null : myVote === r.imposterId ? { win: true, text: `+${myStreak >= 1 ? 150 : 100} ${r.caught ? 'nice catch!' : 'you were right!'}` } : { win: false, text: 'Fooled!' };
 
   return (
     <div ref={wrap} className={`unmask-wrap ${step === 'stamped' && !rm ? 'unmask-wrap--shake' : ''}`}>
@@ -111,6 +117,23 @@ export function UnmaskMoment({ view, phone }: MomentProps & { phone?: boolean })
         )}
         {step === 'outcome' && (
           <motion.p key="out" className="phase__sub" initial={{ opacity: 0, y: rm ? 0 : 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: D.base, ease: ease.bounce }}>{outcome}</motion.p>
+        )}
+        {step === 'outcome' && odds.length > 0 && (
+          <motion.div key="ai" className="detective" initial={{ opacity: 0, y: rm ? 0 : 10 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: rm ? 0 : 0.6, duration: D.base, ease: ease.bounce }}>
+            <img src={LUNA_IMG} alt="" className="detective__face" />
+            <div className="detective__body">
+              <p className="detective__title">
+                {aiRight ? `Inspector Luna called it: ${imposterName}, ${pct(odds[0][1])}` : `Inspector Luna bet on ${view.byId.get(odds[0][0])?.name} (${pct(odds[0][1])}). Fooled! +100 to ${imposterName}`}
+              </p>
+              {odds.map(([id, p], i) => (
+                <div key={id} className="detective__row">
+                  <span className="detective__name"><AvatarArt avatar={view.byId.get(id)?.avatar || ''} /> {view.byId.get(id)?.name}</span>
+                  <span className="detective__bar"><motion.span className={id === r.imposterId ? 'is-imp' : ''} initial={{ width: rm ? `${p * 100}%` : 0 }} animate={{ width: `${p * 100}%` }} transition={{ delay: rm ? 0 : 0.8 + i * 0.12, duration: rm ? 0 : 0.6, ease: ease.smooth }} /></span>
+                  <span className="detective__pct">{pct(p)}</span>
+                </div>
+              ))}
+            </div>
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

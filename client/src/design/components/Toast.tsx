@@ -1,3 +1,4 @@
+import { CAST } from '@shared/cast';
 import { AvatarArt, AwardArt, StatusIcon } from './Illustrations';
 import { AnimatePresence, motion, useReducedMotion } from 'framer-motion';
 import { createContext, useCallback, useContext, useMemo, useRef, useState, type ReactNode } from 'react';
@@ -33,7 +34,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
         <AnimatePresence>
           {items.map((t) => (
             <motion.div key={t.id} className={`toast toast--${t.kind}`} variants={popVariants(rm)} initial="initial" animate="enter" exit="exit" layout="position" style={{ ['--av-color' as any]: t.color }}>
-              <span className="toast__icon">{t.icon && ['🦊','🐸','🦄','🐙','🐼','🦁','🐧','🐲'].includes(t.icon) ? <AvatarArt avatar={t.icon} /> : t.kind === 'streak' ? <AwardArt kind="flame" /> : <StatusIcon kind={ICON[t.kind]} />}</span>
+              <span className="toast__icon">{t.icon && CAST.some((c) => c.id === t.icon) ? <AvatarArt avatar={t.icon} /> : t.kind === 'streak' ? <AwardArt kind="flame" /> : <StatusIcon kind={ICON[t.kind]} />}</span>
               <span>{t.text}</span>
             </motion.div>
           ))}
