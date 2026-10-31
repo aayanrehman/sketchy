@@ -10,12 +10,14 @@ import './cover.css';
  * a real target next to a real AI recreation with its score and tier, and what the imposter saw.
  */
 export function Cover() {
+  // ?tall: a 1200 × 800 (3:2) version with safe margins, for upload forms that crop to 3:2 (Handshake).
+  const tall = new URLSearchParams(location.search).has('tall');
   const t = targetById('frog-band')!;
   const bot = DEMO_BOTS['frog-band']?.artists[0];
   const score = bot ? matchOf(bot.final) : 82;
   const tier = tierInfo(tierOf(score));
   return (
-    <div className="cover">
+    <div className={`cover ${tall ? 'cover--tall' : ''}`}>
       <div className="cover__sun" />
       <svg className="cover__hills" viewBox="0 0 1200 150" preserveAspectRatio="none" aria-hidden>
         <path d="M0 60 C 300 10 600 30 800 60 S 1100 40 1200 50 L1200 150 L0 150Z" fill="#B9F09A" />

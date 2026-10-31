@@ -28,3 +28,8 @@
 .cover__cast .cover__luna { width: 58px; height: 58px; }
 .cover__vs { font-family: var(--f-display); font-size: 18px; color: var(--c-ink); margin: 0 6px; }
 .cover__luna-label { white-space: nowrap; font-size: 13px; font-weight: 900; line-height: 1.15; color: var(--c-ink); margin-left: 4px; }
+
+/* 3:2 upload version: more sky, wider side margins, art scaled to fit */
+.cover--tall { height: 800px; padding: 70px 80px 120px; grid-template-columns: 500px 1fr; }
+.cover--tall .cover__art { transform: scale(.9); transform-origin: left center; }
+.cover--tall .cover__hills { height: 190px; }

@@ -1,4 +1,4 @@
-/** Screenshots the live /cover route at 1200×630 into client/public/og.png, docs/sketchy-cover.png and video/sketchy-cover-1200x630.png. */
+/** Screenshots the live /cover route at 1200×630 into client/public/og.png, docs/sketchy-cover.png and video/sketchy-cover-1200x630.png, plus a 1200×800 docs/sketchy-cover-3x2.png. */
 import { chromium } from '@playwright/test';
 import fs from 'node:fs/promises';
 const SITE = process.env.SITE || 'https://sketchy-blue.vercel.app';
@@ -6,4 +6,7 @@ const b = await chromium.launch({ channel: 'chrome' }); const p = await b.newPag
 await p.goto(`${SITE}/cover`); await p.locator('.cover__card img').first().waitFor(); await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(1500);
 const png = await p.screenshot({ clip: { x: 0, y: 0, width: 1200, height: 630 } });
 for (const f of ['client/public/og.png', 'docs/sketchy-cover.png', 'video/sketchy-cover-1200x630.png']) await fs.writeFile(f, png);
+// 3:2 version for Handshake's upload field, which crops the wide one.
+await p.setViewportSize({ width: 1200, height: 800 }); await p.goto(`${SITE}/cover?tall`); await p.locator('.cover__card img').first().waitFor(); await p.evaluate(() => document.fonts.ready); await p.waitForTimeout(1500);
+await fs.writeFile('docs/sketchy-cover-3x2.png', await p.screenshot({ clip: { x: 0, y: 0, width: 1200, height: 800 } }));
 await b.close(); console.log('cover written');

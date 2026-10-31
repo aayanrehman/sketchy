@@ -6,9 +6,13 @@
 
 **Project URL:** https://sketchy-blue.vercel.app
 
-**Cover image:** [sketchy-cover.png](sketchy-cover.png) (1200×630). Rendered from the `/cover` route by `scripts/make-cover.ts`; it is also the link-preview image `client/public/og.png`.
+**Cover image:** upload [sketchy-cover-3x2.png](sketchy-cover-3x2.png) (1200×800; Handshake's preview crops to 3:2, which cuts the sides off the wide one). The wide [sketchy-cover.png](sketchy-cover.png) (1200×630) Rendered from the `/cover` route by `scripts/make-cover.ts`; it is also the link-preview image `client/public/og.png`.
 
-**Description:**
+**Description (Handshake's field allows 500 characters; this is 467):**
+
+A party game where you recreate a picture by writing AI prompts, and one of you can't see all of it. Everyone studies the same target; the imposter sees it with the key detail erased and must bluff. Draft, refine, compare the AI images, then vote. An AI judge scores every image and gives a tip, and Inspector Luna, an AI detective, hunts the imposter too. 2–8 players, bots fill empty seats, no login, any phone. Judges: tap "Play solo vs. bots" for a 3-minute game.
+
+**Longer version (for anywhere without a limit):**
 
 Sketchy is a party game for 2 to 8 players where you recreate a picture by writing AI image prompts, and one of you can't see the whole picture.
 
