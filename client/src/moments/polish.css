@@ -44,7 +44,7 @@
 .reel__prompt { font-size: var(--t-body-xs); color: var(--c-text-dim); font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .reel__tag { position: absolute; top: -10px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 11px; padding: 2px 8px; }
 
-/* AI detective (OpenAI Decisions API) odds on the unmask */
+/* Inspector Luna (AI detective) odds on the unmask */
 .detective { display: flex; gap: var(--s-2); align-items: flex-start; max-width: 520px; width: 100%; margin: var(--s-2) auto 0; padding: var(--s-2); background: var(--c-surface); border: 2px solid var(--c-ink); border-radius: 16px; text-align: left; }
 .detective__face { width: 64px; height: 64px; flex: none; object-fit: contain; }
 .detective__body { flex: 1; min-width: 0; display: grid; gap: 4px; }

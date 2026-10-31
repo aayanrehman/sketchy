@@ -4,7 +4,7 @@ import type { Round } from '@shared/types';
 
 export const LUNA_IMG = `/cast/${DETECTIVE.slug}.webp`;
 
-/** Inspector Luna (OpenAI Decisions API) sits at every Prompt-mode table. Shown once a bet is in, so a failed call just means no detective. */
+/** Inspector Luna, the AI detective, sits at every Prompt-mode table. Shown once a bet is in, so a failed call just means no detective. */
 export function LunaChip({ round, phase }: { round: Round; phase: string }) {
   const rm = !!useReducedMotion();
   if (round.mode !== 'prompt' || !round.detectiveIn || !['DISCUSS', 'VOTE'].includes(phase)) return null;

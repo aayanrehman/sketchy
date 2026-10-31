@@ -13,5 +13,5 @@ export const CAST: CastMember[] = [
 ];
 export const castOf = (avatar: string) => CAST.find((c) => c.id === avatar) || CAST[0];
 
-/** The AI detective (OpenAI Decisions API) who sits at every Prompt-mode table. */
+/** The AI detective who sits at every Prompt-mode table. */
 export const DETECTIVE = { id: 'luna', slug: 'luna', name: 'Inspector Luna', role: 'The AI Detective', look: 'a wise round grey owl detective in a deerstalker hat and a little tan trench coat collar, holding a big magnifying glass, a crescent moon pin on the collar, one eye looking through the glass.' };

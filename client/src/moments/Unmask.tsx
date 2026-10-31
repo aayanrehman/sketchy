@@ -28,7 +28,7 @@ export function UnmaskMoment({ view, phone }: MomentProps & { phone?: boolean })
   for (const t of Object.values(r.votes)) counts.set(t, (counts.get(t) || 0) + 1);
   const target = r.revealedId;
   const D = rm ? durRM : dur;
-  // OpenAI Decisions API: calibrated imposter odds per player, highest first.
+  // Inspector Luna's imposter odds per player, highest first.
   const odds = Object.entries(r.detective || {}).sort((a, b) => b[1] - a[1]);
   // Leave room under the tiles for Inspector Luna's bet.
   const grid = useFitGrid(tiles.length, { gap: 12, reserve: odds.length ? 96 + 26 * odds.length + 40 : 64 });

@@ -1,6 +1,7 @@
 import { Mascot } from '@/design/components';
 import { DEMO_BOTS, targetById, matchOf } from '../../../convex/targets';
 import { tierInfo, tierOf } from '@shared/types';
+import { CAST, DETECTIVE } from '@shared/cast';
 import './cover.css';
 
 /**
@@ -25,6 +26,7 @@ export function Cover() {
         <div className="cover__brand"><Mascot mood="happy" size={132} /><h1 className="cover__title gold-text">SKETCHY</h1></div>
         <p className="cover__sub">Recreate the picture with an AI prompt.<br />One of you can’t see all of it. Find them.</p>
         <div className="cover__pills"><span className="cover__pill">2–8 players · bots fill empty seats</span><span className="cover__pill cover__pill--lime">Daily target · streaks · crews</span></div>
+        <div className="cover__cast">{CAST.map((c) => <img key={c.id} src={`/cast/${c.slug}.webp`} alt="" />)}<span className="cover__vs">vs</span><img className="cover__luna" src={`/cast/${DETECTIVE.slug}.webp`} alt="" /><span className="cover__luna-label">Inspector Luna,<br />the AI detective</span></div>
       </div>
       <div className="cover__art" aria-label="A target image, the AI image made from a prompt with its score, and the imposter's erased view">
         <figure className="cover__card cover__card--target"><img src={t.image} alt="The target" /><figcaption>Target</figcaption></figure>

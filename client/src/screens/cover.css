@@ -22,3 +22,9 @@
 .cover__card--imp img { box-shadow: 0 0 0 4px var(--c-red); filter: saturate(.85); }
 .cover__erased { position: absolute; left: 50%; top: 18px; transform: translateX(-50%) rotate(-7deg); padding: 4px 16px; border-radius: 10px; background: var(--c-red); border: 3px solid var(--c-ink); color: var(--c-ink); font-family: var(--f-display); font-weight: 700; font-size: 24px; letter-spacing: .08em; box-shadow: 0 4px 0 var(--c-ink); }
 .cover__card--imp figcaption { color: var(--c-danger-text); }
+
+.cover__cast { display: flex; align-items: center; gap: 2px; margin-top: 14px; }
+.cover__cast img { width: 46px; height: 46px; }
+.cover__cast .cover__luna { width: 58px; height: 58px; }
+.cover__vs { font-family: var(--f-display); font-size: 18px; color: var(--c-ink); margin: 0 6px; }
+.cover__luna-label { white-space: nowrap; font-size: 13px; font-weight: 900; line-height: 1.15; color: var(--c-ink); margin-left: 4px; }

@@ -46,7 +46,7 @@ npm run deploy       # convex deploy (prod) + vercel deploy --prod
 
 The backend is [Convex](https://convex.dev) (`convex/`). The engine (`convex/engine.ts`) is pure TypeScript: one mutation loads room state, calls one method, saves it and carries out the returned effects (timers, AI jobs). Timers are the Convex scheduler with token-based cancellation.
 
-AI runs through fal.ai: `fal-ai/gpt-image-1-mini` for images, GPT-4.1 mini via fal’s vision router for the judge and the hint. Keys live only in Convex environment variables. Without a key the game runs in mock mode with placeholder images and deterministic scores.
+AI runs through fal.ai: `fal-ai/z-image/turbo` for Prompt-mode images (768 px, about 0.3¢ each), GPT-4.1 mini via fal’s vision router for the judge, the hint and Inspector Luna, the AI detective. Keys live only in Convex environment variables. Without a key the game runs in mock mode with placeholder images and deterministic scores.
 
 Convex env (prod): `FAL_KEY`, `AI_MODE=fal`, `LIVE_AI_ENABLED=true`, `AI_DAILY_JOB_LIMIT` (images and judge calls each, default 200), `SITE_URL`.
 

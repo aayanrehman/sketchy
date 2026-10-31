@@ -82,7 +82,7 @@ async function commit(ctx: MutationCtx, roomId: Id<'rooms'>, eng: Engine) {
         break;
       case 'detect':
         // Same pause as the hint so late final images are in.
-        await ctx.scheduler.runAfter(2_500, internal.ai.detect, { roomId, round: fx.round, gameId: fx.gameId, mode: AI_MODE });
+        if (await reserve(ctx, 'judge')) await ctx.scheduler.runAfter(2_500, internal.ai.detect, { roomId, round: fx.round, gameId: fx.gameId, mode: AI_MODE });
         break;
     }
   }
